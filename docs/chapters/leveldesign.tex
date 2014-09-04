@@ -1,0 +1,11 @@
+\chapter{Level design}
+
+As described in the previous chapter, the game will contain several goals, these will be achievable in a certain environment. We will refer to this environment as the level. Achieving the goals will be done by guiding the vikings through the level. The zombies placed in the level will obviously attempt to stop you. The levels will contain predefined zombie locations and zombie spawn locations. Additionally there will be static obstructions to limit both your and the zombies' movement options, these could be walls, buildings or debree.
+
+\section{Interactions}
+
+Besides static objects to obstruct movement, levels will also contain objects with which characters can interact. Light sources may be toggled on or off, doors can be opened and levers may be pulled to trigger some special event. Some objects might even contain an item to drop when a character interacts with it.
+
+\section{Interconnected}
+
+It will be preferred to work out some way to make the levels seem interconnected to increase the feeling that the player is on a longer journey and that these levels are merely steps in it. This could either be achieved by actually maintaining a single large level, this may however affect performance significantly. It is doable however by dividing the level in chunks to be loaded when required. Another option would be to simply reuse part of a preceding level as the starting point for the players' vikings.
