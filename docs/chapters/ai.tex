@@ -1,0 +1,19 @@
+\chapter{AI}
+
+There will be several problems to be solved with artificial intelligence.
+
+\section{Pathfinding}
+
+Vikings will be ordered to move to a new location, and zombies will decide on their own to move to a new location. Since the map contains impassible terrain, both characters should be able to find a route around the obstacles. This can be easily solved with existing algorithms like A*. However, this gets much more complicated when you want to prevent the characters from moving through each other. We will need to find a way to move the characters from A to B in an effective, yet somewhat realistic manner.
+
+Vikings will walk faster in the light, and zombies slow down in the light. This will make the vikings stay more in lit areas. We will not make the vikings pathfinding too smart, the player has to make the right decisions. We will not implement any zombie avoiding elements in the pathfinding algorithm.
+
+\section{Targeting}
+
+A player can order a group of vikings to attack a group of zombies. Which viking will attack which viking is a problem that is relatively easy as long as there are are at least as much zombies as vikings. However, this is rarely the case. The vikings will have to decide which zombie to attack, and when to change target.
+
+When zombies attack a viking, the viking might need to fight back automatically. Decisions about when to start defending, and when to stop fighting (when the zombie flees) will need to be made by the viking itself.
+
+\section{Zombieminds}
+
+The zombies will each have an individual mind. They are in search for viking brains. One of the features of this game is that the zombies become smarter the longer you play. We will achieve this by giving the zombies more advanced skills, like using weapons, mounting motorcycles, pathfinding over a larger area. We will also try to give the zombies smarter minds over time, possibly even anticipating on the player's tactics, for example, at first zombies will follow a viking into an ambush, and later in the game they learn not to follow a viking on their own.
