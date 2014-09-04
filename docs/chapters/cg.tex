@@ -1,17 +1,19 @@
 \chapter{Computer Graphics}
 
-This chapter will explain the computer graphics features this project will contain and shortly evaluate their value to the game, their feasibility and roughly specify their implementation.\\
+This chapter will explain the computer graphics challenges this project will face and shortly evaluate their value to the game, their feasibility and roughly specify their implementation. Challenges are listed in order of importance to the project.
 
-
+\section{Basis}
+The project will use an OpenGL binder for java to render all graphics. We will use external programs to create geometry and textures to form most of the basis for the graphics. The project will require a method to import geometry and textures from external sources. It will need to be able to properly display this geometry with appropriate materials and lighting through the use of OpenGL shaders. All graphics should be rendered efficiently enough to allow real time interaction with the project. 
 
 \section{Lighting}
-As explained in the gameplay and environment design chapters within this document, lighting is an integral part of both the gameplay and the feel of the project and as such lighting information should be communicated to the player in a realistic and preferably aesthetically pleasing fashion.\\
+As explained in the gameplay and level design chapters within this document, lighting is an integral part of both the gameplay and the feel of the project and therefore lighting information should be communicated to the player in a clear, realistic and preferably aesthetically pleasing fashion.
+
 To achieve this the games' graphics code will employ a forward rendering set-up designed to support a fixed number of static and dynamic lights. The lighting will be fragment-based and will be computed in world space, using the Lambertian model for diffuse lighting with specular being a possible extension.
 Although the graphics set-up will heavily focus on lighting, we will not take a deferred approach because of the heavy performance penalty and because our top down view allows us to tightly control the amount of on-screen lights.
 
-Lighting System - Static/Dynamic/frag-based/diffuse/specular
-Shadow System - Shadow Mapping, multiple sources (4/16), possibly soft
-Bloom - lights/fire/contrast
-Efficiency - Possibly many zombies, many fragments
-Reflections - water 
-BumpMapping - bonus round
+\section{Shadows}
+In addition to a solid lighting system, shadows are needed to construct a convincing scene. Shadows add a lot of mood and ambiance to any scene and will hopefully reinforce the intended feeling of dread. We strive to implement multiple shadow casting light sources through a shadow-mapping system, but we will be limited by the performance of our target hardware in determining the details of those shadows.
+
+\section{Miscellaneous}
+Besides these main features, there are a host of features which allow us to improve the aesthetic of the game. Three examples are Bloom, reflections and Bump-Mapping. Bloom could be implemented to give a more powerful feel to lighting and particle systems while Bump Mapping and reflections could increase the overall visual fidelity. These features can be implemented at any time throughout development as an extension and are not integral to the game play. As such, they will not have the main focus.
+
