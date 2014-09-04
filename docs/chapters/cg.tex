@@ -1,0 +1,17 @@
+\chapter{Computer Graphics}
+
+This chapter will explain the computer graphics features this project will contain and shortly evaluate their value to the game, their feasibility and roughly specify their implementation.\\
+
+
+
+\section{Lighting}
+As explained in the gameplay and environment design chapters within this document, lighting is an integral part of both the gameplay and the feel of the project and as such lighting information should be communicated to the player in a realistic and preferably aesthetically pleasing fashion.\\
+To achieve this the games' graphics code will employ a forward rendering set-up designed to support a fixed number of static and dynamic lights. The lighting will be fragment-based and will be computed in world space, using the Lambertian model for diffuse lighting with specular being a possible extension.
+Although the graphics set-up will heavily focus on lighting, we will not take a deferred approach because of the heavy performance penalty and because our top down view allows us to tightly control the amount of on-screen lights.
+
+Lighting System - Static/Dynamic/frag-based/diffuse/specular
+Shadow System - Shadow Mapping, multiple sources (4/16), possibly soft
+Bloom - lights/fire/contrast
+Efficiency - Possibly many zombies, many fragments
+Reflections - water 
+BumpMapping - bonus round
