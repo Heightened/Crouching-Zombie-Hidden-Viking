@@ -1,0 +1,7 @@
+package model.character;
+
+import model.Drawable;
+
+public class Item implements Drawable{
+
+}
