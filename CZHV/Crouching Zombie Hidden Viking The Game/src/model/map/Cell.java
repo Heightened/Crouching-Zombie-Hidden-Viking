@@ -1,15 +1,18 @@
 package model.map;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import model.Container;
-import model.character.Item;
+import model.Item;
 import model.character.Character;
 
 public class Cell {
 	
-	private Container<Item> itemHolder;
-	private Container<Character> characterHolder;
+	private boolean isPassible = true;
+	private Container<Item> itemHolder = new Container<>();
+	private Container<Character> characterHolder = new Container<>();
+	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
 
@@ -20,9 +23,14 @@ public class Cell {
 		this.y   = y;
 	}
 	
+	public void setPassible(boolean isPassible)
+	{
+		this.isPassible = isPassible;
+	}
+	
 	public Collection<Cell> getNeighbours()
 	{
-		return null;
+		return new HashSet<>();
 	}
 	
 	public Container<Item> getItemHolder()
@@ -33,6 +41,11 @@ public class Cell {
 	public Container<Character> getCharacterHolder()
 	{
 		return this.characterHolder;
+	}
+	
+	public Container<Decor> getDecorHolder()
+	{
+		return this.decorHolder;
 	}
 	
 	public boolean isActive() {

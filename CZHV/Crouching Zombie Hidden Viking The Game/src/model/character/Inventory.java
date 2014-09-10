@@ -1,5 +1,7 @@
 package model.character;
 
+import model.Item;
+
 public class Inventory {
 	private ItemSlot[] inventory;
 	
