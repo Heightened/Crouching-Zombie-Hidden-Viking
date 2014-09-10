@@ -28,6 +28,11 @@ public class Cell {
 		this.isPassible = isPassible;
 	}
 	
+	public boolean isPassible()
+	{
+		return this.isPassible && this.characterHolder.isEmpty();
+	}
+	
 	public Collection<Cell> getNeighbours()
 	{
 		return new HashSet<>();
