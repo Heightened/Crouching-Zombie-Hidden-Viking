@@ -1,4 +1,4 @@
-package view.Renderer2D;
+package view.renderer2D;
 
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
