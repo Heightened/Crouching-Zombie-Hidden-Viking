@@ -15,7 +15,7 @@ public class Map
 		this.grid = new Cell[width][height];
 		
 		for(int x=0; x<width; x++)
-			for(int y=0; x<height; y++)
+			for(int y=0; y<height; y++)
 				this.grid[x][y] = new Cell(this, x, y);
 	}
 	
