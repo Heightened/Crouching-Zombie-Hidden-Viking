@@ -76,6 +76,23 @@ public class Map
 		return this.grid[x][y];
 	}
 	
+	public Collection<Cell> getImpassibleCells()
+	{
+		// TODO:
+		// - optimise by caching this
+		// - cache in blocks
+		// - return only blocks that overlap with given area (add parameters like x,y,x2,y2)
+		
+		Collection<Cell> impassibleCells = new HashSet<>();
+		
+		for(int x=0; x<this.grid.length; x++)
+			for(int y=0; x<this.grid[x].length; y++)
+				if(!this.getCell(x,y).isPassible())
+					impassibleCells.add(this.getCell(x,y));
+		
+		return impassibleCells;
+	}
+	
 	public Collection<Cell> getActiveCells()
 	{
 		// TODO:
@@ -88,7 +105,7 @@ public class Map
 		
 		for(int x=0; x<this.grid.length; x++)
 			for(int y=0; x<this.grid[x].length; y++)
-				if(!this.getCell(x,y).isActive())
+				if(this.getCell(x,y).isActive())
 					activeCells.add(this.getCell(x,y));
 		
 		return activeCells;

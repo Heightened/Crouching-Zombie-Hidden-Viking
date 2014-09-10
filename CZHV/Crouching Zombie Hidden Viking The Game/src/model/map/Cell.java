@@ -33,6 +33,16 @@ public class Cell {
 		return this.isPassible && this.characterHolder.isEmpty();
 	}
 	
+	public int getX()
+	{
+		return this.x;
+	}
+	
+	public int getY()
+	{
+		return this.y;
+	}
+	
 	public Collection<Cell> getNeighbours()
 	{
 		return new HashSet<>();
