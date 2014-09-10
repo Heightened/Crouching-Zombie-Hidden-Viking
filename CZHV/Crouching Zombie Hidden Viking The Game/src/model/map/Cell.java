@@ -30,7 +30,7 @@ public class Cell {
 	
 	public boolean isPassible()
 	{
-		return this.isPassible && this.characterHolder.isEmpty();
+		return this.isPassible;
 	}
 	
 	public int getX()
