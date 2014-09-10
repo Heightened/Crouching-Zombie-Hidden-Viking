@@ -1,29 +1,41 @@
 package model.map;
 
-import model.ItemHolder;
+import java.util.Collection;
+
+import model.Container;
 import model.character.Item;
+import model.character.Character;
 
-public class Cell implements ItemHolder {
+public class Cell {
 	
-	private Item item;
-	
-	@Override
-	public Item getItem() {
-		return item;
-	}
+	private Container<Item> itemHolder;
+	private Container<Character> characterHolder;
+	private Map map;
+	private int x,y;
 
-	@Override
-	public void setItem(Item i) {
-		this.item = i;
+	public Cell(Map map, int x, int y)
+	{
+		this.map = map;
+		this.x   = x;
+		this.y   = y;
 	}
 	
-	@Override
-	public void removeItem(){
-		setItem(null);
+	public Collection<Cell> getNeighbours()
+	{
+		return null;
 	}
 	
-	@Override
-	public boolean isEmpty() {
-		return item == null;
+	public Container<Item> getItemHolder()
+	{
+		return this.itemHolder;
+	}
+	
+	public Container<Character> getCharacterHolder()
+	{
+		return this.characterHolder;
+	}
+	
+	public boolean isActive() {
+		return !this.itemHolder.isEmpty() || !this.characterHolder.isEmpty();
 	}
 }
