@@ -33,7 +33,8 @@ public class Map
 			
 			for(int j=0; j<n; j++)
 			{
-				this.getCell(x,y).setPassible(false);
+				if(this.isInGrid(x,y))
+					this.getCell(x,y).setPassible(false);
 				
 				switch(this.randInt(0, 3))
 				{
@@ -71,9 +72,27 @@ public class Map
 		}
 	}
 	
+	public boolean isInGrid(int x, int y)
+	{
+		return x>0 && y>0 && x<this.getWidth() && y<this.getHeight();
+	}
+
+	public int getWidth()
+	{
+		return this.grid.length;
+	}
+
+	public int getHeight()
+	{
+		return this.grid[0].length;
+	}
+
 	public Cell getCell(int x, int y)
 	{
-		return this.grid[x][y];
+		if(this.isInGrid(x, y))
+			return this.grid[x][y];
+		else
+			throw new IllegalArgumentException("Cannot return cell outside of grid");
 	}
 	
 	public Collection<Cell> getImpassibleCells()
