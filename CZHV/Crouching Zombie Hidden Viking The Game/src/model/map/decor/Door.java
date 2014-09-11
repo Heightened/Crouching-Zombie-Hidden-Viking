@@ -1,11 +1,12 @@
-package model;
+package model.map.decor;
 
 import model.character.Character;
 
-public class Item implements Interactable
+public class Door extends Decor
 {
+	@Override
 	public void interact(Character interacter)
 	{
-		// pick up from map?
+		
 	}
 }

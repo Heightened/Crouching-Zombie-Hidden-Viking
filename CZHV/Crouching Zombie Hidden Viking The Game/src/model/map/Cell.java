@@ -6,6 +6,7 @@ import java.util.HashSet;
 import model.Container;
 import model.Item;
 import model.character.Character;
+import model.map.decor.Decor;
 
 public class Cell {
 	
