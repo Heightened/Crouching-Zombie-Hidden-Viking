@@ -54,12 +54,8 @@ public class Map
 			}
 		}
 		
-		for(int x=0; x<getWidth(); x++)
-			for(int y=0; y<getHeight(); y++)
-				 System.out.println(grid[x][y].isPassible());
+		int nZombies = this.randInt(size/600, size/300);
 		
-		int nZombies = this.randInt(size/200, size/100);
-		nZombies = 1;
 		for(int i=0; i<nZombies; i++)
 		{
 			int x,y;
@@ -68,7 +64,6 @@ public class Map
 			{
 				x = this.randInt(0, this.getWidth() - 1);
 				y = this.randInt(0, this.getHeight() - 1);
-				System.out.println("asdfasdf");
 			}
 			while(!this.getCell(x, y).isPassible());
 			
