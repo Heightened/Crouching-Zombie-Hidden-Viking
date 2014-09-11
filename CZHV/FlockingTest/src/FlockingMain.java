@@ -15,8 +15,8 @@ public class FlockingMain {
 	public FlockingMain(){
 		grid = new Grid(20,20);
 		vlist = new ArrayList<>();
-		for (int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
+		for (int i = 0; i < 20; i++){
+			for (int j = 0; j < 20; j++){
 				vlist.add(new Vehicle(20*i,20*j));
 			}
 		}
@@ -32,8 +32,11 @@ public class FlockingMain {
 		loop();
 	}
 
+	int framecounter = 0;
+	long time = 0;
 	public void loop(){
 		while(true){
+			framecounter++;
 			try{
 				Thread.sleep(1);
 			} catch(Exception e){
@@ -42,6 +45,12 @@ public class FlockingMain {
 			for (Vehicle v : vlist){
 				v.update(this, grid);
 				v.update(this, grid);
+			}
+			if (framecounter == 100){
+				framecounter = 0;
+				time = System.nanoTime() - time;
+				System.out.println("AVG MS " + time/100/1000000f);
+				time = System.nanoTime();
 			}
 			grid.reset();
 			for (Vehicle v : vlist){

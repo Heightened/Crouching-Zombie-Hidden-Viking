@@ -1,5 +1,7 @@
 import javax.swing.JFrame;
 
+import org.omg.CORBA.FREE_MEM;
+
 
 public class Vehicle {
 	Vector2f steering;
@@ -31,7 +33,8 @@ public class Vehicle {
 		target.x = DrawPanel.mousex;
 		target.y = DrawPanel.mousey;
 
-		clearSteeringForce();
+		steering.x = 0;
+		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
 			for (int y = gridy - 1; y < gridy+2; y++ ){
 				Vehicle[] tempv = grid.getArray(x, y);
@@ -39,7 +42,9 @@ public class Vehicle {
 				for (int i = 0; i < size; i++){
 					Vehicle v = tempv[i];
 					if (v != null && v != this){
-						addSteeringForce(evade(v, 30),4f);
+						Vector2f vec = fleeTarget(v.position, 30);//all performance issues here
+						steering.x += vec.x*4f;
+						steering.y += vec.y*4f;
 					}
 				}
 			}
@@ -119,26 +124,39 @@ public class Vehicle {
 		return tempsteering;
 	}
 
+	public Vector2f correction = new Vector2f(0,0);
+	//OPTIMIZED AND UGLY
 	public Vector2f fleeTarget(Vector2f target, float fleeRadius){
-		targetVelocity.x = position.x - target.x;
-		targetVelocity.y = position.y - target.y;
+		targetVelocity.x = target.x - position.x;
+		targetVelocity.y = target.y - position.y;
 		
-		float distance = targetVelocity.getLength();
-		
-		Vector2f correction = new Vector2f(targetVelocity.x, targetVelocity.y);
-		correction.normalize();
-		correction.scale(fleeRadius);
-		targetVelocity.x =  targetVelocity.x - correction.x;
-		targetVelocity.y = targetVelocity.y - correction.y;
+		//compute length of targetVelocity
+		float number = targetVelocity.x*targetVelocity.x + targetVelocity.y*targetVelocity.y;
+		float xhalf = 0.5f*number;
+	    int i = Float.floatToIntBits(number);
+	    i = 0x5f3759df - (i>>1);
+	    number = Float.intBitsToFloat(i);
+	    number = number*(1.5f - xhalf*number*number);
+	    float distance = 1/number;
+	    //end compute length
 
-		float factor = targetVelocity.getLength();
+	    float factor = fleeRadius - distance;
+	    
+	    targetVelocity.x = targetVelocity.x/distance*factor;
+	    targetVelocity.y = targetVelocity.y/distance*factor;
+	    
 
 		if (distance < fleeRadius){
-			targetVelocity.normalize();
-			targetVelocity.scale(max_speed);
-			targetVelocity.scale(factor/fleeRadius);
-			targetVelocity.truncate(max_speed);
-			targetVelocity.invert();
+			targetVelocity.x/=factor;
+			targetVelocity.y/=factor;
+			targetVelocity.x*= max_speed;
+			targetVelocity.y*= max_speed;
+			targetVelocity.x*=factor/fleeRadius;
+			targetVelocity.y*=factor/fleeRadius;
+			targetVelocity.x*= max_speed;
+			targetVelocity.y*= max_speed;
+			targetVelocity.x*=-1;
+			targetVelocity.y*=-1;
 		}else{
 			targetVelocity.x = velocity.x;
 			targetVelocity.y = velocity.y;
