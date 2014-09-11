@@ -22,24 +22,30 @@ public class Vehicle {
 		velocity = new Vector2f(0,0);
 	}
 
-	float time = 0;
 	float targetSlowRadius = 100;
-	public void update(FlockingMain main){
+	Vector2f center = new Vector2f(250,250);
+	public void update(FlockingMain main, Grid grid){
 		gridx = (int)(position.x/32);
 		gridy = (int)(position.y/32);
 		
-		target = new Vector2f(DrawPanel.mousex,DrawPanel.mousey);
+		target.x = DrawPanel.mousex;
+		target.y = DrawPanel.mousey;
 
 		clearSteeringForce();
-		for (Vehicle v : main.vlist){
-			if (Math.abs(v.gridx - gridx + v.gridy - gridy) < 2 ){
-				if (v != this){
-					addSteeringForce(evade(v, 30),4f);
+		for (int x = gridx - 1; x < gridx+2; x++ ){
+			for (int y = gridy - 1; y < gridy+2; y++ ){
+				Vehicle[] tempv = grid.getArray(x, y);
+				int size = grid.getSize(x, y);
+				for (int i = 0; i < size; i++){
+					Vehicle v = tempv[i];
+					if (v != null && v != this){
+						addSteeringForce(evade(v, 30),4f);
+					}
 				}
 			}
 		}
 		addSteeringForce( seekTarget(target, 100), 5);
-	    addSteeringForce( fleeTarget(new Vector2f(250,250), targetSlowRadius), 10);
+	    addSteeringForce( fleeTarget(center, targetSlowRadius), 10);
 
 		steering.truncate(max_force);
 		steering.scale(1/mass);
@@ -53,6 +59,12 @@ public class Vehicle {
 		position.y += velocity.y;
 		position.x %= 500;
 		position.y %= 500;
+		if (position.x < 0){
+			position.x += 500;
+		}
+		if (position.y < 0){
+			position.y += 500;
+		}
 	}
 	
 	public void clearSteeringForce(){
@@ -69,22 +81,25 @@ public class Vehicle {
 		return new Vector2f(position.x + velocity.x*time, position.y + velocity.y*time);
 	}
 
+	Vector2f temp = new Vector2f(0,0);
 	public Vector2f pursuit(Vehicle target){
-		Vector2f temp = new Vector2f(target.position.x - position.x,target.position.y - position.y);
+		temp.x = target.position.x - position.x;
+		temp.y = target.position.y - position.y;
 		float distance = temp.getLength();
 		float temp2 = distance/max_speed;
 		return seekTarget(target.getFuturePosition(temp2), 0);
 	}
 	
 	public Vector2f evade(Vehicle target, float radius){
-		Vector2f temp = new Vector2f(target.position.x - position.x,target.position.y - position.y);
+		temp.x = target.position.x - position.x;
+		temp.y = target.position.y - position.y;
 		float distance = temp.getLength();
 		float temp2 = distance/max_speed/8;
 		return fleeTarget(target.getFuturePosition(temp2), radius);
 	}
 
+	Vector2f tempsteering = new Vector2f(0,0);
 	public Vector2f seekTarget(Vector2f target, float slowRadius){
-		Vector2f steering = new Vector2f(0,0);
 		targetVelocity.x = target.x - position.x;
 		targetVelocity.y = target.y - position.y;
 
@@ -99,13 +114,12 @@ public class Vehicle {
 			targetVelocity.scale(max_speed);
 		}
 
-		steering.x = targetVelocity.x - velocity.x;
-		steering.y = targetVelocity.y - velocity.y;
-		return steering;
+		tempsteering.x = targetVelocity.x - velocity.x;
+		tempsteering.y = targetVelocity.y - velocity.y;
+		return tempsteering;
 	}
 
 	public Vector2f fleeTarget(Vector2f target, float fleeRadius){
-		Vector2f steering = new Vector2f(0,0);
 		targetVelocity.x = position.x - target.x;
 		targetVelocity.y = position.y - target.y;
 		
@@ -130,8 +144,8 @@ public class Vehicle {
 			targetVelocity.y = velocity.y;
 		}
 
-		steering.x = targetVelocity.x - velocity.x;
-		steering.y = targetVelocity.y - velocity.y;
-		return steering;
+		tempsteering.x = targetVelocity.x - velocity.x;
+		tempsteering.y = targetVelocity.y - velocity.y;
+		return tempsteering;
 	}
 }

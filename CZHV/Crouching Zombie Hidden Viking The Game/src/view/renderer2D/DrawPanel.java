@@ -46,6 +46,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		solidCells = c;
 	}
 	
+	float distance = 0;
 	@Override
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
@@ -61,7 +62,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		drawGrid(g2);
+		drawSolid(g2, 0, 0);
 		g2.drawImage(lightmap,-viewPosition.x%cellSize-cellSize,-viewPosition.y%cellSize-cellSize,256*cellSize,128*cellSize,null);
+		distance += 0.2;
+		distance %= 8;
+		drawCharacter(g2,Color.yellow, 0, 0, -distance, Math.PI*1.75);
 	}
 	
 	public Point getViewPosition(){
@@ -91,6 +96,13 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		drawOval(g2, c, cellToWorldSpace(cellx, celly));
 	}
 	
+	public void drawCharacter(Graphics2D g2, Color c, int cellx, int celly, float distance, double radians){
+		Point pos = cellToWorldSpace(cellx, celly);
+		pos.x += (float)(Math.cos(radians)*distance);
+		pos.y += (float)(Math.sin(radians)*distance);
+		drawOval(g2, c, pos, cellSize);
+	}
+	
 	public Point cellToWorldSpace(int cellx, int celly){
 		return new Point(cellx*cellSize - viewPosition.x, celly*cellSize - viewPosition.y);
 	}
@@ -102,6 +114,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	public void drawOval(Graphics2D g2, Color c, Point position){
 		g2.setColor(c);
 		g2.fillOval(position.x-cellSize, position.y-cellSize, cellSize*3, cellSize*3);
+	}
+	
+	public void drawOval(Graphics2D g2, Color c, Point position, int radius){
+		g2.setColor(c);
+		g2.fillOval(position.x-radius/2+cellSize/2, position.y-radius/2+cellSize/2, radius, radius);
 	}
 	
 	private Color gridColor = new Color(0.3f,0.3f,0.3f,0.5f);

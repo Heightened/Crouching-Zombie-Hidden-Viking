@@ -6,16 +6,18 @@ import javax.swing.JFrame;
 public class FlockingMain {
 	JFrame frame;
 	DrawPanel panel;
+	Grid grid;
 	public static void main(String[] args){
 		FlockingMain m = new FlockingMain();
 	}
 
 	ArrayList<Vehicle> vlist;	
 	public FlockingMain(){
+		grid = new Grid(20,20);
 		vlist = new ArrayList<>();
 		for (int i = 0; i < 10; i++){
 			for (int j = 0; j < 10; j++){
-				vlist.add(new Vehicle(80*i,80*j));
+				vlist.add(new Vehicle(20*i,20*j));
 			}
 		}
 		
@@ -38,8 +40,12 @@ public class FlockingMain {
 				e.printStackTrace();
 			}
 			for (Vehicle v : vlist){
-				v.update(this);
-				v.update(this);
+				v.update(this, grid);
+				v.update(this, grid);
+			}
+			grid.reset();
+			for (Vehicle v : vlist){
+				grid.addVehicle(v);
 			}
 			panel.repaint();
 		}
