@@ -8,14 +8,16 @@ public class Character {
 	private int currentHp = 0;
 	private int strength = 0;
 	private int speed = 0;
+	private boolean infected;
 	
 	public Character(){	}
 	
-	public Character(int maxHp, int strength, int speed, int inventory_size){
+	public Character(int maxHp, int strength, int speed, int inventory_size, boolean infected){
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setSpeed(speed);
 		setBag(new Inventory(inventory_size));
+		setInfected(infected);
 		currentHp = maxHp;
 	}
 	
@@ -68,5 +70,13 @@ public class Character {
 	
 	public boolean isDead(){
 		return getCurrentHp()<=0;
+	}
+
+	public boolean isInfected() {
+		return infected;
+	}
+
+	public void setInfected(boolean infected) {
+		this.infected = infected;
 	}
 }
