@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 
 public class DrawPanel extends JPanel implements MouseMotionListener{
+	
 	JFrame frame;
 	ArrayList<Vehicle> vlist;
 	public DrawPanel(JFrame frame, ArrayList<Vehicle> vlist){
