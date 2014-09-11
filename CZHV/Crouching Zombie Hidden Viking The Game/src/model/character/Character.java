@@ -9,6 +9,7 @@ public class Character {
 	private int strength = 0;
 	private int speed = 0;
 	
+	public Character(){	}
 	
 	public Character(int maxHp, int strength, int speed, int inventory_size){
 		setMaxHp(maxHp);
