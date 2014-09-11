@@ -9,4 +9,9 @@ public class Door extends Decor
 	{
 		
 	}
+	
+	public boolean isPassible()
+	{
+		return true;
+	}
 }
