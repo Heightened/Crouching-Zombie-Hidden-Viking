@@ -6,10 +6,11 @@ import java.util.HashSet;
 import model.Container;
 import model.Item;
 import model.character.Character;
+import model.map.decor.Decor;
 
 public class Cell {
 	
-	private boolean isPassible = true;
+	private boolean isPassible = true; // should be taken over by decor later;
 	private Container<Item> itemHolder = new Container<>();
 	private Container<Character> characterHolder = new Container<>();
 	private Container<Decor> decorHolder = new Container<>();
@@ -23,14 +24,23 @@ public class Cell {
 		this.y   = y;
 	}
 	
+	// should be taken over by decor later
 	public void setPassible(boolean isPassible)
 	{
 		this.isPassible = isPassible;
 	}
 	
+	// returns false only if permanently impassible
 	public boolean isPassible()
 	{
-		return this.isPassible;
+		return this.isPassible && (this.decorHolder.isEmpty() || this.decorHolder.getItem().isPassible());
+	}
+	
+	// returns false even if temporarily impassible
+	public boolean isFree(Character c)
+	{
+		return this.isPassible()
+				&& this.characterHolder.isEmpty();
 	}
 	
 	public int getX()
