@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 public class VBO {
 	public static final int STATIC_DRAW = ARBVertexBufferObject.GL_STATIC_DRAW_ARB;
@@ -50,6 +51,10 @@ public class VBO {
 	public void draw(){
 		classInv();
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertCount);
+	}
+	
+	public void deAllocate(){
+		ARBVertexBufferObject.glDeleteBuffersARB(index);
 	}
 
 	public void classInv(){
