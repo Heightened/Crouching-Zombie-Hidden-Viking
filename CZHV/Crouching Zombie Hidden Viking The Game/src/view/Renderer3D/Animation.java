@@ -1,4 +1,4 @@
-package view.Renderer3D;
+package view.renderer3D;
 
 public class Animation {
 	
