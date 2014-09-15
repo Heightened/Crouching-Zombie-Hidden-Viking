@@ -7,19 +7,19 @@ public class Vehicle {
 	Vector2f steering;
 	Vector2f velocity;
 	Vector2f targetVelocity;
-	float max_speed = 5;
-	float max_force = 1;
-	float mass = 6;
+	final float max_speed = 5;//final for performance
+	final float max_force = 1;
+	final float mass = 6;
 	Vector2f position;
 	Vector2f target;
 	
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(float posx, float posy){
+	public Vehicle(float posx, float posy, Vector2f target){
 		position = new Vector2f(posx, posy);
 		steering = new Vector2f(0,0);
-		target = new Vector2f(0,0);
+		this.target = target;
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
 	}
@@ -27,11 +27,8 @@ public class Vehicle {
 	float targetSlowRadius = 100;
 	Vector2f center = new Vector2f(250,250);
 	public void update(FlockingMain main, Grid grid){
-		gridx = (int)(position.x/32);
-		gridy = (int)(position.y/32);
-		
-		target.x = DrawPanel.mousex;
-		target.y = DrawPanel.mousey;
+		gridx = (int)(position.x/FlockingMain.GRID_CELL_SIZE);
+		gridy = (int)(position.y/FlockingMain.GRID_CELL_SIZE);
 
 		steering.x = 0;
 		steering.y = 0;
@@ -41,7 +38,7 @@ public class Vehicle {
 				int size = grid.getSize(x, y);
 				for (int i = 0; i < size; i++){
 					Vehicle v = tempv[i];
-					if (v != null && v != this){
+					if (v != this){
 						Vector2f vec = fleeTarget(v.position, 30);//all performance issues here
 						steering.x += vec.x*4f;
 						steering.y += vec.y*4f;
@@ -62,13 +59,13 @@ public class Vehicle {
 
 		position.x += velocity.x;
 		position.y += velocity.y;
-		position.x %= 500;
-		position.y %= 500;
+		position.x %= FlockingMain.screenSize.width;
+		position.y %= FlockingMain.screenSize.height;
 		if (position.x < 0){
-			position.x += 500;
+			position.x += FlockingMain.screenSize.width;
 		}
 		if (position.y < 0){
-			position.y += 500;
+			position.y += FlockingMain.screenSize.height;
 		}
 	}
 	
@@ -127,43 +124,44 @@ public class Vehicle {
 	public Vector2f correction = new Vector2f(0,0);
 	//OPTIMIZED AND UGLY
 	public Vector2f fleeTarget(Vector2f target, float fleeRadius){
-		targetVelocity.x = target.x - position.x;
-		targetVelocity.y = target.y - position.y;
+		float targetvx = target.x - position.x;//local float faster than shared vertex
+		float targetvy = target.y - position.y;
 		
 		//compute length of targetVelocity
-		float number = targetVelocity.x*targetVelocity.x + targetVelocity.y*targetVelocity.y;
+		float number = targetvx*targetvx + targetvy*targetvy;//faster than math.pow
+		//magic starts here
 		float xhalf = 0.5f*number;
 	    int i = Float.floatToIntBits(number);
 	    i = 0x5f3759df - (i>>1);
 	    number = Float.intBitsToFloat(i);
 	    number = number*(1.5f - xhalf*number*number);
-	    float distance = 1/number;
+	    float distance = 1/number;//faster than math.sqrt
 	    //end compute length
 
 	    float factor = fleeRadius - distance;
 	    
-	    targetVelocity.x = targetVelocity.x/distance*factor;
-	    targetVelocity.y = targetVelocity.y/distance*factor;
+	    targetvx = targetvx/distance*factor;
+	    targetvy = targetvy/distance*factor;
 	    
-
+	    
 		if (distance < fleeRadius){
-			targetVelocity.x/=factor;
-			targetVelocity.y/=factor;
-			targetVelocity.x*= max_speed;
-			targetVelocity.y*= max_speed;
-			targetVelocity.x*=factor/fleeRadius;
-			targetVelocity.y*=factor/fleeRadius;
-			targetVelocity.x*= max_speed;
-			targetVelocity.y*= max_speed;
-			targetVelocity.x*=-1;
-			targetVelocity.y*=-1;
+			targetvx/=factor;
+			targetvy/=factor;
+			targetvx*= max_speed;
+			targetvy*= max_speed;
+			targetvx*=factor/fleeRadius;
+			targetvy*=factor/fleeRadius;
+			targetvx*= max_speed;
+			targetvy*= max_speed;
+			targetvx*=-1;
+			targetvy*=-1;
 		}else{
-			targetVelocity.x = velocity.x;
-			targetVelocity.y = velocity.y;
+			targetvx = velocity.x;
+			targetvy = velocity.y;
 		}
 
-		tempsteering.x = targetVelocity.x - velocity.x;
-		tempsteering.y = targetVelocity.y - velocity.y;
+		tempsteering.x = targetvx - velocity.x;
+		tempsteering.y = targetvy - velocity.y;
 		return tempsteering;
 	}
 }

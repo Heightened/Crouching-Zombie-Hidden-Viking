@@ -12,14 +12,16 @@ public class Character {
 	private int strength = 0;
 	private int speed = 0;
 	private Map<Skill, Boolean> skills = new HashMap<>();
+	private boolean infected;
 	
 	public Character(){	}
 	
-	public Character(int maxHp, int strength, int speed, int inventory_size){
+	public Character(int maxHp, int strength, int speed, int inventory_size, boolean infected){
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setSpeed(speed);
 		setBag(new Inventory(inventory_size));
+		setInfected(infected);
 		currentHp = maxHp;
 		
 		this.skills.put(Skill.OPEN_DOOR, true);
@@ -82,6 +84,13 @@ public class Character {
 	}
 	
 	public enum Skill
+
+	public boolean isInfected() {
+		return infected;
+	}
+
+	public void setInfected(boolean infected) {
+		this.infected = infected;
 	{
 		OPEN_DOOR;
 	}
