@@ -1,5 +1,8 @@
 package model.character;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Character {
 	
 	private Inventory bag;
@@ -8,6 +11,7 @@ public class Character {
 	private int currentHp = 0;
 	private int strength = 0;
 	private int speed = 0;
+	private Map<Skill, Boolean> skills = new HashMap<>();
 	
 	public Character(){	}
 	
@@ -17,6 +21,8 @@ public class Character {
 		setSpeed(speed);
 		setBag(new Inventory(inventory_size));
 		currentHp = maxHp;
+		
+		this.skills.put(Skill.OPEN_DOOR, true);
 	}
 	
 	public Inventory getBag() {
@@ -68,5 +74,15 @@ public class Character {
 	
 	public boolean isDead(){
 		return getCurrentHp()<=0;
+	}
+	
+	public boolean hasSkill(Skill skill)
+	{
+		return this.skills.containsValue(skill) && this.skills.get(skill);
+	}
+	
+	public enum Skill
+	{
+		OPEN_DOOR;
 	}
 }

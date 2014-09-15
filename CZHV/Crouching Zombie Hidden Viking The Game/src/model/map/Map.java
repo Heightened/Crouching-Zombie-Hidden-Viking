@@ -94,6 +94,18 @@ public class Map
 			throw new IllegalArgumentException("Cannot return cell outside of grid");
 	}
 	
+	public Collection<Cell> getNearbyCells(int x, int y, int r)
+	{
+		Collection<Cell> nearbyCells = new HashSet<>();
+		
+		for(int xi=x-r; xi<=x+r; xi++)
+			for(int yi=y-r; yi<=y+r; yi++)
+				if(Math.pow(xi-x,0) + Math.pow(yi-y,2) < r*r)
+					nearbyCells.add(this.getCell(xi,yi));
+		
+		return nearbyCells;
+	}
+	
 	public Collection<Cell> getImpassibleCells()
 	{
 		// TODO:
