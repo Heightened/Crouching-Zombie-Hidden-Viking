@@ -1,3 +1,5 @@
+#version 330
+
 varying vec3 normal;
 varying vec2 texture_coordinate;
 

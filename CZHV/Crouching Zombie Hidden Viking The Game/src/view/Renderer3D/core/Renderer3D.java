@@ -5,10 +5,12 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -21,7 +23,7 @@ public class Renderer3D {
 	private ShaderObject shader;
 	public Renderer3D(){
 		setupDisplay();
-		camera = new Camera();
+		camera = new Camera(viewMatrix);
 		testVBO = new VBO(VBO.STATIC_DRAW);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*3);//8 floats per vert, 3 verts
 		int scale = 1;
@@ -57,6 +59,7 @@ public class Renderer3D {
 		shader.link();
 		shader.bind();
 		shader.findUniforms();
+		shader.findAttributes();
 		shader.unbind();
 	}
 
@@ -77,9 +80,6 @@ public class Renderer3D {
 		
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		
-
-		GL11.glColor4f(1, 1, 1, 1);
 
 		
 		currentTime += 0.001f;
@@ -91,10 +91,12 @@ public class Renderer3D {
 		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,currentTime*1000,0), modelmat);
 		FloatBuffer b = BufferUtils.createFloatBuffer(16);
 		shader.putMat4("modelMatrix", MatrixCZHV.MatrixToBuffer(modelmat, b));
+		shader.putMat4("viewMatrix", viewMatrix);
+		shader.putMat4("projectionMatrix", projectionMatrix);
 		
 		
         testVBO.bind();
-        testVBO.prepareForDraw();
+        testVBO.prepareForDraw(shader);
         testVBO.draw();
         testVBO.unbind();
         
@@ -113,10 +115,16 @@ public class Renderer3D {
 
 	}
 
+	public FloatBuffer projectionMatrix;
+	public FloatBuffer viewMatrix;
 	public final void setupDisplay(){
+		PixelFormat pixelFormat = new PixelFormat();
+		ContextAttribs contextAtrributes = new ContextAttribs(3, 3)
+		.withForwardCompatible(true)
+		.withProfileCore(true);
 		try{
 			Display.setDisplayMode(new DisplayMode(1024, 720));
-			Display.create();
+			Display.create(pixelFormat, contextAtrributes);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -130,9 +138,23 @@ public class Renderer3D {
 		float near_plane = 0.05f;
 		float far_plane = 300;
 
-		GL11.glMatrixMode(GL11.GL_PROJECTION);
-		GLU.gluPerspective(fieldOfView, aspect, near_plane,far_plane);
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        float y_scale = 1/(float)Math.tan(Math.toRadians(fieldOfView / 2f));
+        float x_scale = y_scale / aspectRatio;
+        float frustum_length = far_plane - near_plane;
+		
+		Matrix4f projmat = new Matrix4f();
+		
+		projmat.m00 = x_scale;
+		projmat.m11 = y_scale;
+		projmat.m22 = -((far_plane + near_plane) / frustum_length);
+		projmat.m23 = -1;
+		projmat.m32 = -((2 * near_plane * far_plane) / frustum_length);
+		projmat.m33 = 0;   
+
+		viewMatrix = BufferUtils.createFloatBuffer(16);
+		projectionMatrix = BufferUtils.createFloatBuffer(16);
+		projmat.store(projectionMatrix);
+		projectionMatrix.flip();
 		
 		try{
 			Mouse.create();
@@ -141,16 +163,14 @@ public class Renderer3D {
 			e.printStackTrace();
 		}
 
-        GL11.glShadeModel(GL11.GL_SMOOTH);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);		
         
         //enable fixed pipeline bindings for VBO
-        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-        //GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-        GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-        GL11.glEnableClientState( GL11.GL_TEXTURE_COORD_ARRAY);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
+        
+		TOOLBOX.checkGLERROR(true);
 	}
 
 	public static void main(String[] args){
