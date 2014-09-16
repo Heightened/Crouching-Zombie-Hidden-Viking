@@ -84,6 +84,9 @@ public class Character {
 	}
 	
 	public enum Skill
+	{
+		OPEN_DOOR;
+	}
 
 	public boolean isInfected() {
 		return infected;
@@ -91,7 +94,5 @@ public class Character {
 
 	public void setInfected(boolean infected) {
 		this.infected = infected;
-	{
-		OPEN_DOOR;
 	}
 }
