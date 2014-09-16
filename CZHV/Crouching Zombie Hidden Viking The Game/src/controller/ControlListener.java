@@ -1,5 +1,5 @@
 package controller;
 
-public class ControlListener {
-	
+public interface ControlListener {
+	public void input(String key);
 }

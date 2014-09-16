@@ -2,7 +2,7 @@ package steering;
 
 
 public class SteeringManager {
-	private Vector3D steer;
+	private Vector steer;
 	private Steerable host;
 	
 	public SteeringManager(Steerable host){
@@ -11,11 +11,11 @@ public class SteeringManager {
 	}
 	
 	
-	public void seek(Vector3D targetPos, int slowRadius){
+	public void seek(Vector targetPos, int slowRadius){
 		//steer+seek;
 	}
 	
-	public void flee(Vector3D targetPos){
+	public void flee(Vector targetPos){
 		//steer+flee();
 	}
 	
@@ -23,11 +23,11 @@ public class SteeringManager {
 		//steer+wander();
 	}
 	
-	public void evade(Vector3D targetPos){
+	public void evade(Vector targetPos){
 		//steer+evade();
 	}
 	
-	public void pursuit(Vector3D targetPos){
+	public void pursuit(Vector targetPos){
 		//steer+pursuit();
 	}
 	
@@ -36,7 +36,7 @@ public class SteeringManager {
 	}
 	
 	public void reset(){
-		this.setSteer(new Vector3D(0,0,0));
+		this.setSteer(new Vector(0,0,0));
 	}
 	
 	public Steerable getHost() {
@@ -47,11 +47,11 @@ public class SteeringManager {
 		this.host = host;
 	}
 
-	public Vector3D getSteer() {
+	public Vector getSteer() {
 		return steer;
 	}
 
-	public void setSteer(Vector3D steer) {
+	public void setSteer(Vector steer) {
 		this.steer = steer;
 	}
 	

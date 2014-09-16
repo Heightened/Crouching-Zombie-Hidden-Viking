@@ -9,11 +9,16 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
+
+import view.renderer3D.inputoutput.FileToString;
 
 public class Renderer3D {
 	private Camera camera;
 	private VBO testVBO;
-	private Texture2D tex;
+	private TextureObject tex;
+	private ShaderObject shader;
 	public Renderer3D(){
 		setupDisplay();
 		camera = new Camera();
@@ -38,12 +43,27 @@ public class Renderer3D {
 		testVBO.put(buffer);
 		testVBO.unbind();
 		
-		tex = new Texture2D("tex.png");
+		tex = new TextureObject("tex.png");
+		tex.setup();
+		tex.setMINMAG(GL11.GL_LINEAR);
+		tex.setWRAPST(GL11.GL_REPEAT);
+		tex.unbind();
+		
+		shader = new ShaderObject("test shader");
+		shader.addVertexSource(FileToString.read("test.vert"));
+		shader.addFragmentSource(FileToString.read("test.frag"));
+		shader.compileVertex();
+		shader.compileFragment();
+		shader.link();
+		shader.bind();
+		shader.findUniforms();
+		shader.unbind();
 	}
 
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
+	float currentTime = 0;
 	public void update(){
 		framecounter++;
 		if (framecounter == 100){
@@ -60,13 +80,25 @@ public class Renderer3D {
 		
 
 		GL11.glColor4f(1, 1, 1, 1);
+
 		
-		tex.bind();
+		currentTime += 0.001f;
+		
+		shader.bind();
+		shader.putUnifFloat("time", currentTime);
+		shader.bindTexture("texture", tex);
+		Matrix4f modelmat = new Matrix4f();
+		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,currentTime*1000,0), modelmat);
+		FloatBuffer b = BufferUtils.createFloatBuffer(16);
+		shader.putMat4("modelMatrix", MatrixCZHV.MatrixToBuffer(modelmat, b));
+		
 		
         testVBO.bind();
         testVBO.prepareForDraw();
         testVBO.draw();
         testVBO.unbind();
+        
+        shader.unbind();
 
 		TOOLBOX.checkGLERROR(true);
 		Display.update();
