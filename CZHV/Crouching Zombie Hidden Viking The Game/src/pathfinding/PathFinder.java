@@ -5,7 +5,7 @@ import model.character.Character;
 
 public abstract class PathFinder
 {
-	// Everything outside of radius from the starting point
+	
 	private int radius;
 	private Map map;
 	private Character character;

@@ -15,6 +15,7 @@ public class PathFindingMap
 	public PathFindingMap(Collection<Cell> cells, Character character)
 	{
 		this.grid = new HashMap<Integer, Map<Integer, CellType>>();
+		this.character = character;
 		
 		for(Cell c : cells)
 		{
@@ -22,7 +23,7 @@ public class PathFindingMap
 		}
 	}
 	
-	protected void addCell(Cell c)
+	public void addCell(Cell c)
 	{
 		if(!this.grid.containsValue(c.getX()))
 			this.grid.put(c.getX(), new HashMap<Integer, CellType>());
@@ -34,6 +35,14 @@ public class PathFindingMap
 			value = CellType.IMPASSIBLE;
 		
 		this.grid.get(c.getX()).put(c.getY(), value);
+	}
+	
+	public void addAll(Collection<Cell> cells)
+	{
+		for(Cell c : cells)
+		{
+			this.addCell(c);
+		}
 	}
 	
 	public CellType getCellType(int x, int y)

@@ -1,21 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package Graphics.Resources.Terrain.Byte.Collision.Astar;
+package pathfinding;
 
-import Graphics.Resources.Resources;
-import Graphics.Resources.Terrain.Byte.ByteMap;
-import Graphics.Resources.Terrain.Byte.Nodes.LocationInNode;
 import java.util.ArrayList;
-import org.lwjgl.util.vector.Vector3f;
+import util.SortedList;
 
 /**
  *
  * @author Vouwfietsman
  */
-public class Node implements Comparable{
-    float path_length = 0;
+public class Node implements Comparable<Node>
+{
+	float path_length = 0;
     float heuristicscore = 0;
     
     boolean solid = false;
@@ -23,7 +17,7 @@ public class Node implements Comparable{
     int x = 0;
     int y = 0;
     
-    public SortedList neighbours;
+    public SortedList<Node> neighbours;
     Node camefrom;
     
     
@@ -32,7 +26,7 @@ public class Node implements Comparable{
         this.y = y;
         heuristicscore = 100000;
         path_length = 100000;
-        neighbours = new SortedList();
+        neighbours = new SortedList<>();
     }
     
     public Node(Node n){
@@ -87,7 +81,7 @@ public class Node implements Comparable{
     }
     
     private boolean hasNeighbour(int x, int y){
-        for (Node n : neighbours.list){
+        for (Node n : neighbours.getList()){
             if (n.x == x && n.y == y){
                 return true;
             }
@@ -96,8 +90,7 @@ public class Node implements Comparable{
     }
 
     @Override
-    public int compareTo(Object t) {
-        Node n = (Node)t;
+    public int compareTo(Node n) {
         if (getScore() == n.getScore()){
             return 0;
         }
@@ -106,23 +99,6 @@ public class Node implements Comparable{
         }else{
             return -1;
         }
-    }
-    
-    Vector3f position;
-    public Vector3f getPosition(){
-        if (position == null){
-            position = new Vector3f(ByteMap.offsetx + x*20, ByteMap.getHeight(x, y), ByteMap.offsetz+y*20);
-        }
-        return position;
-        
-    }
-    
-    LocationInNode loc;
-    public LocationInNode getLoc(){
-        if (loc == null){
-            loc = LocationInNode.createLOC(x*20, y*20).get(0);
-        }
-        return loc;
     }
     
     @Override
@@ -136,7 +112,7 @@ public class Node implements Comparable{
     
     @Override
     public String toString(){
-        return x +" " + y + " " + path_length +" " +heuristicscore;
+        return "("+x+", "+y+") cost:" + path_length +", score" +heuristicscore;
     }
 
     public int getX() {
@@ -146,6 +122,4 @@ public class Node implements Comparable{
     public int getY() {
         return y;
     }
-    
-    
 }

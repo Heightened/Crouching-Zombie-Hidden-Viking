@@ -1,8 +1,9 @@
+package util;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Graphics.Resources.Terrain.Byte.Collision.Astar;
+//package Graphics.Resources.Terrain.Byte.Collision.Astar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +12,8 @@ import java.util.Collections;
  *
  * @author Vouwfietsman
  */
-public class SortedList {
+public class SortedList<Node extends Comparable<Node>> {
+	
     ArrayList<Node> list;
     public SortedList(){
         list = new ArrayList<Node>();
