@@ -1,6 +1,12 @@
 package view.renderer3D.core;
 
+import java.io.File;
 import java.nio.FloatBuffer;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -10,10 +16,13 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import view.renderer3D.inputoutput.FileToString;
+
 public class Renderer3D {
 	private Camera camera;
 	private VBO testVBO;
-	private Texture2D tex;
+	private TextureObject tex;
+	private ShaderObject shader;
 	public Renderer3D(){
 		setupDisplay();
 		camera = new Camera();
@@ -38,12 +47,26 @@ public class Renderer3D {
 		testVBO.put(buffer);
 		testVBO.unbind();
 		
-		tex = new Texture2D("tex.png");
+		tex = new TextureObject("tex.png");
+		tex.setup();
+		tex.setMINMAG(GL11.GL_LINEAR);
+		tex.setWRAPST(GL11.GL_REPEAT);
+		tex.unbind();
+		
+		shader = new ShaderObject("test shader");
+		shader.addVertexSource(FileToString.read("test.vert"));
+		shader.addFragmentSource(FileToString.read("test.frag"));
+		shader.compileVertex();
+		shader.compileFragment();
+		shader.link();
+		shader.findUniforms();
+		TOOLBOX.checkGLERROR(true);
 	}
 
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
+	float currentTime = 0;
 	public void update(){
 		framecounter++;
 		if (framecounter == 100){
@@ -60,13 +83,21 @@ public class Renderer3D {
 		
 
 		GL11.glColor4f(1, 1, 1, 1);
+
 		
-		tex.bind();
+		currentTime += 0.001f;
+		
+		shader.bind();
+		shader.putUnifFloat("time", currentTime);
+		shader.bindTexture("texture", tex);
+		
 		
         testVBO.bind();
         testVBO.prepareForDraw();
         testVBO.draw();
         testVBO.unbind();
+        
+        shader.unbind();
 
 		TOOLBOX.checkGLERROR(true);
 		Display.update();
