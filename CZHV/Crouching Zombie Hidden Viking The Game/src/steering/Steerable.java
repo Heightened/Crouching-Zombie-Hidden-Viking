@@ -1,9 +1,9 @@
 package steering;
 
 public interface Steerable {
-	public Vector3D getVelocity();
+	public Vector getVelocity();
 	public float getMaxVelocity();
-	public Vector3D getPosition();
+	public Vector getPosition();
 	public float getMass();
-	public void setSteer(Vector3D steer);
+	public void setSteer(Vector steer);
 }
