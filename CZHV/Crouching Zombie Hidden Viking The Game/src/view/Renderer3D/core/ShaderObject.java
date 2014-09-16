@@ -1,6 +1,7 @@
 package view.renderer3D.core;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL31;
 
 public class ShaderObject {
 	private int shaderID;
@@ -93,15 +95,19 @@ public class ShaderObject {
 	
 	private HashMap<String,Integer> uniformLocations;
 	private HashMap<String,Integer> samplerLocations;
+	private HashMap<String,Integer> uniformBlockLocations;
 	@SuppressWarnings("deprecation")
 	public void findUniforms(){
+		classInv();
 		TOOLBOX.checkGLERROR(true);
-		bind();
 		int textureCounter = 0;
+		int blockCounter = 0;
 		int numUnifs = GL20.glGetProgrami(shaderID, GL20.GL_ACTIVE_UNIFORMS);
+		int numUnifBlocks = GL20.glGetProgrami(shaderID, GL31.GL_ACTIVE_UNIFORM_BLOCKS);
 		TOOLBOX.checkGLERROR(true);
 		uniformLocations = new HashMap<String, Integer>(numUnifs);
 		samplerLocations = new HashMap<String, Integer>(numUnifs);
+		uniformBlockLocations = new HashMap<String, Integer>(numUnifBlocks);
 		for (int i = 0; i < numUnifs; i++){
 			String name = GL20.glGetActiveUniform(shaderID, i, 100);
 			int type = GL20.glGetActiveUniformType(shaderID, i);
@@ -114,11 +120,22 @@ public class ShaderObject {
 				textureCounter++;
 			}
 		}
+		for (int i = 0; i < numUnifBlocks; i++){
+			String name = GL31.glGetActiveUniformBlockName(shaderID, i, 100);
+			int blockIndex = GL31.glGetUniformBlockIndex(shaderID, name);
+			uniformBlockLocations.put(name, blockCounter);
+	        GL31.glUniformBlockBinding(shaderID, blockIndex, blockCounter);
+	        blockCounter++;
+		}
 		TOOLBOX.checkGLERROR(true);
 	}
 	
 	public void putUnifFloat(String name, float value){
 		GL20.glUniform1f(uniformLocations.get(name), value);
+	}
+	
+	public void putMat4(String name, FloatBuffer value){
+		GL20.glUniformMatrix4(uniformLocations.get(name), false, value);
 	}
 	
 	public void bindTexture(String texName, TextureObject tex){
@@ -134,6 +151,14 @@ public class ShaderObject {
 	public void unbind(){
 		GL20.glUseProgram(0);
 		bound = false;
+	}
+
+	private void classInv(){
+		if (!bound){
+			System.err.println("OPERATING ON " + this + " WHILE NOT BOUND");
+			TOOLBOX.printStackTraceFromHere();
+			System.exit(0);
+		}
 	}
 	
 	public void delete(){

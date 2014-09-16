@@ -1,12 +1,6 @@
 package view.renderer3D.core;
 
-import java.io.File;
 import java.nio.FloatBuffer;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -15,6 +9,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import view.renderer3D.inputoutput.FileToString;
 
@@ -59,8 +55,9 @@ public class Renderer3D {
 		shader.compileVertex();
 		shader.compileFragment();
 		shader.link();
+		shader.bind();
 		shader.findUniforms();
-		TOOLBOX.checkGLERROR(true);
+		shader.unbind();
 	}
 
 	long totaltime = 0;
@@ -90,6 +87,10 @@ public class Renderer3D {
 		shader.bind();
 		shader.putUnifFloat("time", currentTime);
 		shader.bindTexture("texture", tex);
+		Matrix4f modelmat = new Matrix4f();
+		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,currentTime*1000,0), modelmat);
+		FloatBuffer b = BufferUtils.createFloatBuffer(16);
+		shader.putMat4("modelMatrix", MatrixCZHV.MatrixToBuffer(modelmat, b));
 		
 		
         testVBO.bind();
