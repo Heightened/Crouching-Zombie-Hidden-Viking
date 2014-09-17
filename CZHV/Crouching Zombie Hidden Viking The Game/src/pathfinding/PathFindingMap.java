@@ -45,12 +45,14 @@ public class PathFindingMap
 		}
 	}
 	
-	public CellType getCellType(int x, int y)
+	public Node getNode(int x, int y)
 	{
+		//TODO: caching
+		
 		if(this.grid.containsKey(x) && this.grid.get(x).containsKey(y))
-			return this.grid.get(x).get(y);
+			return new Node(x,y,this.grid.get(x).get(y),this);
 		else
-			return CellType.UNKNOWN;
+			return new Node(x,y,CellType.UNKNOWN,this);
 	}
 	
 	public enum CellType

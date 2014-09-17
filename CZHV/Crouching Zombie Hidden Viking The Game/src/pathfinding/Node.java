@@ -12,38 +12,41 @@ public class Node implements Comparable<Node>
 	float path_length = 0;
     float heuristicscore = 0;
     
-    boolean solid = false;
+    PathFindingMap.CellType type;
     
     int x = 0;
     int y = 0;
+    
+    private PathFindingMap map;
     
     public SortedList<Node> neighbours;
     Node camefrom;
     
     
-    public Node(int x, int y){
+    public Node(int x, int y, PathFindingMap.CellType type, PathFindingMap map){
         this.x = x;
         this.y = y;
+        this.map = map;
+        this.type = type;
         heuristicscore = 100000;
         path_length = 100000;
         neighbours = new SortedList<>();
     }
     
-    public Node(Node n){
+    public Node(Node n, PathFindingMap map){
         this.x = n.x;
         this.y = n.y;
+        this.type = n.type;
+        this.map = map;
     }
     
-    public void setSolid(){
-        this.solid = true;
-    }
-    
-    public void setNoSolid(){
-        this.solid = false;
+    protected PathFindingMap getMap()
+    {
+    	return this.map;
     }
     
     public boolean isSolid(){
-        return solid;
+        return this.type == PathFindingMap.CellType.IMPASSIBLE;
     }
     
     public void addNeighbour(Node n){
@@ -70,7 +73,7 @@ public class Node implements Comparable<Node>
             for (int i = -1; i < 2; i++){
                 for (int j = -1; j < 2; j++){
                     if (!hasNeighbour(x + i, y + j)){
-                        Node n = Astar.getNode(x + i, y + j);
+                        Node n = this.getMap().getNode(x + i, y + j);
                         neighbours.add( n);
                         n.neighbours.add(this);
                     }

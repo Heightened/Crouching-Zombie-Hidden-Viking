@@ -1,5 +1,7 @@
 package pathfinding;
 
+import java.util.List;
+
 import model.map.Map;
 import model.character.Character;
 
@@ -17,16 +19,16 @@ public abstract class PathFinder
 		this.character = character;
 	}
 	
-	protected PathFindingMap getMap(int x, int y)
+	protected PathFindingMap makeMap(int x, int y)
 	{
 		return new PathFindingMap(this.map.getNearbyCells(x, y, this.radius), this.character);
 	}
 	
 	// returns a path from (x1,y1) to (x2,y2)
-	public abstract Path calculatePath(int x1, int y1, int x2, int y2);
+	public abstract List<Node> calculatePath(int x1, int y1, int x2, int y2);
 	
 	// returns a path from (x1,y1) in the general direction of direction [rad]
-	public abstract Path calculatePath(int x1, int y1,  float direction);
+	public abstract List<Node> calculatePath(int x1, int y1,  float direction);
 	
 	// --------------------------------------
 	// knowledge exchange between pathfinders

@@ -1,6 +1,7 @@
 package pathfinding;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import model.character.Character;
 import model.map.Map;
@@ -8,21 +9,22 @@ import util.SortedList;
 
 public class Astar extends PathFinder
 {
+	private PathFindingMap currentMap;
+	
 	public Astar(Map map, int radius, Character character)
 	{
 		super(map, radius, character);
 	}
 	
-	public Path calculatePath(int x1, int y1, int x2, int y2)
+	public List<Node> calculatePath(int x1, int y1, int x2, int y2)
 	{
-		return this.calculatePath(this.getNode(x1, x2), this.getNode(x2, y2));
+		return this.calculatePath(this.currentMap.getNode(x1, x2), this.currentMap.getNode(x2, y2));
 	}
 	
-	public Path calculatePath(Node start, Node goal)
+	public List<Node> calculatePath(Node start, Node goal)
 	{
-		knownNodes.clear();
-		knownNodes.add(start);
-		knownNodes.add(goal);
+		this.currentMap = this.makeMap(start.x, start.y);
+		
 		SortedList<Node> closedset = new SortedList<>();
 		SortedList<Node> openset = new SortedList<>();
 		
@@ -84,29 +86,41 @@ public class Astar extends PathFinder
 		return null;
 	}
 	
-	public static ArrayList<Node> reconstructPath( Node current, Node start){
+	public ArrayList<Node> reconstructPath( Node current, Node start){
 		//System.out.println(current);
 		if (!current.equals(start)){
 			ArrayList<Node> p = reconstructPath( current.camefrom, start);
-			p.add(new Node(current));
+			p.add(current); //new Node(current, this));
 			return p;
 		}
 		else{
 			ArrayList<Node> ret = new ArrayList<>();
-			ret.add(new Node(start));
+			ret.add(start); //new Node(start, this));
 			return ret;
 		}
 	}
 	
-	ArrayList<Node> knownNodes = new ArrayList<>();
-	public Node getNode(int x, int y){
-		for (Node n : knownNodes){
-			if (n.x == x && n.y == y){
-				return n;
-			}
-		}
-		Node n = new Node(x, y);
-		knownNodes.add(n);
-		return n;
+	private Node getGoal(Node start, float direction)
+	{
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public Path calculatePath(int x1, int y1, float direction) {
+		Node start = this.currentMap.getNode(x1, y1);
+		this.calculatePath(start, this.getGoal(start,direction));
+		return null;
+	}
+
+	@Override
+	public PathFindingData getData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addData(PathFindingData data) {
+		// TODO Auto-generated method stub
+		
 	}
 }
