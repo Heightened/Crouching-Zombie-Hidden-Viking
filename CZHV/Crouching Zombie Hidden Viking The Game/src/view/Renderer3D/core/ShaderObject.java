@@ -11,6 +11,7 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.util.vector.Vector4f;
 
 public class ShaderObject {
 	private int shaderID;
@@ -85,7 +86,6 @@ public class ShaderObject {
 		boolean retBool = true;
         GL20.glAttachShader(shaderID, vertexID);
         GL20.glAttachShader(shaderID, fragmentID);
-        retBool = retBool && !TOOLBOX.checkGLERROR(true);
         GL20.glLinkProgram(shaderID);
         retBool = retBool && !TOOLBOX.checkGLERROR(true);
         GL20.glValidateProgram(shaderID);
@@ -130,8 +130,34 @@ public class ShaderObject {
 		TOOLBOX.checkGLERROR(true);
 	}
 	
+
+	private HashMap<String,Integer> vertexAttrLocations;
+	public void findAttributes(){
+		TOOLBOX.checkGLERROR(true);
+		int numAttr = GL20.glGetProgrami(shaderID, GL20.GL_ACTIVE_ATTRIBUTES);
+		vertexAttrLocations = new HashMap<String, Integer>(numAttr);
+		System.out.println(numAttr);
+		for (int i = 0; i < numAttr; i++){
+			String name = GL20.glGetActiveAttrib(shaderID, i, 100);
+			int type = GL20.glGetActiveAttribType(shaderID, i);
+			int loc = GL20.glGetAttribLocation(shaderID, name);
+			vertexAttrLocations.put(name, loc);
+			GL20.glBindAttribLocation(shaderID, loc, name);
+			System.out.println(name + " " + loc);
+		}
+		TOOLBOX.checkGLERROR(true);
+	}
+	
+	public int getAttrLocation(String name){
+		return vertexAttrLocations.get(name);
+	}
+	
 	public void putUnifFloat(String name, float value){
 		GL20.glUniform1f(uniformLocations.get(name), value);
+	}
+	
+	public void putUnifFloat4(String name, Vector4f value){
+		GL20.glUniform4f(uniformLocations.get(name), value.x, value.y, value.z, value.w);
 	}
 	
 	public void putMat4(String name, FloatBuffer value){
