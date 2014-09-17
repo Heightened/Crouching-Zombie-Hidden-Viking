@@ -2,6 +2,7 @@ package view.renderer3D.core;
 
 import java.awt.Dimension;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -21,35 +22,33 @@ import view.renderer3D.inputoutput.FileToString;
 
 public class Renderer3D {
 	private Camera camera;
-	private VBO testVBO;
+	private VBO quadVBO;
 	private TextureObject tex;
 	private ShaderObject shader;
-	private Dummy3DObj dummy;
+	private ShaderObject quadShader;
 	private Matrix4f MVP;
+	private ArrayList<Dummy3DObj> objList;
+	private DEMOselecter selecter;
 	public Renderer3D(){
 		setupDisplay();
 		MVP = new Matrix4f();
 		camera = new Camera(viewMatrix, viewMat);
-		testVBO = new VBO(VBO.STATIC_DRAW);
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*3);//8 floats per vert, 3 verts
+		quadVBO = new VBO(VBO.STATIC_DRAW);
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*6);//8 floats per vert, 6 verts
 		int scale = 1;
-		//vert 1
-		buffer.put(-scale).put(0).put(-scale);
-		buffer.put(0).put(1).put(0);
-		buffer.put(0).put(0);
-		//vert 2
-		buffer.put(scale).put(0).put(-scale);
-		buffer.put(0).put(1).put(0);
-		buffer.put(1).put(0);
-		//vert 3
-		buffer.put(scale).put(0).put(scale);
-		buffer.put(0).put(1).put(0);
-		buffer.put(1).put(1);
+		//tri 1
+		putVertex(buffer, 0, 0, 0);
+		putVertex(buffer, 1, 0, 0);
+		putVertex(buffer, 1, 1, 0);
+		//tri2
+		putVertex(buffer, 0, 0, 0);
+		putVertex(buffer, 0, 1, 0);
+		putVertex(buffer, 1, 1, 0);
 		
 		buffer.flip();
-		testVBO.bind();
-		testVBO.put(buffer);
-		testVBO.unbind();
+		quadVBO.bind();
+		quadVBO.put(buffer);
+		quadVBO.unbind();
 		
 		tex = new TextureObject("tex.png");
 		tex.setup();
@@ -68,7 +67,30 @@ public class Renderer3D {
 		shader.findAttributes();
 		shader.unbind();
 		
-		dummy = new Dummy3DObj(new Vector4f(1,0.1f,1,1));
+		quadShader = new ShaderObject("fullscreen quad shader");
+		quadShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
+		quadShader.addFragmentSource(FileToString.read("orthscreenspace.frag"));
+		quadShader.compileVertex();
+		quadShader.compileFragment();
+		quadShader.link();
+		quadShader.bind();
+		quadShader.findUniforms();
+		quadShader.findAttributes();
+		quadShader.unbind();
+
+		objList = new ArrayList<>();
+		for (int i = 0; i < 5; i++){
+			for (int j = 0; j < 5; j++){
+				objList.add(new Dummy3DObj(new Vector4f(1+0.2f*i,0.1f,1+0.2f*j,1)));
+			}
+		}
+		selecter = new DEMOselecter( objList);
+	}
+	
+	public void putVertex(FloatBuffer buffer, float x, float y, float z){
+		buffer.put(x).put(y).put(z);
+		buffer.put(0).put(1).put(0);
+		buffer.put(x).put(z);
 	}
 
 	long totaltime = 0;
@@ -77,13 +99,13 @@ public class Renderer3D {
 	float currentTime = 0;
 	Vector4f dummyColor = new Vector4f(0,0,1,1);
 	Vector4f selectedColor = new Vector4f(0,0,0.5f,1);
+	Vector4f selectboxColor = new Vector4f(0,0,0.5f,0.5f);
 	Vector4f floorColor = new Vector4f(1,1,1,1);
 	public void update(){
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
-		dummy.calcScreenSpace(MVP);
-		dummy.select(new Vector2f(( Mouse.getX()/(float)screenSize.width)*2-1,(Mouse.getY()/(float)screenSize.height)*2-1 ));
+		selecter.update(MVP);
 		
 		framecounter++;
 		if (framecounter == 100){
@@ -104,29 +126,29 @@ public class Renderer3D {
 		shader.bind();
 		shader.putUnifFloat("time", currentTime);
 		shader.bindTexture("texture", tex);
-		Matrix4f modelmat = new Matrix4f();
-		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,0,0), modelmat);
-		FloatBuffer b = BufferUtils.createFloatBuffer(16);
-		shader.putMat4("modelMatrix", MatrixCZHV.MatrixToBuffer(modelmat, b));
 		shader.putMat4("viewMatrix", viewMatrix);
 		shader.putMat4("projectionMatrix", projectionMatrix);
 		
 		shader.putUnifFloat4("color", floorColor);
 		
-        testVBO.bind();
-        testVBO.prepareForDraw(shader);
-        testVBO.draw();
-        testVBO.unbind();
         
-        if (dummy.isSelected()){
-    		shader.putUnifFloat4("color", selectedColor);
-        }else{
-    		shader.putUnifFloat4("color", dummyColor);
+        for (Dummy3DObj dummy : objList){
+	        if (dummy.isSelected()){
+	    		shader.putUnifFloat4("color", selectedColor);
+	        }else{
+	    		shader.putUnifFloat4("color", dummyColor);
+	        }
+	        
+	        dummy.draw(shader);
         }
         
-        dummy.draw(shader);
-        
         shader.unbind();
+        
+        quadShader.bind();
+        
+        selecter.draw(quadShader, quadVBO, selectboxColor);;
+		
+        quadShader.unbind();
 
 		TOOLBOX.checkGLERROR(true);
 		Display.update();
@@ -195,6 +217,7 @@ public class Renderer3D {
 		}
 
         GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         
         //enable fixed pipeline bindings for VBO

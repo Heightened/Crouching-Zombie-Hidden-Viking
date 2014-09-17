@@ -31,7 +31,7 @@ public class Camera {
         
         if (Mouse.isButtonDown(0)){
 	       // yaw += dx*sensitivity;
-	        pitch -= dy*sensitivity;
+	       // pitch -= dy*sensitivity;
         }
         
         if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)){

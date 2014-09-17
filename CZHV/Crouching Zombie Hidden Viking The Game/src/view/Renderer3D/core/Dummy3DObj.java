@@ -10,11 +10,11 @@ import org.lwjgl.util.vector.Vector4f;
 
 public class Dummy3DObj {
 	private static VBO mesh;
-	private static Vector4f position;
-	private static Matrix4f modelMat;
-	private static FloatBuffer modelMatrix;
-	private static Vector4f screenPos;
-	private float scale = 0.15f;
+	private Vector4f position;
+	private Matrix4f modelMat;
+	private FloatBuffer modelMatrix;
+	private Vector4f screenPos;
+	private float scale = 0.075f;
 	private boolean selected = false;
 	public Dummy3DObj(Vector4f position){
 		modelMatrix = BufferUtils.createFloatBuffer(16);
@@ -48,12 +48,23 @@ public class Dummy3DObj {
 		Matrix4f.transform(mvp, position, screenPos);
 		screenPos.x /= screenPos.w;//divide by W for perspective (normally the GC does this for you)
 		screenPos.y /= screenPos.w;
+		//translate to absolute window coordinates to comply with LWJGL.Mouse
+		screenPos.x = (screenPos.x + 1)/2*Renderer3D.screenSize.width;
+		screenPos.y = (screenPos.y + 1)/2*Renderer3D.screenSize.height;
 	}
 	
-	final float radius = 0.1f;
+	final float radius = 30f;
 	public void select(Vector2f mousePos){
 		Vector2f temp = new Vector2f( mousePos.x - screenPos.x,mousePos.y - screenPos.y);
 		if (temp.length() < radius){
+			selected = true;
+		}else{
+			selected = false;
+		}
+	}
+	
+	public void selectRect(Vector2f startpos, Vector2f endpos){
+		if (screenPos.x > startpos.x && screenPos.y < startpos.y && screenPos.x < endpos.x && screenPos.y > endpos.y){
 			selected = true;
 		}else{
 			selected = false;
