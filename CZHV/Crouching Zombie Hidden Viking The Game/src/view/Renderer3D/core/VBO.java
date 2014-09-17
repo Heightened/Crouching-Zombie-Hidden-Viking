@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL20;
 
 public class VBO {
 	public static final int STATIC_DRAW = ARBVertexBufferObject.GL_STATIC_DRAW_ARB;
@@ -41,11 +41,11 @@ public class VBO {
 		ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, type);
 	}
 
-	public void prepareForDraw(){
+	public void prepareForDraw(ShaderObject shader){
 		classInv();
-		GL11.glVertexPointer(3,  GL11.GL_FLOAT,   stride, 0 );
-		GL11.glNormalPointer( GL11.GL_FLOAT,      stride, 12); 
-		GL11.glTexCoordPointer(2,  GL11.GL_FLOAT, stride, 24);
+		GL20.glVertexAttribPointer(shader.getAttrLocation("in_position"), 3, GL11.GL_FLOAT, false, 32, 0);
+		GL20.glVertexAttribPointer(shader.getAttrLocation("in_normal"), 3, GL11.GL_FLOAT, false, 32, 12);
+		GL20.glVertexAttribPointer(shader.getAttrLocation("in_texcoord"), 2, GL11.GL_FLOAT, false, 32, 24);
 	}
 	
 	public void draw(){
