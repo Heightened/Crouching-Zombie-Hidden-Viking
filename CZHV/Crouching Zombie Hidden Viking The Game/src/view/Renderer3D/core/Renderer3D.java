@@ -1,5 +1,6 @@
 package view.renderer3D.core;
 
+import java.awt.Dimension;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -12,7 +13,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.inputoutput.FileToString;
 
@@ -21,22 +24,25 @@ public class Renderer3D {
 	private VBO testVBO;
 	private TextureObject tex;
 	private ShaderObject shader;
+	private Dummy3DObj dummy;
+	private Matrix4f MVP;
 	public Renderer3D(){
 		setupDisplay();
-		camera = new Camera(viewMatrix);
+		MVP = new Matrix4f();
+		camera = new Camera(viewMatrix, viewMat);
 		testVBO = new VBO(VBO.STATIC_DRAW);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*3);//8 floats per vert, 3 verts
 		int scale = 1;
 		//vert 1
-		buffer.put(-scale).put(1).put(-scale);
+		buffer.put(-scale).put(0).put(-scale);
 		buffer.put(0).put(1).put(0);
 		buffer.put(0).put(0);
 		//vert 2
-		buffer.put(scale).put(1).put(-scale);
+		buffer.put(scale).put(0).put(-scale);
 		buffer.put(0).put(1).put(0);
 		buffer.put(1).put(0);
 		//vert 3
-		buffer.put(scale).put(1).put(scale);
+		buffer.put(scale).put(0).put(scale);
 		buffer.put(0).put(1).put(0);
 		buffer.put(1).put(1);
 		
@@ -61,13 +67,24 @@ public class Renderer3D {
 		shader.findUniforms();
 		shader.findAttributes();
 		shader.unbind();
+		
+		dummy = new Dummy3DObj(new Vector4f(1,0.1f,1,1));
 	}
 
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
 	float currentTime = 0;
+	Vector4f dummyColor = new Vector4f(0,0,1,1);
+	Vector4f selectedColor = new Vector4f(0,0,0.5f,1);
+	Vector4f floorColor = new Vector4f(1,1,1,1);
 	public void update(){
+		MVP.setIdentity();
+		Matrix4f.mul(projMat, viewMat, MVP);
+		
+		dummy.calcScreenSpace(MVP);
+		dummy.select(new Vector2f(( Mouse.getX()/(float)screenSize.width)*2-1,(Mouse.getY()/(float)screenSize.height)*2-1 ));
+		
 		framecounter++;
 		if (framecounter == 100){
 			framecounter = 0;
@@ -88,17 +105,26 @@ public class Renderer3D {
 		shader.putUnifFloat("time", currentTime);
 		shader.bindTexture("texture", tex);
 		Matrix4f modelmat = new Matrix4f();
-		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,currentTime*1000,0), modelmat);
+		MatrixCZHV.getModelMatrix(new Vector3f(0,0,0), new Vector3f(1,1,1), new Vector3f(0,0,0), modelmat);
 		FloatBuffer b = BufferUtils.createFloatBuffer(16);
 		shader.putMat4("modelMatrix", MatrixCZHV.MatrixToBuffer(modelmat, b));
 		shader.putMat4("viewMatrix", viewMatrix);
 		shader.putMat4("projectionMatrix", projectionMatrix);
 		
+		shader.putUnifFloat4("color", floorColor);
 		
         testVBO.bind();
         testVBO.prepareForDraw(shader);
         testVBO.draw();
         testVBO.unbind();
+        
+        if (dummy.isSelected()){
+    		shader.putUnifFloat4("color", selectedColor);
+        }else{
+    		shader.putUnifFloat4("color", dummyColor);
+        }
+        
+        dummy.draw(shader);
         
         shader.unbind();
 
@@ -117,13 +143,16 @@ public class Renderer3D {
 
 	public FloatBuffer projectionMatrix;
 	public FloatBuffer viewMatrix;
+	public Matrix4f projMat;
+	public Matrix4f viewMat;
+	public static final Dimension screenSize = new Dimension(1024, 720);
 	public final void setupDisplay(){
 		PixelFormat pixelFormat = new PixelFormat();
 		ContextAttribs contextAtrributes = new ContextAttribs(3, 3)
 		.withForwardCompatible(true)
 		.withProfileCore(true);
 		try{
-			Display.setDisplayMode(new DisplayMode(1024, 720));
+			Display.setDisplayMode(new DisplayMode(screenSize.width, screenSize.height));
 			Display.create(pixelFormat, contextAtrributes);
 		}catch (Exception e){
 			e.printStackTrace();
@@ -142,18 +171,20 @@ public class Renderer3D {
         float x_scale = y_scale / aspectRatio;
         float frustum_length = far_plane - near_plane;
 		
-		Matrix4f projmat = new Matrix4f();
+		projMat = new Matrix4f();
+		viewMat = new Matrix4f();
 		
-		projmat.m00 = x_scale;
-		projmat.m11 = y_scale;
-		projmat.m22 = -((far_plane + near_plane) / frustum_length);
-		projmat.m23 = -1;
-		projmat.m32 = -((2 * near_plane * far_plane) / frustum_length);
-		projmat.m33 = 0;   
-
+		projMat.m00 = x_scale;
+		projMat.m11 = y_scale;
+		projMat.m22 = -((far_plane + near_plane) / frustum_length);
+		projMat.m23 = -1;
+		projMat.m32 = -((2 * near_plane * far_plane) / frustum_length);
+		projMat.m33 = 0;    
+		
 		viewMatrix = BufferUtils.createFloatBuffer(16);
 		projectionMatrix = BufferUtils.createFloatBuffer(16);
-		projmat.store(projectionMatrix);
+		
+		projMat.store(projectionMatrix);
 		projectionMatrix.flip();
 		
 		try{
@@ -164,6 +195,7 @@ public class Renderer3D {
 		}
 
         GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
         
         //enable fixed pipeline bindings for VBO
         GL20.glEnableVertexAttribArray(0);

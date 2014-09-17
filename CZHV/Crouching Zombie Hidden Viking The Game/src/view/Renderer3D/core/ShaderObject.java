@@ -11,6 +11,7 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.util.vector.Vector4f;
 
 public class ShaderObject {
 	private int shaderID;
@@ -153,6 +154,10 @@ public class ShaderObject {
 	
 	public void putUnifFloat(String name, float value){
 		GL20.glUniform1f(uniformLocations.get(name), value);
+	}
+	
+	public void putUnifFloat4(String name, Vector4f value){
+		GL20.glUniform4f(uniformLocations.get(name), value.x, value.y, value.z, value.w);
 	}
 	
 	public void putMat4(String name, FloatBuffer value){

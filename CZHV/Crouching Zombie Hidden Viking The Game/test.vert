@@ -2,6 +2,7 @@
 
 varying vec3 normal;
 varying vec2 texture_coordinate;
+varying vec4 worldPosition;
 
 uniform float time;
 
@@ -15,8 +16,8 @@ attribute vec2 in_texcoord;
 
 void main()
 {
-
-	gl_Position = projectionMatrix*viewMatrix*modelMatrix*in_position;
+    worldPosition = modelMatrix*in_position;
+	gl_Position = projectionMatrix*viewMatrix*worldPosition;
 
     normal = gl_NormalMatrix * in_normal;
     texture_coordinate = vec2(in_texcoord);
