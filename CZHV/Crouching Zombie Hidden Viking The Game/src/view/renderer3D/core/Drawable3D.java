@@ -29,9 +29,9 @@ public class Drawable3D {
 		vbo.unbind();
 	}
 	
-	public void draw() {
+	public void draw(ShaderObject shader) {
 		vbo.bind();
-		vbo.prepareForDraw();
+		vbo.prepareForDraw(shader);
 		vbo.draw();
 		vbo.unbind();
 	}

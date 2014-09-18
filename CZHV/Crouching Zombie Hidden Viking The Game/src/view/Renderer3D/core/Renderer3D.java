@@ -18,6 +18,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import view.renderer3D.Model;
 import view.renderer3D.inputoutput.FileToString;
 
 public class Renderer3D {
@@ -29,6 +30,9 @@ public class Renderer3D {
 	private Matrix4f MVP;
 	private ArrayList<Dummy3DObj> objList;
 	private DEMOselecter selecter;
+	
+	//private Model cube;
+	
 	public Renderer3D(){
 		setupDisplay();
 		MVP = new Matrix4f();
@@ -85,6 +89,8 @@ public class Renderer3D {
 			}
 		}
 		selecter = new DEMOselecter( objList);
+		
+		//cube = new Model("tricube.obj");
 	}
 	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
@@ -142,11 +148,13 @@ public class Renderer3D {
 	        dummy.draw(shader);
         }
         
+        //cube.draw(shader);
+        
         shader.unbind();
         
         quadShader.bind();
         
-        selecter.draw(quadShader, quadVBO, selectboxColor);;
+        selecter.draw(quadShader, quadVBO, selectboxColor);
 		
         quadShader.unbind();
 

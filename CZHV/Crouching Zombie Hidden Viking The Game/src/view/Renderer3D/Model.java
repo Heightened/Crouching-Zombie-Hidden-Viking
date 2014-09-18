@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import view.renderer3D.core.Drawable3D;
+import view.renderer3D.core.ShaderObject;
 
 public class Model {
 	private class modelSegment extends Drawable3D {
@@ -150,9 +151,9 @@ public class Model {
 		}
 	}
 	
-	public void draw() {
+	public void draw(ShaderObject shader) {
 		for (modelSegment s : model) {
-			s.draw();
+			s.draw(shader);
 		}
 	}
 }
