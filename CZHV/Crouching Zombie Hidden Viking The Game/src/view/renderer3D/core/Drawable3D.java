@@ -17,10 +17,10 @@ public class Drawable3D {
 		for (int i = 0; i < size; i++) {
 			//buffer vertex position vector
 			vertexBuffer.put(vertices[i*3]).put(vertices[i*3 + 1]).put(vertices[i*3 + 2]);
-			//buffer vertex texture coordinates
-			vertexBuffer.put(uvcoords[i*2]).put(uvcoords[i*2 + 1]);
 			//buffer vertex normal vector
 			vertexBuffer.put(normals[i*3]).put(normals[i*3 + 1]).put(normals[i*3 + 2]);
+			//buffer vertex texture coordinates
+			vertexBuffer.put(uvcoords[i*2]).put(uvcoords[i*2 + 1]);
 		}
 		
 		vertexBuffer.flip();

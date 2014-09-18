@@ -2,6 +2,7 @@ package view.renderer3D.core;
 
 import java.nio.FloatBuffer;
 
+import org.lwjgl.opengl.ARBBufferObject;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -17,7 +18,7 @@ public class VBO {
 	private int stride = 32;
 	public VBO(int type) {
 		this.type = type;
-		index = ARBVertexBufferObject.glGenBuffersARB();
+		index = ARBBufferObject.glGenBuffersARB();
 	}
 
 	public void bind(){
@@ -26,19 +27,19 @@ public class VBO {
 			System.exit(0);
 		}
 		bound = true;
-		ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
 	}
 
 	public void unbind(){
 		classInv();
 		bound = false;
-		ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 
 	public void put(FloatBuffer buffer) {
 		classInv();
 		vertCount = buffer.capacity()*4/stride;
-		ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, type);
+		ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, type);
 	}
 
 	public void prepareForDraw(ShaderObject shader){
@@ -54,7 +55,7 @@ public class VBO {
 	}
 	
 	public void deAllocate(){
-		ARBVertexBufferObject.glDeleteBuffersARB(index);
+		ARBBufferObject.glDeleteBuffersARB(index);
 	}
 
 	public void classInv(){

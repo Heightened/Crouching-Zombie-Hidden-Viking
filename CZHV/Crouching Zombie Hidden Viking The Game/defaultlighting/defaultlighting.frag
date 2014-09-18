@@ -94,7 +94,7 @@ void main(void)
 	gl_FragColor = texture2D(texture,texture_coordinate);
     gl_FragColor = vec4(final_color.rgb*color.rgb,1);
     gl_FragColor = vec4(final_color.rgb,1);
-    //l_FragColor = vec4(worldspacePos.rgb/4,1);
+   // gl_FragColor = vec4(normal.rgb,1);
     //gl_FragColor.r = lights[1].color.a;
     //gl_FragColor.g = 1;
    // gl_FragColor.b = 0;

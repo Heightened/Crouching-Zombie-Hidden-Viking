@@ -49,10 +49,10 @@ public class LightManager {
         inits = true;
         Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector3f(0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
-        lights.add(new Light(new Vector3f(0,0.5f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),1f,0.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(1,0.5f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),1f,0.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(0,0.5f,1), new Vector3f(0,1,0),new Vector3f(1,0,0),1f,0.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(1,0.5f,1), new Vector3f(1,0,1),new Vector3f(1,0,0),1f,0.5f,new Vector3f(0,-1,0)));
+        lights.add(new Light(new Vector3f(0,0.5f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
+        lights.add(new Light(new Vector3f(1,0.5f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
+        lights.add(new Light(new Vector3f(0,0.5f,1), new Vector3f(0,1,0),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
+        lights.add(new Light(new Vector3f(1,0.5f,1), new Vector3f(1,0,1),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
         
         lightBuffer = new int[2];
         lightBuffer[0] = ARBVertexBufferObject.glGenBuffersARB();
@@ -123,7 +123,7 @@ public class LightManager {
         //stay idle for now
         for (int i = 1; i < lights.size(); i++){
             lights.get(i).setDirty();
-           // lights.get(i).position.x = ((float)Math.sin(Renderer3D.currentTime*20+i)*1)+1;
+           // lights.get(i).position.y = ((float)Math.sin(Renderer3D.currentTime*20+i)*0.5f);
            lights.get(i).spotdirection.z = ((float)Math.sin(Renderer3D.currentTime*20+i)*1f);
            lights.get(i).spotdirection.x = ((float)Math.cos(Renderer3D.currentTime*20+i)*1f);
            // lights.get(i).cutoffangle = 0.8f;
