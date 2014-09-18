@@ -1,0 +1,45 @@
+\section{Path Finding}
+In the area of path finding we encounter a few problems due to the desired game mechanics. These problems and their solutions will be discussed in this chapter.
+
+\section{Navigational Reference \& Exact Positions}
+Simply having a map with float co-ordinates makes path finding very difficult due to the endless possibility space. To work with this we put a grid over the map, such that the integer part of a float co-ordinate indexes a cell. This allows us to use graph-based algorithms. Once a unit is in the desired cell, the accuracy of the float number can then fine tune its position.
+
+\subsection{Non-solid Obstacles}
+Vikings will walk slower in the dark, whereas zombies will slow down in the light. Next to this, any number of terrain hazards may be added to the game. When finding a path this has to be taken into account. These obstructions mean that our navigation graph has to be weighted. A good algorithm for dealing with weighted graphs would be A*, which we will expand further on to accommodate the solutions for other problems.
+
+\subsection{Limited Knowledge}
+For our game we will deal with a "fog of war" for a group or a limited viewing radius of individual units. This means that a path cannot simply be planned out completely with A*. One solution for this is to have A* recalculate from a new position after information has been gathered along the path, but this would be very slow. Instead, we are better off using an incremental variant of A*, called D*. D* uses data from prior calculations towards the same goal to more efficiently find an alternative path. We will be opting for a more simple and efficient version of D*, D*-Lite. D*-Lite is based on Lifelong Planning A*, thus giving it a different algorithmic structure from plain D*, but the same navigational strategy. 
+
+\subsubsection{D*-Lite}
+
+\subsection{Smooth Movement \& Other Units}
+We want the movement of units to appear at least somewhat smooth rather than having them jerk from cell to cell. Additionally, we do not want units to simply pass through one another, so some form of collision avoidance is required. Both of these problems can be solved by flocking.
+
+\subsubsection{Flocking}
+
+\subsubsection{Group Movement}
+Group movement will be done slightly differently from the movement of singular units. First of all, when a group of units get to their goal, they do not adjust to the exact position. Instead of adjusting or trying to get into once cell together, they all flock to the center of the cell until they are within a radius from it, based on the group size. Group movement also brings the problem of narrow passages. When a path returns and a narrow passage is included, we can opt to increase the weight of the cells in that path and calculate a new path for part of the group.
+
+\subsubsection{The Scooping Problem}
+Since flocking allows groups to move together, we do not want to force all members of a group to first get into a cell before moving to the next one. Instead, we just let them flock to within a radius of the target cell, its travel radius, then they move on to the next. This creates a problem when a group encounters the start of a wall. The units have to walk on one side of the wall to reach their final destination. The wall may scoop some of the group to the other side, because it is still within travel radius of their target cell.\newline
+In order to fix this problem, determine the radii of the cells upon creation or loading of the map. These radii will be the distance from the center of the cell to the edge of the closest static obstacle. This allows groups to move very freely towards their goal in open fields, while making sure they correctly funnel into finer areas.
+
+\subsubsection{Wall Hugging Slowdown}
+A problem that arises with diagonal movement using flocking is that moving along a wall gets slower. The initial slowdown comes from the unit pushing a bit into the wall as it moves along, if the wall is not smooth. A group also cannot take enough space to move in at the wall side. The solution for the scooping problem worsens this, as the radii for cells next to a wall are very small. We solve these problems at once by increasing the weight of cells, depending on their travel radii and the group size. The weight of cells at least the radius of the group away should be uninfluenced. From the group radius up to the cells adjacent to obstacles, the weight should increase at a faster-than-linear rate. We will determine the weight influence based on the following formula:\newline
+$f(r_g, r_t) = (r_g - r_t)^p / s if (r_g - r_t) > 0, 0 otherwise$\newline
+Here $r_g$ is the radius of the group, $r_t$ is the travel radius of the cell, and $p$ and $s$ are to be determined by simulation. The radius of the group is actually a function $r_g (n) = \root (n * h_u / \PI)$, where $n$ is the number of units and $h_u$ is the surface of the bounding hexagon around a unit.
+
+\subsection{Large Numbers}
+We want our maps to be large and the number of zombies to be great, so paths to be calculated have to be long and plentiful. In order to do this, we need to make sure that our path finding is extra efficient.
+
+\subsubsection{Less Path Finding}
+Next to path finding, there are a couple of other movement options we can use to keep units busy. We can for instance make zombies wander aimlessly, or follow something by flocking towards that thing constantly. Finding a path to a choke point in the map and just guarding it could also be an option, if we design maps that motivate the AI to do so.
+
+\subsubsection{Ignoring Parts of the Map}
+The group of Vikings the player will typically control is extremely small compared to the map size. Zombies outside of a certain proximity of the Vikings can be simplified in their navigation. Additionally, paths will be only as long as the size of the relevant area.
+
+\subsubsection{Non-perfect Paths}
+We can use the fact that A* can be adjusted to make sub-optimal paths and apply it to D*-Lite. The output of the heuristic function used to estimate distance to the goal can be multiplied by $1 + \epsilon$, Static Heuristic Weighting (SHW). This way, the evaluated points that are already close to the goal take priority over those still around the starting point. The value of $\epsilon$ can even be adjusted according to the current performance.
+
+\subsubsection{Ignoring Weight}
+In the worst case, we can start ignoring terrain hazards when calculating a path. The benefit of this is that we can use Jump Point Search (JPS). Instead of looking at adjacent cells, JPS uses a few criteria to jump ahead in straight lines, thus pruning a lot of nodes. This makes the space over which we have to calculate dramatically smaller. The resulting path is a sequence of jumps, which can be easily filled in to form a sequence of neighbours, which isn't even necessary thanks to flocking. The problem with applying this and SHW is that the paths will be severely dumbed down.
