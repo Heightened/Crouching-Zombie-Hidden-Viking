@@ -29,10 +29,19 @@ public class DEMOselecter {
 			startclick = false;
 			endpos.x = Mouse.getX();
 			endpos.y = Mouse.getY();
+
+			//swap coordinates for squares which dont start top-left
+			Vector2f startposM = new Vector2f();
+			Vector2f endposM = new Vector2f();
+			startposM.x = (float)Math.min(endpos.x, startpos.x);
+			startposM.y = (float)Math.max(endpos.y, startpos.y);
+			
+			endposM.x = (float)Math.max(endpos.x, startpos.x);
+			endposM.y = (float)Math.min(endpos.y, startpos.y);
 			
 			for (Dummy3DObj obj : objList){
 				obj.calcScreenSpace(mvp);
-				obj.selectRect(startpos, endpos);
+				obj.selectRect(startposM, endposM);
 			}
 		}
 	}

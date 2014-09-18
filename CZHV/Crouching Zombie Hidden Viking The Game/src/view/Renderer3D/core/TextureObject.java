@@ -120,7 +120,54 @@ public class TextureObject {
 		return textureID;
 	}
 
+	public void mipMap(){
+		int scale = width/2;
+		int iterator = 0;
+		ByteBuffer prevdata = data;
+		ByteBuffer newdata;
+		byte[] newdataA;
+		while (scale >= 1){
+			iterator++;
+			newdata = BufferUtils.createByteBuffer(scale*scale*4);//create array for new mipmap 
+			newdataA = new byte[scale*scale*4];//create array for new mipmap 
+			//fill array
+			for (int i = 0; i < scale; i++){
+				for (int j = 0; j < scale; j++){
+					newdataA[i*scale*4 + j*4 + 0] = getPrevMipmapPixel(i, j, 0, prevdata, scale);
+					newdataA[i*scale*4 + j*4 + 1] = getPrevMipmapPixel(i, j, 1, prevdata, scale);
+					newdataA[i*scale*4 + j*4 + 2] = getPrevMipmapPixel(i, j, 2, prevdata, scale);
+					byte alpha =  getPrevMipmapPixel(i, j, 3, prevdata, scale);
+					if ((alpha & 0xFF) > 200){
+						alpha = (byte)255;
+					}else{
 
+					}
+					newdataA[i*scale*4 + j*4 + 3] = getPrevMipmapPixel(i, j, 3, prevdata, scale);
+				}
+			}
+			newdata.put(newdataA);
+			newdata.flip();
+			//set new previous
+			prevdata = newdata;
+			//pass mipmap to opengl
+			glTexImage2D(GL_TEXTURE_2D, iterator,internalFormat, scale, scale, 0,format, type, newdata);
+			scale = scale/2;
+		}
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+		TOOLBOX.checkGLERROR(true);
+		//plz GC hear me out
+		data = null;
+	}
+	public byte getPrevMipmapPixel(int x, int y, int channel, ByteBuffer mipmap, int scale){
+		return (byte)((unsignedToBytes(mipmap.get((x*2)*scale*2*4 + (y*2)*4 + channel))
+				+ unsignedToBytes(mipmap.get((x*2+1)*scale*2*4 + (y*2)*4 + channel))
+				+ unsignedToBytes(mipmap.get((x*2)*scale*2*4 + (y*2+1)*4 + channel))
+				+ unsignedToBytes(mipmap.get((x*2+1)*scale*2*4 + (y*2+1)*4 + channel)))/4);
+	}
+	
+	public int unsignedToBytes(byte b){
+		return b&0xFF;
+	}
 
 	private void classInv(){
 		if (!bound){

@@ -96,6 +96,7 @@ public class ShaderObject {
 	private HashMap<String,Integer> uniformLocations;
 	private HashMap<String,Integer> samplerLocations;
 	private HashMap<String,Integer> uniformBlockLocations;
+	private HashMap<String,Integer> uniformBlockBindingPoints;
 	@SuppressWarnings("deprecation")
 	public void findUniforms(){
 		classInv();
@@ -108,6 +109,7 @@ public class ShaderObject {
 		uniformLocations = new HashMap<String, Integer>(numUnifs);
 		samplerLocations = new HashMap<String, Integer>(numUnifs);
 		uniformBlockLocations = new HashMap<String, Integer>(numUnifBlocks);
+		uniformBlockBindingPoints = new HashMap<String, Integer>(numUnifBlocks);
 		for (int i = 0; i < numUnifs; i++){
 			String name = GL20.glGetActiveUniform(shaderID, i, 100);
 			int type = GL20.glGetActiveUniformType(shaderID, i);
@@ -123,8 +125,10 @@ public class ShaderObject {
 		for (int i = 0; i < numUnifBlocks; i++){
 			String name = GL31.glGetActiveUniformBlockName(shaderID, i, 100);
 			int blockIndex = GL31.glGetUniformBlockIndex(shaderID, name);
-			uniformBlockLocations.put(name, blockCounter);
+			uniformBlockLocations.put(name, blockIndex);
+			uniformBlockBindingPoints.put(name, blockCounter);
 	        GL31.glUniformBlockBinding(shaderID, blockIndex, blockCounter);
+	        System.out.println(name + " " + blockIndex + " " + blockCounter);
 	        blockCounter++;
 		}
 		TOOLBOX.checkGLERROR(true);
@@ -143,7 +147,6 @@ public class ShaderObject {
 			int loc = GL20.glGetAttribLocation(shaderID, name);
 			vertexAttrLocations.put(name, loc);
 			GL20.glBindAttribLocation(shaderID, loc, name);
-			System.out.println(name + " " + loc);
 		}
 		TOOLBOX.checkGLERROR(true);
 	}
@@ -152,12 +155,23 @@ public class ShaderObject {
 		return vertexAttrLocations.get(name);
 	}
 	
+	public int getUnifBlockBindingPoint(String name){
+		return uniformBlockBindingPoints.get(name);
+	}
+	public int getUnifBlockLocation(String name){
+		return uniformBlockLocations.get(name);
+	}
+	
 	public void putUnifFloat(String name, float value){
 		GL20.glUniform1f(uniformLocations.get(name), value);
 	}
 	
 	public void putUnifFloat4(String name, Vector4f value){
 		GL20.glUniform4f(uniformLocations.get(name), value.x, value.y, value.z, value.w);
+	}
+	
+	public void putUnifFloat4(String name, float x, float y, float z, float w){
+		GL20.glUniform4f(uniformLocations.get(name), x, y, z, w);
 	}
 	
 	public void putMat4(String name, FloatBuffer value){
