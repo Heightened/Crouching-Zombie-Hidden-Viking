@@ -1,7 +1,7 @@
 \documentclass[12pt]{report}
 
 \usepackage{graphicx, titlesec}
-\usepackage{import}
+\usepackage{import, pdfpages}
 \titleformat{\chapter}
   {\normalfont\LARGE\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
@@ -64,6 +64,10 @@ Carl \textsc{van Dueren den Hollander}\\[.25cm] % name
 \tableofcontents
 
 \subimport{introduction/}{introduction.tex}
+\subimport{architectural_design/}{ad.tex}
+\subimport{computer_graphics/}{cg.tex}
 \subimport{artificial_intelligence/}{artificial_intelligence.tex}
+\subimport{peerreviews/}{peerreviews.tex}
+\subimport{appendix/}{appendix.tex}
 
 \end{document}
