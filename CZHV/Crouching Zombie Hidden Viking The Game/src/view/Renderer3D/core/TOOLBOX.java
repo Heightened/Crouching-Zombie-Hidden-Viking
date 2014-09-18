@@ -57,7 +57,4 @@ public class TOOLBOX {
         return false;
     }
     
-    public static void main(String[] args){
-        printStackTraceFromHere();
-    }
 }

@@ -18,19 +18,22 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.inputoutput.FileToString;
 
 public class Renderer3D {
 	private Camera camera;
 	private VBO quadVBO;
 	private TextureObject tex;
-	private ShaderObject shader;
+	private ShaderObject lightShader;
 	private ShaderObject quadShader;
 	private Matrix4f MVP;
 	private ArrayList<Dummy3DObj> objList;
 	private DEMOselecter selecter;
+	private LightManager lightManager;
 	public Renderer3D(){
 		setupDisplay();
+		lightManager = new LightManager();
 		MVP = new Matrix4f();
 		camera = new Camera(viewMatrix, viewMat);
 		quadVBO = new VBO(VBO.STATIC_DRAW);
@@ -54,18 +57,19 @@ public class Renderer3D {
 		tex.setup();
 		tex.setMINMAG(GL11.GL_LINEAR);
 		tex.setWRAPST(GL11.GL_REPEAT);
+		tex.mipMap();
 		tex.unbind();
 		
-		shader = new ShaderObject("test shader");
-		shader.addVertexSource(FileToString.read("test.vert"));
-		shader.addFragmentSource(FileToString.read("test.frag"));
-		shader.compileVertex();
-		shader.compileFragment();
-		shader.link();
-		shader.bind();
-		shader.findUniforms();
-		shader.findAttributes();
-		shader.unbind();
+		lightShader = new ShaderObject("lighting shader");
+		lightShader.addVertexSource(FileToString.read("defaultlighting\\defaultlighting.vert"));
+		lightShader.addFragmentSource(FileToString.read("defaultlighting\\defaultlighting.frag"));
+		lightShader.compileVertex();
+		lightShader.compileFragment();
+		lightShader.link();
+		lightShader.bind();
+		lightShader.findUniforms();
+		lightShader.findAttributes();
+		lightShader.unbind();
 		
 		quadShader = new ShaderObject("fullscreen quad shader");
 		quadShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
@@ -81,7 +85,7 @@ public class Renderer3D {
 		objList = new ArrayList<>();
 		for (int i = 0; i < 5; i++){
 			for (int j = 0; j < 5; j++){
-				objList.add(new Dummy3DObj(new Vector4f(1+0.2f*i,0.1f,1+0.2f*j,1)));
+				objList.add(new Dummy3DObj(new Vector4f(0.4f*i,i*j*0.08f,0.4f*j,1)));
 			}
 		}
 		selecter = new DEMOselecter( objList);
@@ -96,25 +100,34 @@ public class Renderer3D {
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
-	float currentTime = 0;
+	public static float currentTime = 0;
 	Vector4f dummyColor = new Vector4f(0,0,1,1);
 	Vector4f selectedColor = new Vector4f(0,0,0.5f,1);
 	Vector4f selectboxColor = new Vector4f(0,0,0.5f,0.5f);
 	Vector4f floorColor = new Vector4f(1,1,1,1);
+	private long frametime = 0;
+	private long totalframetime = 0;
 	public void update(){
+		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
 		selecter.update(MVP);
+		lightManager.update();
+		
+		
+		long sleeptime = System.currentTimeMillis();
+		sleep(framedelay);
+		sleeptime = System.currentTimeMillis() - sleeptime;
+
 		
 		framecounter++;
 		if (framecounter == 100){
 			framecounter = 0;
-			totaltime = System.currentTimeMillis() - totaltime;
-			System.out.println("100 frames in " + (totaltime/100 - framedelay) + " ms");
-			totaltime = System.currentTimeMillis();
+			System.out.println("100 frames in " + (totalframetime/100) + " ms");
+			totalframetime = 0;
 		}
-		sleep(framedelay);
+		
 		camera.lookThrough();
 		
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -123,26 +136,29 @@ public class Renderer3D {
 		
 		currentTime += 0.001f;
 		
-		shader.bind();
-		shader.putUnifFloat("time", currentTime);
-		shader.bindTexture("texture", tex);
-		shader.putMat4("viewMatrix", viewMatrix);
-		shader.putMat4("projectionMatrix", projectionMatrix);
+		lightShader.bind();
+		lightManager.bind(lightShader);
+		//lightShader.putUnifFloat("time", currentTime);
+		lightShader.bindTexture("texture", tex);
+		lightShader.putMat4("viewMatrix", viewMatrix);
+		lightShader.putMat4("projectionMatrix", projectionMatrix);
 		
-		shader.putUnifFloat4("color", floorColor);
+		Vector3f pos = camera.getPosition();
+		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
 		
         
         for (Dummy3DObj dummy : objList){
 	        if (dummy.isSelected()){
-	    		shader.putUnifFloat4("color", selectedColor);
+	        	lightShader.putUnifFloat4("color", selectedColor);
 	        }else{
-	    		shader.putUnifFloat4("color", dummyColor);
+	        	lightShader.putUnifFloat4("color", dummyColor);
 	        }
 	        
-	        dummy.draw(shader);
+	        dummy.draw(lightShader);
         }
         
-        shader.unbind();
+        lightShader.unbind();
+        lightManager.unbind();
         
         quadShader.bind();
         
@@ -151,7 +167,11 @@ public class Renderer3D {
         quadShader.unbind();
 
 		TOOLBOX.checkGLERROR(true);
+
+		frametime = System.currentTimeMillis();
 		Display.update();
+		frametime = System.currentTimeMillis() - frametime;
+		totalframetime += frametime;
 	}
 
 	public void sleep(int time){

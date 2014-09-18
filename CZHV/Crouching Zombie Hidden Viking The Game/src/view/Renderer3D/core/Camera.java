@@ -20,6 +20,10 @@ public class Camera {
 		position = new Vector3f(-1,-1,-2);
 	}
 	
+	public Vector3f getPosition(){
+		return position;
+	}
+	
 	int curAngle = 0;
 	float sensitivity = 1/100f;
 	public void lookThrough(){
