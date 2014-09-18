@@ -58,9 +58,9 @@ public class MatrixCZHV {
 
 	private static Matrix4f temptrans = new Matrix4f();
 	public static Matrix4f getTranslationMatrix(Vector3f trans, Vector3f scale){
-		tempscale.m00 = scale.x;
-		tempscale.m11 = scale.y;
-		tempscale.m22 = scale.z;
+		temptrans.m00 = scale.x;
+		temptrans.m11 = scale.y;
+		temptrans.m22 = scale.z;
 		temptrans.m33 = 1.0f;
 		
 		temptrans.m30 = trans.x;

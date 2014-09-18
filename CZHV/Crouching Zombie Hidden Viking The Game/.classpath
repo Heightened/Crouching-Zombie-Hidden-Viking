@@ -8,5 +8,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Crouching Zombie Hidden Viking The Game/lwjgl-2.9.1/native/CrossOS"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lwjgl-2.9.1/jar/lwjgl_util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

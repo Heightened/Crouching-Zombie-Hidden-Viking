@@ -15,6 +15,7 @@ public class PathFindingMap
 	public PathFindingMap(Collection<Cell> cells, Character character)
 	{
 		this.grid = new HashMap<Integer, Map<Integer, CellType>>();
+		this.character = character;
 		
 		for(Cell c : cells)
 		{
@@ -22,7 +23,7 @@ public class PathFindingMap
 		}
 	}
 	
-	protected void addCell(Cell c)
+	public void addCell(Cell c)
 	{
 		if(!this.grid.containsValue(c.getX()))
 			this.grid.put(c.getX(), new HashMap<Integer, CellType>());
@@ -36,12 +37,22 @@ public class PathFindingMap
 		this.grid.get(c.getX()).put(c.getY(), value);
 	}
 	
-	public CellType getCellType(int x, int y)
+	public void addAll(Collection<Cell> cells)
 	{
+		for(Cell c : cells)
+		{
+			this.addCell(c);
+		}
+	}
+	
+	public Node getNode(int x, int y)
+	{
+		//TODO: caching
+		
 		if(this.grid.containsKey(x) && this.grid.get(x).containsKey(y))
-			return this.grid.get(x).get(y);
+			return new Node(x,y,this.grid.get(x).get(y),this);
 		else
-			return CellType.UNKNOWN;
+			return new Node(x,y,CellType.UNKNOWN,this);
 	}
 	
 	public enum CellType
