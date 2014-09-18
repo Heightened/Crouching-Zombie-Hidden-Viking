@@ -10,10 +10,15 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import view.renderer3D.Model;
+
 public class Renderer3D {
 	private Camera camera;
 	private VBO testVBO;
 	private Texture2D tex;
+	
+	private Model cube;
+	
 	public Renderer3D(){
 		setupDisplay();
 		camera = new Camera();
@@ -39,6 +44,10 @@ public class Renderer3D {
 		testVBO.unbind();
 		
 		tex = new Texture2D("tex.png");
+		
+		//Object loader test
+		
+		cube = new Model("tricube.obj");
 	}
 
 	long totaltime = 0;
@@ -63,10 +72,13 @@ public class Renderer3D {
 		
 		tex.bind();
 		
+		/*
         testVBO.bind();
         testVBO.prepareForDraw();
         testVBO.draw();
         testVBO.unbind();
+        */
+		cube.draw();
 
 		TOOLBOX.checkGLERROR(true);
 		Display.update();
