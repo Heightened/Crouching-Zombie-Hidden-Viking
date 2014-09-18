@@ -34,5 +34,5 @@
 *.backup
 
 # Output
-*.pdf
-!final/appendix/minutes/*.pdf
+/final/*.pdf
+/concept/*.pdf
