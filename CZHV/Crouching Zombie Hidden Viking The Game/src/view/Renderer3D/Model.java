@@ -13,11 +13,12 @@ import view.renderer3D.core.Drawable3D;
 import view.renderer3D.core.ShaderObject;
 
 public class Model {
+	ArrayList<Float[]> distinctVertices = null;
+	ArrayList<Float[]> distinctTextureCoords = null;
+	ArrayList<Float[]> distinctNormals = null;
+	
 	private class modelSegment extends Drawable3D {
 		int size;
-		ArrayList<Float[]> distinctVertices = new ArrayList<Float[]>();
-		ArrayList<Float[]> distinctTextureCoords = new ArrayList<Float[]>();
-		ArrayList<Float[]> distinctNormals = new ArrayList<Float[]>();
 		ArrayList<String[]> faces = new ArrayList<String[]>();
 		
 		public modelSegment() {
@@ -27,7 +28,8 @@ public class Model {
 		private int[] getIntArray(int offset, String[] words) {
 			int[] intArray = new int[words.length - offset];
 			for (int i = 0; i < intArray.length; i++) {
-				intArray[i] = Integer.parseInt(words[i + offset]);
+				String word = words[i + offset];
+				intArray[i] = (!word.isEmpty()) ? Integer.parseInt(word) : 1;
 			}
 			return intArray;
 		}
@@ -70,11 +72,8 @@ public class Model {
 			
 			initialize(size, vertices, uvcoords, normals);
 			
-			// Delete references to unused information
+			// Delete reference to unused information
 			
-			distinctVertices = null;
-			distinctTextureCoords = null;
-			distinctVertices = null;
 			faces = null;
 		}
 	}
@@ -83,9 +82,7 @@ public class Model {
 	
 	private Float[] getFloatArray(int offset, String[] words) {
 		Float[] floatArray = new Float[words.length - offset];
-		System.out.println(Arrays.toString(words));
 		for (int i = 0; i < floatArray.length; i++) {
-			System.out.println(Arrays.toString(floatArray));
 			floatArray[i] = Float.parseFloat(words[i + offset]);
 		}
 		return floatArray;
@@ -93,6 +90,10 @@ public class Model {
 	
 	public Model(String objPath) {
 		super();
+		
+		distinctVertices = new ArrayList<Float[]>();
+		distinctTextureCoords = new ArrayList<Float[]>();
+		distinctNormals = new ArrayList<Float[]>();
 		
 		// Open .obj file
 		
@@ -121,13 +122,13 @@ public class Model {
 						segments.add(segment);
 						break;
 					case "v":
-						segment.distinctVertices.add(getFloatArray(1, words));
+						distinctVertices.add(getFloatArray(1, words));
 						break;
 					case "vt":
-						segment.distinctTextureCoords.add(getFloatArray(1, words));
+						distinctTextureCoords.add(getFloatArray(1, words));
 						break;
 					case "vn":
-						segment.distinctNormals.add(getFloatArray(1, words));
+						distinctNormals.add(getFloatArray(1, words));
 						break;
 					case "f":
 						segment.size += (words.length - 1);
@@ -149,6 +150,12 @@ public class Model {
 			model[i] = segments.get(i);
 			model[i].initializeSegment();
 		}
+		
+		// Delete references to unused information
+		
+		distinctVertices = null;
+		distinctTextureCoords = null;
+		distinctVertices = null;
 	}
 	
 	public void draw(ShaderObject shader) {

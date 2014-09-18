@@ -1,13 +1,15 @@
 package controller;
 
+import model.Game;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-public class InputManager implements Control{
-	ControlListener listener;
+public class InputManager extends Controller{
 	
-	public InputManager(){
+	public InputManager(Game game){
+		super(game);
 		try {
 			Keyboard.create();
 			Mouse.create();
@@ -40,10 +42,5 @@ public class InputManager implements Control{
 				//TODO: keyconfig
 			}
 		}
-	}
-
-	@Override
-	public void assignListener(ControlListener l) {
-		listener = l;
 	}
 }

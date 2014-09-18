@@ -1,11 +1,12 @@
 package controller;
 
-public class AI_Manager implements Control{
+import model.Game;
 
-	@Override
-	public void assignListener(ControlListener l) {
-		// TODO Auto-generated method stub
-		
+public class AI_Manager extends Controller{
+
+	public AI_Manager(Game game) {
+		super(game);
+		// TODO Auto-generated constructor stub
 	}
 
 }

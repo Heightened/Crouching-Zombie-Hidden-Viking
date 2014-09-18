@@ -77,7 +77,7 @@ public class Dummy3DObj {
 	}
 	
 	public void calcModelMatrix(){
-		MatrixCZHV.getModelMatrix(new Vector3f(position.x, position.y, position.z), new Vector3f(0.05f,0.05f,0.05f), new Vector3f(0,0,0), modelMat);
+		MatrixCZHV.getModelMatrix(new Vector3f(position.x, position.y, position.z), new Vector3f(0.25f,0.25f,0.25f), new Vector3f(0,0,0), modelMat);
 		MatrixCZHV.MatrixToBuffer(modelMat, modelMatrix);
 	}
 	
