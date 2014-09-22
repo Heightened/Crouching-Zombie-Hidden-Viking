@@ -24,6 +24,10 @@ public class Camera {
 		return position;
 	}
 	
+	public Vector3f getWorldPosition(){
+		return new Vector3f(-position.x, -position.y, -position.z);
+	}
+	
 	int curAngle = 0;
 	float sensitivity = 1/100f;
 	public void lookThrough(){

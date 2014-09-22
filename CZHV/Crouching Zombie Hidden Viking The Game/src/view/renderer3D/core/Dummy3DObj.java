@@ -14,39 +14,32 @@ public class Dummy3DObj {
 	private static Model mesh;
 	private Vector4f position;
 	private Matrix4f modelMat;
+	private Vector3f rotation;
 	private FloatBuffer modelMatrix;
 	private Vector4f screenPos;
-	private float scale = 0.075f;
+	private float scale = 0.035f;
 	private boolean selected = false;
 	
-	public Dummy3DObj(Vector4f position){
+	public Dummy3DObj(Vector4f position, Vector3f rotation){
 		modelMatrix = BufferUtils.createFloatBuffer(16);
+		this.rotation = rotation;
 		modelMat = new Matrix4f();
 		screenPos = new Vector4f();
 		this.position = position;
 		if (mesh == null){
 			mesh = new Model("tricube.obj");
-			
-			/*FloatBuffer buffer = BufferUtils.createFloatBuffer(8*6);//8 floats per vert, 3 verts
-			//tri 1
-			putVertex(buffer, -scale, 0, -scale);
-			putVertex(buffer, scale, 0, -scale);
-			putVertex(buffer, scale, 0, scale);
-			//tri 2
-			putVertex(buffer, -scale, 0, -scale);
-			putVertex(buffer, -scale, 0, scale);
-			putVertex(buffer, scale, 0, scale);
-			
-			buffer.flip();
-			mesh.bind();
-			mesh.put(buffer);
-			mesh.unbind();*/
 		}
 		
 	}
 	
 	public boolean isSelected(){
 		return selected;
+	}
+	
+	public void setPosition(float x, float y, float z){
+		position.x = x;
+		position.y = y;
+		position.z = z;
 	}
 	
 	public void calcScreenSpace(Matrix4f mvp){
@@ -77,7 +70,7 @@ public class Dummy3DObj {
 	}
 	
 	public void calcModelMatrix(){
-		MatrixCZHV.getModelMatrix(new Vector3f(position.x, position.y, position.z), new Vector3f(0.25f,0.25f,0.25f), new Vector3f(0,0,0), modelMat);
+		MatrixCZHV.getModelMatrix(new Vector3f(position.x, position.y, position.z), new Vector3f(scale, scale, scale), rotation, modelMat);
 		MatrixCZHV.MatrixToBuffer(modelMat, modelMatrix);
 	}
 	

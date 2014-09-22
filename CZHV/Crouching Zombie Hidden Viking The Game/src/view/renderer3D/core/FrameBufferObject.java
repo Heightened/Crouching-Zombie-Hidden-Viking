@@ -23,12 +23,25 @@ public class FrameBufferObject {
     private String name;
     private List<Integer> attachments;
     private boolean bound = false;
+    private boolean[] colormask;
     
     public FrameBufferObject(String name, int width, int height){
         this.width = width;
         this.height = height;
         this.name = name;
         attachments = new ArrayList<>();
+    	colormask = new boolean[4];
+    	colormask[0] = true;
+    	colormask[1] = true;
+    	colormask[2] = true;
+    	colormask[3] = true;
+    }
+    
+    public void setColorMask(boolean r, boolean g, boolean b, boolean a){
+    	colormask[0] = r;
+    	colormask[1] = g;
+    	colormask[2] = b;
+    	colormask[3] = a;
     }
     
     public void setup(){
@@ -66,12 +79,14 @@ public class FrameBufferObject {
             TOOLBOX.printStackTraceFromHere();
             System.exit(0);
         }
+        glColorMask(colormask[0], colormask[1], colormask[2], colormask[3]);
         bound = true;
         glBindFramebuffer( GL_FRAMEBUFFER, bufferID);
     }
     
     public void unBind(){
         bound = false;
+        glColorMask(true,true,true,true);
         glBindFramebuffer( GL_FRAMEBUFFER, 0);
     }
     
@@ -82,6 +97,11 @@ public class FrameBufferObject {
         }
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,GL_TEXTURE_2D, t.getTextureID(), 0);
         TOOLBOX.checkGLERROR();
+    }
+    
+    public void drawBufferNone(){
+    	classInv();
+        glDrawBuffer(GL_NONE);
     }
     
     private void checkOK(){

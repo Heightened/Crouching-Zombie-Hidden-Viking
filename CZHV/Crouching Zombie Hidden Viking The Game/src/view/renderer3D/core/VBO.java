@@ -44,9 +44,17 @@ public class VBO {
 
 	public void prepareForDraw(ShaderObject shader){
 		classInv();
-		GL20.glVertexAttribPointer(shader.getAttrLocation("in_position"), 3, GL11.GL_FLOAT, false, 32, 0);
-		GL20.glVertexAttribPointer(shader.getAttrLocation("in_normal"), 3, GL11.GL_FLOAT, false, 32, 12);
-		GL20.glVertexAttribPointer(shader.getAttrLocation("in_texcoord"), 2, GL11.GL_FLOAT, false, 32, 24);
+		setAttrPointer(shader,"in_position", 3, GL11.GL_FLOAT, false, 32, 0);
+		setAttrPointer(shader,"in_normal", 3, GL11.GL_FLOAT, false, 32, 12);
+		setAttrPointer(shader,"in_texcoord", 2, GL11.GL_FLOAT, false, 32, 24);
+	}
+	
+	private void setAttrPointer(ShaderObject shader, String name, int size, int type, boolean normalize, int stride, int offset){
+		Integer loc = shader.getAttrLocation(name);
+		if (loc == null){
+			return;
+		}
+		GL20.glVertexAttribPointer( loc, size, type, normalize, stride, offset);
 	}
 	
 	public void draw(){

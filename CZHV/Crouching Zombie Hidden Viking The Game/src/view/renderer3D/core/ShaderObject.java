@@ -85,7 +85,9 @@ public class ShaderObject {
 	public boolean link(){
 		boolean retBool = true;
         GL20.glAttachShader(shaderID, vertexID);
+        retBool = retBool && !TOOLBOX.checkGLERROR(true);
         GL20.glAttachShader(shaderID, fragmentID);
+        retBool = retBool && !TOOLBOX.checkGLERROR(true);
         GL20.glLinkProgram(shaderID);
         retBool = retBool && !TOOLBOX.checkGLERROR(true);
         GL20.glValidateProgram(shaderID);
@@ -128,7 +130,6 @@ public class ShaderObject {
 			uniformBlockLocations.put(name, blockIndex);
 			uniformBlockBindingPoints.put(name, blockCounter);
 	        GL31.glUniformBlockBinding(shaderID, blockIndex, blockCounter);
-	        System.out.println(name + " " + blockIndex + " " + blockCounter);
 	        blockCounter++;
 		}
 		TOOLBOX.checkGLERROR(true);
@@ -140,7 +141,6 @@ public class ShaderObject {
 		TOOLBOX.checkGLERROR(true);
 		int numAttr = GL20.glGetProgrami(shaderID, GL20.GL_ACTIVE_ATTRIBUTES);
 		vertexAttrLocations = new HashMap<String, Integer>(numAttr);
-		System.out.println(numAttr);
 		for (int i = 0; i < numAttr; i++){
 			String name = GL20.glGetActiveAttrib(shaderID, i, 100);
 			int type = GL20.glGetActiveAttribType(shaderID, i);
@@ -151,7 +151,7 @@ public class ShaderObject {
 		TOOLBOX.checkGLERROR(true);
 	}
 	
-	public int getAttrLocation(String name){
+	public Integer getAttrLocation(String name){
 		return vertexAttrLocations.get(name);
 	}
 	
@@ -167,7 +167,11 @@ public class ShaderObject {
 	}
 	
 	public void putUnifFloat4(String name, Vector4f value){
-		GL20.glUniform4f(uniformLocations.get(name), value.x, value.y, value.z, value.w);
+		Integer loc = uniformLocations.get(name);
+		if (loc == null){
+			return;
+		}
+		GL20.glUniform4f(loc, value.x, value.y, value.z, value.w);
 	}
 	
 	public void putUnifFloat4(String name, float x, float y, float z, float w){

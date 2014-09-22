@@ -6,19 +6,19 @@ package view.renderer3D.core.lighting;
 
 import static org.lwjgl.opengl.GL30.glBindBufferBase;
 import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
-import static org.lwjgl.opengl.GL31.glGetUniformBlockIndex;
-import static org.lwjgl.opengl.GL31.glUniformBlockBinding;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Renderer3D;
 import view.renderer3D.core.ShaderObject;
+import view.renderer3D.core.shadows.ShadowManager;
 
 /**
  *
@@ -45,14 +45,22 @@ public class LightManager {
     
     private static int flipflop = 0;
     private static boolean inits = false;
-    public LightManager(){
+    private ShadowManager shadowManger;
+    public LightManager(ShadowManager shadowManager){
+    	this.shadowManger = shadowManager;
         inits = true;
-        Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector3f(0,0,0));
+        Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector4f(0,0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
-        lights.add(new Light(new Vector3f(0,0.5f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(1,0.5f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(0,0.5f,1), new Vector3f(0,1,0),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
-        lights.add(new Light(new Vector3f(1,0.5f,1), new Vector3f(1,0,1),new Vector3f(1,0,0),1f,.5f,new Vector3f(0,-1,0)));
+        lights.add(new Light(new Vector3f(0,0.3f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(1,0,1,0)));
+        lights.add(new Light(new Vector3f(1,0.3f,1), new Vector3f(1,1,1),new Vector3f(1,0,0),1f,.9f,new Vector4f(0,-1,0,0)));
+        
+        lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
+        lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
+        
+        for (int i = 1; i < lights.size(); i++){
+        	lights.get(i).setShadow(shadowManager.getShadow(lights.get(i)));
+        }
+        
         
         lightBuffer = new int[2];
         lightBuffer[0] = ARBVertexBufferObject.glGenBuffersARB();
@@ -119,16 +127,29 @@ public class LightManager {
         //light is updated to graphics card, so draw any lit geometry
     }
     
+    private boolean isAnimating = true;
     private void animate(){
+    	if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
+    		return;
+    	}
         //stay idle for now
-        for (int i = 1; i < lights.size(); i++){
+        for (int i = 3; i < lights.size(); i++){
             lights.get(i).setDirty();
            // lights.get(i).position.y = ((float)Math.sin(Renderer3D.currentTime*20+i)*0.5f);
-           lights.get(i).spotdirection.z = ((float)Math.sin(Renderer3D.currentTime*20+i)*1f);
-           lights.get(i).spotdirection.x = ((float)Math.cos(Renderer3D.currentTime*20+i)*1f);
+           lights.get(i).spotDirection.z = ((float)Math.sin(Renderer3D.currentTime*20+i)*1f);
+           lights.get(i).spotDirection.x = ((float)Math.cos(Renderer3D.currentTime*20+i)*1f);
+          // lights.get(i).radius = (float)Math.sin(Renderer3D.currentTime*20)+1f;
            // lights.get(i).cutoffangle = 0.8f;
             //lights.get(i).radius = (float)Math.sin(Renderer3D.currentTime*10)*1+1;
         }
+    }
+    
+    public void pauseResumeAnimation(){
+    	isAnimating = !isAnimating;
+    }
+    
+    public Light getLight(int index){
+    	return lights.get(index);
     }
     
     private void distribute(){

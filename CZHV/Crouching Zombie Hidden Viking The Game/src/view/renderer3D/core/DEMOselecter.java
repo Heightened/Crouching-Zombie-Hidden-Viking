@@ -7,9 +7,11 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
+import view.renderer3D.core.tempFlocking.Vehicle;
+
 public class DEMOselecter {
-	ArrayList<Dummy3DObj> objList;
-	public DEMOselecter(ArrayList<Dummy3DObj> objList){
+	ArrayList<Vehicle> objList;
+	public DEMOselecter(ArrayList<Vehicle> objList){
 		this.objList = objList;
 		startpos = new Vector2f();
 		endpos = new Vector2f();
@@ -57,6 +59,12 @@ public class DEMOselecter {
 	        quadVBO.draw();
 	        quadVBO.unbind();
 		}
+	}
+	
+	public Vector2f getNormalizedMouse(){
+		Vector2f ret = normalize(new Vector2f(Mouse.getX(), Mouse.getY()));
+		ret.y = - ret.y;
+		return ret;
 	}
 	
 	public Vector2f normalize(Vector2f in){

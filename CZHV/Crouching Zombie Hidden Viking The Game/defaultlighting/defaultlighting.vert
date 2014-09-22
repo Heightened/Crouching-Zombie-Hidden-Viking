@@ -26,7 +26,7 @@ void main()
 	worldspacePos = modelMatrix*in_position;
 	gl_Position = projectionMatrix*viewMatrix*worldspacePos;
 
-	normal =  in_normal;
+	normal =  mat3(modelMatrix)*in_normal;
 	tangents =  mat3(modelMatrix)*vec3(1,0,0);
 
   	texture_coordinate = vec2(in_texcoord);
