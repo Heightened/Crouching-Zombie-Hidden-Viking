@@ -104,6 +104,7 @@ public class ShaderObject {
 		int textureCounter = 0;
 		int blockCounter = 0;
 		int numUnifs = GL20.glGetProgrami(shaderID, GL20.GL_ACTIVE_UNIFORMS);
+		System.out.println(this.name + " numunifs " + numUnifs);
 		int numUnifBlocks = GL20.glGetProgrami(shaderID, GL31.GL_ACTIVE_UNIFORM_BLOCKS);
 		TOOLBOX.checkGLERROR(true);
 		uniformLocations = new HashMap<String, Integer>(numUnifs);
@@ -112,6 +113,7 @@ public class ShaderObject {
 		uniformBlockBindingPoints = new HashMap<String, Integer>(numUnifBlocks);
 		for (int i = 0; i < numUnifs; i++){
 			String name = GL20.glGetActiveUniform(shaderID, i, 100);
+			System.out.println(name);
 			int type = GL20.glGetActiveUniformType(shaderID, i);
 			int location = GL20.glGetUniformLocation(shaderID, name);
 			uniformLocations.put(name, location);

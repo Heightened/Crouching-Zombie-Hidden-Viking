@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import view.renderer3D.core.tempFlocking.Vehicle;
+
 
 public class DrawPanel extends JPanel implements MouseMotionListener{
 	

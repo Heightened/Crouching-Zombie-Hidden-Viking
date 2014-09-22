@@ -1,23 +1,31 @@
-import javax.swing.JFrame;
+package view.renderer3D.core.tempFlocking;
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
-import org.omg.CORBA.FREE_MEM;
+import view.renderer3D.core.Dummy3DObj;
 
 
-public class Vehicle {
+public class Vehicle extends Dummy3DObj{
 	Vector2f steering;
 	Vector2f velocity;
 	Vector2f targetVelocity;
-	final float max_speed = 5;//final for performance
-	final float max_force = 1;
-	final float mass = 6;
-	Vector2f position;
-	Vector2f target;
+	final float max_speed = 0.7f;//final for performance
+	final float max_force = 0.05f;
+	final float mass = 10;
+	Vector4f position;
+	Vector4f prevPosition;
+	Vector4f target;
+	Vector3f rotation;
 	
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(float posx, float posy, Vector2f target){
-		position = new Vector2f(posx, posy);
+	public Vehicle(Vector4f position, Vector4f target, Vector3f rotation){
+		super(position, rotation);
+		this.position = position;
+		this.rotation = rotation;
+		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
 		this.target = target;
 		targetVelocity = new Vector2f(0,0);
@@ -25,10 +33,9 @@ public class Vehicle {
 	}
 
 	float targetSlowRadius = 100;
-	Vector2f center = new Vector2f(250,250);
-	public void update(FlockingMain main, Grid grid){
-		gridx = (int)(position.x/FlockingMain.GRID_CELL_SIZE);
-		gridy = (int)(position.y/FlockingMain.GRID_CELL_SIZE);
+	public void update(FlockingManager main, Grid grid){
+		gridx = (int)(position.x/FlockingManager.GRID_CELL_SIZE);
+		gridy = (int)(position.z/FlockingManager.GRID_CELL_SIZE);
 
 		steering.x = 0;
 		steering.y = 0;
@@ -39,34 +46,50 @@ public class Vehicle {
 				for (int i = 0; i < size; i++){
 					Vehicle v = tempv[i];
 					if (v != this){
-						Vector2f vec = fleeTarget(v.position, 30);//all performance issues here
-						steering.x += vec.x*4f;
-						steering.y += vec.y*4f;
+						Vector2f vec = fleeTarget(v.position, 0.13f);//all performance issues here
+						steering.x += vec.x*1f;
+						steering.y += vec.y*1f;
 					}
 				}
 			}
 		}
+		
+		addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
 		addSteeringForce( seekTarget(target, 100), 5);
-	    addSteeringForce( fleeTarget(center, targetSlowRadius), 10);
 
-		steering.truncate(max_force);
+		truncate(steering, max_force);
 		steering.scale(1/mass);
 
 		velocity.x += steering.x;
 		velocity.y += steering.y;
 
-		velocity.truncate(max_speed);
-
+		truncate(velocity, max_speed);
+		
+		float angle = (float)Math.atan2(velocity.x, velocity.y)/(float)Math.PI;
+		//System.out.println(angle);
+		if (steering.length() > 0.005f){
+		//	rotation.y = angle*180;
+		}
+		
 		position.x += velocity.x;
-		position.y += velocity.y;
-		position.x %= FlockingMain.screenSize.width;
-		position.y %= FlockingMain.screenSize.height;
+		position.z += velocity.y;
+		position.x %= FlockingManager.screenSize.x;
+		position.z %= FlockingManager.screenSize.y;
 		if (position.x < 0){
-			position.x += FlockingMain.screenSize.width;
+			position.x += FlockingManager.screenSize.x;
 		}
-		if (position.y < 0){
-			position.y += FlockingMain.screenSize.height;
+		if (position.z < 0){
+			position.z += FlockingManager.screenSize.y;
 		}
+	}
+	
+	public void truncate(Vector2f in, float max){
+		float len = in.length();
+        if (len > max)
+        {
+            in.normalise();
+            in.scale(max);
+        }
 	}
 	
 	public void clearSteeringForce(){
@@ -79,40 +102,40 @@ public class Vehicle {
 		steering.y += force.y*weight;
 	}
 
-	public Vector2f getFuturePosition(float time){
-		return new Vector2f(position.x + velocity.x*time, position.y + velocity.y*time);
+	public Vector4f getFuturePosition(float time){
+		return new Vector4f(position.x + velocity.x*time, position.y, position.z + velocity.y*time, 1);
 	}
 
 	Vector2f temp = new Vector2f(0,0);
 	public Vector2f pursuit(Vehicle target){
 		temp.x = target.position.x - position.x;
-		temp.y = target.position.y - position.y;
-		float distance = temp.getLength();
+		temp.y = target.position.z - position.z;
+		float distance = temp.length();
 		float temp2 = distance/max_speed;
 		return seekTarget(target.getFuturePosition(temp2), 0);
 	}
 	
 	public Vector2f evade(Vehicle target, float radius){
 		temp.x = target.position.x - position.x;
-		temp.y = target.position.y - position.y;
-		float distance = temp.getLength();
+		temp.y = target.position.z - position.z;
+		float distance = temp.length();
 		float temp2 = distance/max_speed/8;
 		return fleeTarget(target.getFuturePosition(temp2), radius);
 	}
 
 	Vector2f tempsteering = new Vector2f(0,0);
-	public Vector2f seekTarget(Vector2f target, float slowRadius){
+	public Vector2f seekTarget(Vector4f target, float slowRadius){
 		targetVelocity.x = target.x - position.x;
-		targetVelocity.y = target.y - position.y;
+		targetVelocity.y = target.z - position.z;
 
-		float distance = targetVelocity.getLength();
+		float distance = targetVelocity.length();
 
 		if (distance < slowRadius){
-			targetVelocity.normalize();
+			targetVelocity.normalise();
 			targetVelocity.scale(max_speed);
 			targetVelocity.scale(distance/slowRadius);
 		}else{
-			targetVelocity.normalize();
+			targetVelocity.normalise();
 			targetVelocity.scale(max_speed);
 		}
 
@@ -123,9 +146,9 @@ public class Vehicle {
 
 	public Vector2f correction = new Vector2f(0,0);
 	//OPTIMIZED AND UGLY
-	public Vector2f fleeTarget(Vector2f target, float fleeRadius){
+	public Vector2f fleeTarget(Vector4f target, float fleeRadius){
 		float targetvx = target.x - position.x;//local float faster than shared vertex
-		float targetvy = target.y - position.y;
+		float targetvy = target.z - position.z;
 		
 		//compute length of targetVelocity
 		float number = targetvx*targetvx + targetvy*targetvy;//faster than math.pow
