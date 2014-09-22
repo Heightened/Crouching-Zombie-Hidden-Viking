@@ -99,6 +99,11 @@ public class FrameBufferObject {
         TOOLBOX.checkGLERROR();
     }
     
+    public void drawBufferNone(){
+    	classInv();
+        glDrawBuffer(GL_NONE);
+    }
+    
     private void checkOK(){
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
             System.err.println(this + " FRAMEBUFFER NOT COMPLETE");

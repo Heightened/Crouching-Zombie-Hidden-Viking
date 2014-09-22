@@ -12,6 +12,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.MatrixCZHV;
+import view.renderer3D.core.Renderer3D;
+import view.renderer3D.core.shadows.Shadow;
 
 /**
  *
@@ -30,11 +32,13 @@ public class Light {
     boolean[] dirty;
     
     private FloatBuffer viewMatrix;
+    private FloatBuffer projectionMatrix;
     private Matrix4f viewMat;
     public float pitch = 0;
     public float yaw = 0;
     
     public Vector4f spotDirection;
+    private Shadow shadow;
     
     public Light(Vector3f position, Vector3f color, Vector3f specColor, float radius, float cutoffangle, Vector4f spotdirection) {
         this.position = position;
@@ -48,6 +52,7 @@ public class Light {
         dirty = new boolean[2];
         dirty[0] = true;
         dirty[1] = true;
+        calcProjectionMatrix();
     }
     
     public Light calcViewMatrix(){
@@ -68,8 +73,45 @@ public class Light {
     	return this;
     }
     
+    public void setShadow(Shadow s){
+    	this.shadow = s;
+    }
+    
+    public Shadow getShadow(){
+    	return shadow;
+    }
+    
+    public final void calcProjectionMatrix(){
+    	float fieldOfView = 70f;
+		float aspectRatio = Renderer3D.screenSize.width/(float)Renderer3D.screenSize.height;//affected lightmap is square, so x/y = 1
+		float near_plane = 0.05f;
+		float far_plane = 300;
+
+        float y_scale = 1/(float)Math.tan(Math.toRadians(fieldOfView / 2f));
+        float x_scale = y_scale / aspectRatio;
+        float frustum_length = far_plane - near_plane;
+		
+		Matrix4f projMat = new Matrix4f();
+		
+		projMat.m00 = x_scale;
+		projMat.m11 = y_scale;
+		projMat.m22 = -((far_plane + near_plane) / frustum_length);
+		projMat.m23 = -1;
+		projMat.m32 = -((2 * near_plane * far_plane) / frustum_length);
+		projMat.m33 = 0;    
+		
+		projectionMatrix = BufferUtils.createFloatBuffer(16);
+		
+		projMat.store(projectionMatrix);
+		projectionMatrix.flip();
+    }
+    
     public FloatBuffer getViewMatrix(){
     	return viewMatrix;
+    }
+    
+    public FloatBuffer getProjectionMatrix(){
+    	return projectionMatrix;
     }
     
     public void setDirty(){

@@ -6,8 +6,6 @@ package view.renderer3D.core.lighting;
 
 import static org.lwjgl.opengl.GL30.glBindBufferBase;
 import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
-import static org.lwjgl.opengl.GL31.glGetUniformBlockIndex;
-import static org.lwjgl.opengl.GL31.glUniformBlockBinding;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -20,6 +18,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Renderer3D;
 import view.renderer3D.core.ShaderObject;
+import view.renderer3D.core.shadows.ShadowManager;
 
 /**
  *
@@ -46,7 +45,9 @@ public class LightManager {
     
     private static int flipflop = 0;
     private static boolean inits = false;
-    public LightManager(){
+    private ShadowManager shadowManger;
+    public LightManager(ShadowManager shadowManager){
+    	this.shadowManger = shadowManager;
         inits = true;
         Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector4f(0,0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
@@ -55,6 +56,10 @@ public class LightManager {
         
         lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
         lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
+        
+        for (int i = 1; i < lights.size(); i++){
+        	lights.get(i).setShadow(shadowManager.getShadow(lights.get(i)));
+        }
         
         
         lightBuffer = new int[2];

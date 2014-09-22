@@ -22,6 +22,11 @@ uniform vec4 color;
 
 varying vec3 tangents;
 
+uniform sampler2D shadowMap;
+uniform mat4 projectionMatrix;
+uniform mat4 shadowMVP;
+uniform mat4 biasMatrix;
+
 struct Light
 {
   vec4 worldpos;
@@ -39,13 +44,29 @@ layout(std140) uniform lightblock{
 layout(std140) uniform indexblock{
     vec4 indices[256];
 };
-layout(std140) uniform shadowblock{
-    mat4 shadowMVP[16];
-};
-
+//layout(std140) uniform shadowblock{
+//    mat4 shadowMVP[16];
+//};
+float LinearizeDepth(float d){
+    float n = 1; // camera z near
+    float f = 300.0; // camera z far
+    return (2.0 * n) / (f + n - d * (f - n));
+}
 
 void main(void)
 {   
+    mat4 shadowMatrix = biasMatrix*projectionMatrix*shadowMVP;
+    vec4 shadowVertex = shadowMatrix*worldspacePos;
+    shadowVertex = shadowVertex/shadowVertex.w;
+    float shadowMapDepth = texture2D(shadowMap, shadowVertex.xz ).r;
+    float shadow = 1;
+    shadow = (shadowMapDepth - shadowVertex.y + 0.00001)*10000000 + 0.5;
+    shadow = clamp(shadow,0,1);
+
+   // shadow = LinearizeDepth(shadowMapDepth);
+
+
+
     int cellx = int(worldspacePos.x/0.25);
     int cellz = int(worldspacePos.z/0.25);
     float temp = float((cellx*cellz))/256;
@@ -80,6 +101,9 @@ void main(void)
         float specDist = 1 - smoothstep(light.radius.r, light.radius.r*1.2, distToLight);
         vec3 L = normalize(lightvec.rgb);
         float lambertTerm = max(0,dot(N,L));
+        if (int(lightindex[i]) == 1){
+          lambertTerm = min(shadow, lambertTerm);
+        }
         //spotlights
         float spotEffect =  dot(normalize(light.radius.gba), normalize(-L));
         float spotfactordiffuse = smoothstep(light.color.a-0.1,light.color.a,spotEffect);
@@ -93,6 +117,7 @@ void main(void)
 
 	gl_FragColor = texture2D(texture,texture_coordinate);
     gl_FragColor = vec4(final_color.rgb*color.rgb,1);
+    //gl_FragColor = vec4(shadow, shadow, shadow,1);
     //gl_FragColor = vec4(final_color.rgb,1);
    // gl_FragColor = vec4(normal.rgb,1);
     //gl_FragColor.r = lights[1].color.a;

@@ -20,6 +20,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.Model;
 import view.renderer3D.core.lighting.LightManager;
+import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.core.tempFlocking.FlockingManager;
 import view.renderer3D.core.tempFlocking.Vehicle;
 import view.renderer3D.inputoutput.FileToString;
@@ -34,13 +35,16 @@ public class Renderer3D {
 	private ArrayList<Vehicle> objList;
 	private DEMOselecter selecter;
 	private LightManager lightManager;
+	private ShadowManager shadowManager;
 	
 	private FlockingManager flockingManager;
 	private Vector4f flockingTarget;
 	private Model quadModel;
+	private FloatBuffer modelz;
 	public Renderer3D(){
 		setupDisplay();
-		lightManager = new LightManager();
+    	shadowManager = new ShadowManager(this);
+		lightManager = new LightManager(shadowManager);
 		MVP = new Matrix4f();
 		camera = new Camera(viewMatrix, viewMat);
 		quadVBO = new VBO(VBO.STATIC_DRAW);
@@ -103,6 +107,12 @@ public class Renderer3D {
 		selecter = new DEMOselecter( objList);
 		
 		quadModel = new Model("quad.obj");
+		
+		Matrix4f model = new Matrix4f();
+    	MatrixCZHV.getModelMatrix(new Vector3f(1,-0.035f,1), new Vector3f(1,1,1), new Vector3f(0,0,0), model);
+    	modelz = BufferUtils.createFloatBuffer(16);
+    	MatrixCZHV.MatrixToBuffer(model, modelz);
+    	
 	}
 	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
@@ -130,6 +140,7 @@ public class Renderer3D {
 		selecter.update(MVP);
 		lightManager.update();
 		
+		shadowManager.update();
 		
 		
 		long sleeptime = System.currentTimeMillis();
@@ -156,23 +167,16 @@ public class Renderer3D {
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
 		lightShader.bindTexture("texture", tex);
+		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
 		lightShader.putMat4("projectionMatrix", projectionMatrix);
 		
+		lightShader.putMat4("shadowMVP", lightManager.getLight(1).getViewMatrix());
+		lightShader.putMat4("biasMatrix", shadowManager.getBiasMatrix());
+		
 		Vector3f pos = camera.getPosition();
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
-
-    	lightShader.putUnifFloat4("color", dummyColor);
-
-    	Matrix4f model = new Matrix4f();
-    	MatrixCZHV.getModelMatrix(new Vector3f(1,-0.1f,1), new Vector3f(1,1,1), new Vector3f(0,0,0), model);
-    	FloatBuffer modelz = BufferUtils.createFloatBuffer(16);
-    	MatrixCZHV.MatrixToBuffer(model, modelz);
-    	
-		lightShader.putMat4("modelMatrix", modelz);
-		
-    	quadModel.draw(lightShader);
 
 		if (Mouse.isButtonDown(1)){
 			Vector2f mouse = selecter.getNormalizedMouse();
@@ -184,17 +188,9 @@ public class Renderer3D {
 			flockingTarget.w = 1;
 		}
 		
-        
-        for (Dummy3DObj dummy : objList){
-	        if (dummy.isSelected()){
-	        	lightShader.putUnifFloat4("color", selectedColor);
-	        }else{
-	        	lightShader.putUnifFloat4("color", dummyColor);
-	        }
-	        
-	        dummy.draw(lightShader);
-        }
-        
+		bufferGeo(lightShader);
+    	
+		
         lightManager.unbind();
         lightShader.unbind();
         
@@ -210,6 +206,26 @@ public class Renderer3D {
 		Display.update();
 		frametime = System.currentTimeMillis() - frametime;
 		totalframetime += frametime;
+	}
+	
+	public void bufferGeo(ShaderObject shader){
+    	shader.putUnifFloat4("color", dummyColor);
+    	
+		shader.putMat4("modelMatrix", modelz);
+		
+    	quadModel.draw(shader);
+		
+        
+        for (Dummy3DObj dummy : objList){
+	        if (dummy.isSelected()){
+	        	shader.putUnifFloat4("color", selectedColor);
+	        }else{
+	        	shader.putUnifFloat4("color", dummyColor);
+	        }
+	        
+	        dummy.draw(shader);
+        }
+        
 	}
 
 	public void sleep(int time){
