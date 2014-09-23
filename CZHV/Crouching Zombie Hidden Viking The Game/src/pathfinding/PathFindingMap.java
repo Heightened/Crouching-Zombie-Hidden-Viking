@@ -47,12 +47,16 @@ public class PathFindingMap
 	
 	public Node getNode(int x, int y)
 	{
-		//TODO: caching
+		if(!this.grid.containsKey(x))
+			this.grid.put(x, new HashMap<Integer, CellType>());
 		
-		if(this.grid.containsKey(x) && this.grid.get(x).containsKey(y))
-			return new Node(x,y,this.grid.get(x).get(y),this);
-		else
-			return new Node(x,y,CellType.UNKNOWN,this);
+		if(!this.grid.get(x).containsKey(y))
+			this.grid.get(x).put(y, CellType.UNKNOWN);
+		
+		if(this.grid.get(x).get(y).getNode() == null)
+			this.grid.get(x).get(y).newNode(x,y,this);
+		
+		return this.grid.get(x).get(y).node;
 	}
 	
 	public enum CellType
@@ -60,5 +64,17 @@ public class PathFindingMap
 		PASSIBLE,
 		IMPASSIBLE,
 		UNKNOWN;
+		
+		private Node node;
+		
+		public void newNode(int x, int y, PathFindingMap map)
+		{
+			this.node = new Node(x,y,this,map);
+		}
+		
+		public Node getNode()
+		{
+			return this.node;
+		}
 	}
 }
