@@ -11,6 +11,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import model.Item;
 import model.character.Character;
 
 import javax.swing.JPanel;
@@ -54,8 +56,28 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.fillRect(0, 0, dimension.width, dimension.height);
 		if (cells != null && solidCells != null){
 			for (Cell c : cells){
-				Character character = c.getCharacterHolder().getItem();
-				drawCharacter(g2, Color.BLUE, c.getX(), c.getY());
+				if(!c.getCharacterHolder().isEmpty())
+				{
+					Character character = c.getCharacterHolder().getItem();
+					Color color;
+					if(character.isInfected())
+						color = Color.RED;
+					else if(character.isDead())
+						color = Color.DARK_GRAY;
+					else
+						color = Color.BLUE;
+					drawCharacter(g2, color, c.getX(), c.getY());
+				}
+				if(!c.getItemHolder().isEmpty())
+				{
+					Item item = c.getItemHolder().getItem();
+					drawItem(g2, Color.GRAY, c.getX(), c.getY());
+				}
+				if(!c.getDecorHolder().isEmpty())
+				{
+					if(c.getDecorHolder().getItem().isPassible())
+						drawPassibleDecor(g2, c.getX(), c.getY());
+				}
 			}
 			for (Cell c : solidCells){
 				drawSolid(g2,c.getX(), c.getY());
@@ -92,8 +114,18 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.fillRect(worldpos.x, worldpos.y, cellSize+1, cellSize+1);
 	}
 	
+	public void drawPassibleDecor(Graphics2D g2, int cellx, int celly){
+		Point worldpos = cellToWorldSpace(cellx, celly);
+		g2.setColor(Color.PINK);
+		g2.fillRect(worldpos.x, worldpos.y, cellSize+1, cellSize+1);
+	}
+	
 	public void drawCharacter(Graphics2D g2, Color c, int cellx, int celly){
-		drawOval(g2, c, cellToWorldSpace(cellx, celly));
+		drawOval(g2, c, cellToWorldSpace(cellx, celly), 3*cellSize);
+	}
+	
+	public void drawItem(Graphics2D g2, Color c, int cellx, int celly){
+		drawOval(g2, c, cellToWorldSpace(cellx, celly), cellSize);
 	}
 	
 	public void drawCharacter(Graphics2D g2, Color c, int cellx, int celly, float distance, double radians){
@@ -109,11 +141,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	
 	public Point worldToCellSpace(int mousex, int mousey){
 		return new Point((mousex + viewPosition.x)/cellSize,(mousey + viewPosition.y)/cellSize);
-	}
-	
-	public void drawOval(Graphics2D g2, Color c, Point position){
-		g2.setColor(c);
-		g2.fillOval(position.x-cellSize, position.y-cellSize, cellSize*3, cellSize*3);
 	}
 	
 	public void drawOval(Graphics2D g2, Color c, Point position, int radius){

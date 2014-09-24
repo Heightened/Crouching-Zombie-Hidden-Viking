@@ -25,6 +25,7 @@ public class Renderer2D {
 		frame.setSize(500,500);
 		frame.setLocation(400,200);
 		panel = new DrawPanel(CELL_SIZE,0, 0, new Dimension(frame.getWidth(), frame.getHeight()), lights.getLightMap());
+		panel.setSolidCells(m.getImpassibleCells());
 		lights.setViewPosition(panel.getViewPosition());
 		frame.getContentPane().add(panel);
 		frame.setVisible(true);
@@ -46,7 +47,6 @@ public class Renderer2D {
 			}
 		}
 		panel.setCells(c);
-		panel.setSolidCells(m.getImpassibleCells());
 		lights.render();
 		panel.repaint();
 	}
