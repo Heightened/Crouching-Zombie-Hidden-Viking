@@ -22,7 +22,7 @@ public class Renderer2D {
 		m.populate();
 		lights = new Lights(CELL_SIZE); 
 		frame = new JFrame();
-		frame.setSize(500,500);
+		frame.setSize(1000,1000);
 		frame.setLocation(400,200);
 		panel = new DrawPanel(CELL_SIZE,0, 0, new Dimension(frame.getWidth(), frame.getHeight()), lights.getLightMap());
 		panel.setSolidCells(m.getImpassibleCells());

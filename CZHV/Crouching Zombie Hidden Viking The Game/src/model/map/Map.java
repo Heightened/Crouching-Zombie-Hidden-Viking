@@ -3,6 +3,9 @@ package model.map;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
+
+import pathfinding.Astar;
+import model.Item;
 import model.character.Character;
 
 
@@ -54,9 +57,33 @@ public class Map
 			}
 		}
 		
-		int nZombies = this.randInt(size/600, size/300);
+		int nZombies = 5; //this.randInt(size/600, size/300);
 		
 		for(int i=0; i<nZombies; i++)
+		{
+			int x,y;
+			Character c = new Character(128,16,16,2,true);
+			c.setPathFinder(new Astar(this,100,c));
+			
+			do
+			{
+				x = this.randInt(0, this.getWidth() - 1);
+				y = this.randInt(0, this.getHeight() - 1);
+			}
+			while(!this.getCell(x, y).isFree(c));
+			
+			c.teleportTo(this.getCell(x,y));
+			
+			//if(this.randInt(0,5)==2)
+			{
+				c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
+			}
+		}
+		
+		/*
+		int nItems = this.randInt(size/600, size/300);
+		
+		for(int i=0; i<nItems; i++)
 		{
 			int x,y;
 			
@@ -67,8 +94,9 @@ public class Map
 			}
 			while(!this.getCell(x, y).isPassible());
 			
-			this.getCell(x, y).getCharacterHolder().setItem(new Character());
+			this.getCell(x, y).getItemHolder().setItem(new Item());
 		}
+		//*/
 	}
 	
 	public boolean isInGrid(int x, int y)
@@ -100,7 +128,7 @@ public class Map
 		
 		for(int xi=x-r; xi<=x+r; xi++)
 			for(int yi=y-r; yi<=y+r; yi++)
-				if(Math.pow(xi-x,0) + Math.pow(yi-y,2) < r*r)
+				if(Math.pow(xi-x,0) + Math.pow(yi-y,2) < r*r && this.isInGrid(xi, yi))
 					nearbyCells.add(this.getCell(xi,yi));
 		
 		return nearbyCells;
