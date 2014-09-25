@@ -54,6 +54,11 @@ public class Cell {
 		return this.y;
 	}
 	
+	public Map getMap()
+	{
+		return this.map;
+	}
+	
 	public Collection<Cell> getNeighbours()
 	{
 		return new HashSet<>();

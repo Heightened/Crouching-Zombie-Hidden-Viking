@@ -11,7 +11,7 @@ public class Drawable3D {
 //		
 //	}
 	
-	public void initialize(int size, Float[] vertices, Float[] uvcoords, Float[] normals) {
+	public void initialize(int size, float[] vertices, float[] uvcoords, float[] normals) {
 		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(8 * size); //position, normal, uv (, tangent, color)
 		
 		for (int i = 0; i < size; i++) {

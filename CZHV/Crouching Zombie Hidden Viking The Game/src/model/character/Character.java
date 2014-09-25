@@ -1,7 +1,13 @@
 package model.character;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import model.Item;
+import pathfinding.Astar;
+import pathfinding.Node;
+import pathfinding.PathFinder;
 
 public class Character {
 	
@@ -11,10 +17,18 @@ public class Character {
 	private int currentHp = 0;
 	private int strength = 0;
 	private int speed = 0;
+	private float direction = 0;
+	private float x=0.5f,y=0.5f; // in-cell position 0<=x<1 and 0<=y<1
+	
 	private Map<Skill, Boolean> skills = new HashMap<>();
 	private boolean infected;
 	
-	public Character(){	}
+	private model.map.Cell cell = null;
+	private PathFinder pathFinder;
+	
+	public Character(){
+		this(100,16,16,2,false);
+	}
 	
 	public Character(int maxHp, int strength, int speed, int inventory_size, boolean infected){
 		setMaxHp(maxHp);
@@ -25,6 +39,64 @@ public class Character {
 		currentHp = maxHp;
 		
 		this.skills.put(Skill.OPEN_DOOR, true);
+	}
+	
+	// only for simulator
+	public void move(float dtime)
+	{
+		// calculate new position
+		// if moved outside of cell, us teleportTo
+		// else just update in-cell position
+	}
+	
+	// only for controller
+	public void moveTo(float x, float y)
+	{
+		assert this.cell != null;
+		
+		Collection<Node> nodes = this.pathFinder.calculatePath(
+				this.cell.getX(), this.cell.getY(),
+				(int)x, (int)y
+			);
+		
+		for(Node n : nodes)
+		{
+			System.out.println("("+n.getX()+","+n.getY()+")");
+			this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
+		}
+	}
+	
+	public void teleportTo(float x, float y)
+	{
+		assert this.cell != null;
+		
+		int xi = (int)x;
+		int yi = (int)y;
+		model.map.Cell oldCell = this.cell;
+		model.map.Cell newCell = this.cell.getMap().getCell(xi, yi);
+		
+		newCell.getCharacterHolder().setItem(this);
+		this.x = x-xi;
+		this.y = y-yi;
+		
+		this.cell = newCell;
+		oldCell.getCharacterHolder().removeItem();
+		
+	}
+	
+	public void teleportTo(model.map.Cell cell)
+	{
+		cell.getCharacterHolder().setItem(this);
+		
+		if(this.cell != null)
+			this.cell.getCharacterHolder().removeItem();
+		
+		this.cell = cell;
+	}
+	
+	public void setPathFinder(PathFinder pathFinder)
+	{
+		this.pathFinder = pathFinder;
 	}
 	
 	public Inventory getBag() {
@@ -57,6 +129,14 @@ public class Character {
 
 	public void setSpeed(int speed) {
 		this.speed = speed;
+	}
+	
+	public float getDirection() {
+		return direction;
+	}
+	
+	public void setDirection(float direction) {
+		this.direction = direction;
 	}
 
 	public int getCurrentHp() {

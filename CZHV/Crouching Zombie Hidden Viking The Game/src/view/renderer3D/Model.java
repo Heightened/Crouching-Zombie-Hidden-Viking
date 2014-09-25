@@ -13,9 +13,9 @@ import view.renderer3D.core.Drawable3D;
 import view.renderer3D.core.ShaderObject;
 
 public class Model {
-	ArrayList<Float[]> distinctVertices = null;
-	ArrayList<Float[]> distinctTextureCoords = null;
-	ArrayList<Float[]> distinctNormals = null;
+	ArrayList<float[]> distinctVertices = null;
+	ArrayList<float[]> distinctTextureCoords = null;
+	ArrayList<float[]> distinctNormals = null;
 	
 	private class modelSegment extends Drawable3D {
 		int size;
@@ -36,9 +36,9 @@ public class Model {
 		
 		public void initializeSegment() {
 			// Process faces
-			Float[] vertices = new Float[size * 3];
-			Float[] uvcoords = new Float[size * 2];
-			Float[] normals = new Float[size * 3];
+			float[] vertices = new float[size * 3];
+			float[] uvcoords = new float[size * 2];
+			float[] normals = new float[size * 3];
 			
 			int i = 0;
 			for (String[] face : faces) {
@@ -51,9 +51,9 @@ public class Model {
 					int[] attributes = getIntArray(0, vertex.split("/"));
 					System.out.println(Arrays.toString(attributes));
 					
-					Float[] position = distinctVertices.get(attributes[0] - 1);
-					Float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
-					Float[] normal = distinctNormals.get(attributes[2] - 1);
+					float[] position = distinctVertices.get(attributes[0] - 1);
+					float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
+					float[] normal = distinctNormals.get(attributes[2] - 1);
 					
 					vertices[i * 3] = position[0];
 					vertices[i * 3 + 1] = position[1];
@@ -80,20 +80,32 @@ public class Model {
 	
 	modelSegment[] model;
 	
-	private Float[] getFloatArray(int offset, String[] words) {
-		Float[] floatArray = new Float[words.length - offset];
+	public Model(Model original) {
+		super();
+		
+		model = original.model;
+	}
+	
+	private float[] getFloatArray(int offset, String[] words) {
+		float[] floatArray = new float[words.length - offset];
 		for (int i = 0; i < floatArray.length; i++) {
 			floatArray[i] = Float.parseFloat(words[i + offset]);
 		}
 		return floatArray;
 	}
 	
+	protected void finalizeVertexData() {
+		distinctVertices = null;
+		distinctTextureCoords = null;
+		distinctNormals = null;
+	}
+	
 	public Model(String objPath) {
 		super();
 		
-		distinctVertices = new ArrayList<Float[]>();
-		distinctTextureCoords = new ArrayList<Float[]>();
-		distinctNormals = new ArrayList<Float[]>();
+		distinctVertices = new ArrayList<float[]>();
+		distinctTextureCoords = new ArrayList<float[]>();
+		distinctNormals = new ArrayList<float[]>();
 		
 		// Open .obj file
 		
@@ -151,11 +163,9 @@ public class Model {
 			model[i].initializeSegment();
 		}
 		
-		// Delete references to unused information
+		// Final operations on temporary data
 		
-		distinctVertices = null;
-		distinctTextureCoords = null;
-		distinctVertices = null;
+		finalizeVertexData();
 	}
 	
 	public void draw(ShaderObject shader) {

@@ -72,7 +72,7 @@ public class Node implements Comparable<Node>
             asked = true;
             for (int i = -1; i < 2; i++){
                 for (int j = -1; j < 2; j++){
-                    if (!hasNeighbour(x + i, y + j)){
+                    if (!(i==0 && j==0) && !hasNeighbour(x + i, y + j)){
                         Node n = this.getMap().getNode(x + i, y + j);
                         neighbours.add( n);
                         n.neighbours.add(this);
