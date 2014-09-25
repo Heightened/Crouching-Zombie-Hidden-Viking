@@ -4,8 +4,9 @@ import java.awt.Dimension;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import model.Game;
+
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
@@ -19,6 +20,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import czhv.mainClass;
 import view.renderer3D.Model;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
@@ -42,8 +44,10 @@ public class Renderer3D {
 	private Vector4f flockingTarget;
 	private Model quadModel;
 	private FloatBuffer modelz;
-	public Renderer3D(){
+	private Game game;
+	public Renderer3D(Game game){
 		setupDisplay();
+		this.game = game;
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
 		MVP = new Matrix4f();
@@ -133,6 +137,9 @@ public class Renderer3D {
 	private long frametime = 0;
 	private long totalframetime = 0;
 	public void update(){
+		if (Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
+			mainClass.exit();
+		}
 		flockingManager.loop();
 		
 		MVP.setIdentity();
@@ -303,12 +310,5 @@ public class Renderer3D {
         GL20.glEnableVertexAttribArray(2);
         
 		TOOLBOX.checkGLERROR(true);
-	}
-
-	public static void main(String[] args){
-		Renderer3D r3 = new Renderer3D();
-		while(!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
-			r3.update();
-		}
 	}
 }

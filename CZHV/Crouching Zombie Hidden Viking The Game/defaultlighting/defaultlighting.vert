@@ -1,16 +1,16 @@
 #version 330
 
-varying vec2 texture_coordinate;
-varying vec3 normal;
+out vec2 texture_coordinate;
+out vec3 normal;
 
 uniform float time;
 
-varying float shading;
+out float shading;
 
-varying float factor;
+out float factor;
 
-varying vec4 worldspacePos;
-varying vec3 tangents;
+out vec4 worldspacePos;
+out vec3 tangents;
 
 attribute vec4 in_position;
 attribute vec3 in_normal;

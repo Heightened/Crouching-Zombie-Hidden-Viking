@@ -4,28 +4,30 @@ uniform sampler2D texture;
 uniform sampler2D normsamp;
 uniform sampler2D specsamp;
 
-varying vec3 lightVec;
-varying vec3 eyeVec;
-varying vec3 normal;
+in vec3 lightVec;
+in vec3 eyeVec;
+in vec3 normal;
 
-varying vec2 texture_coordinate; 
+in vec2 texture_coordinate; 
 
 uniform float time;
 
-varying float shading;
+in float shading;
 
-varying float factor;
+in float factor;
 
-varying vec4 worldspacePos;
+in vec4 worldspacePos;
 uniform vec4 eyeposition;
 uniform vec4 color;
 
-varying vec3 tangents;
+in vec3 tangents;
 
 uniform sampler2D shadowMap;
 uniform mat4 shadowMVP;
 uniform mat4 shadowProjectionMatrix;
 uniform mat4 biasMatrix;
+
+out vec4 texelColor;
 
 struct Light
 {
@@ -115,12 +117,12 @@ void main(void)
         final_color.rgb += light.speccolor.rgb*specular*min(1,lambertTerm)*spotfactordiffuse*diffuseDist;;
     }	
 
-	gl_FragColor = texture2D(texture,texture_coordinate);
-    gl_FragColor = vec4(final_color.rgb*color.rgb,1);
-    //gl_FragColor = vec4(shadow, shadow, shadow,1);
-    //gl_FragColor = vec4(final_color.rgb,1);
-   // gl_FragColor = vec4(normal.rgb,1);
-    //gl_FragColor.r = lights[1].color.a;
-    //gl_FragColor.g = 1;
-   // gl_FragColor.b = 0;
+	texelColor = texture2D(texture,texture_coordinate);
+    texelColor = vec4(final_color.rgb*color.rgb,1);
+    //texelColor = vec4(shadow, shadow, shadow,1);
+    //texelColor = vec4(final_color.rgb,1);
+   // texelColor = vec4(normal.rgb,1);
+    //texelColor.r = lights[1].color.a;
+  //texelColor.g = 1;
+   // texelColor.b = 0;
 }
