@@ -12,9 +12,9 @@ out float factor;
 out vec4 worldspacePos;
 out vec3 tangents;
 
-attribute vec4 in_position;
-attribute vec3 in_normal;
-attribute vec2 in_texcoord;
+in vec4 in_position;
+in vec3 in_normal;
+in vec2 in_texcoord;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
