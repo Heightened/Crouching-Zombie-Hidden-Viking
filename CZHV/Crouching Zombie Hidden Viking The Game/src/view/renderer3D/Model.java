@@ -52,7 +52,8 @@ public class Model {
 					System.out.println(Arrays.toString(attributes));
 					
 					float[] position = distinctVertices.get(attributes[0] - 1);
-					float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
+					//float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
+					float[] textureCoord = new float[] {0.0f, 0.0f};
 					float[] normal = distinctNormals.get(attributes[2] - 1);
 					
 					vertices[i * 3] = position[0];

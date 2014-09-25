@@ -1,7 +1,5 @@
 package view.renderer3D;
 
-import java.util.ArrayList;
-
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -48,7 +46,7 @@ public class AnimationFrame extends Model {
 	
 	@Override 
 	protected void finalizeVertexData() {
-		for (VertexTracker vt : vertexTrackers) {
+		if (vertexTrackers != null) for (VertexTracker vt : vertexTrackers) {
 			vt.setTracker(
 					distinctVertices.get(vt.attributeLocations[0]), 
 					distinctNormals.get(vt.attributeLocations[1]),
