@@ -51,7 +51,7 @@ public class LightManager {
         inits = true;
         Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector4f(0,0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
-        lights.add(new Light(new Vector3f(0,0.3f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(1,0,1,0)));
+        lights.add(new Light(new Vector3f(0,0.3f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),2f,.8f,new Vector4f(1,0,1,0)));
         lights.add(new Light(new Vector3f(1,0.3f,1), new Vector3f(1,1,1),new Vector3f(1,0,0),1f,.9f,new Vector4f(0,-1,0,0)));
         
         lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));

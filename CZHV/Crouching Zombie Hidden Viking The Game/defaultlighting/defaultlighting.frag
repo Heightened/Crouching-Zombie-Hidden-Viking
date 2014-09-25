@@ -23,8 +23,8 @@ uniform vec4 color;
 varying vec3 tangents;
 
 uniform sampler2D shadowMap;
-uniform mat4 projectionMatrix;
 uniform mat4 shadowMVP;
+uniform mat4 shadowProjectionMatrix;
 uniform mat4 biasMatrix;
 
 struct Light
@@ -55,7 +55,7 @@ float LinearizeDepth(float d){
 
 void main(void)
 {   
-    mat4 shadowMatrix = biasMatrix*projectionMatrix*shadowMVP;
+    mat4 shadowMatrix = biasMatrix*shadowProjectionMatrix*shadowMVP;
     vec4 shadowVertex = shadowMatrix*worldspacePos;
     shadowVertex = shadowVertex/shadowVertex.w;
     float shadowMapDepth = texture2D(shadowMap, shadowVertex.xz ).r;
