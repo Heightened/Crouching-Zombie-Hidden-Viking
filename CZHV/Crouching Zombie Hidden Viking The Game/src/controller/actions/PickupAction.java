@@ -1,6 +1,9 @@
 package controller.actions;
 
 import model.Game;
+import model.Interactable;
+import model.character.Character;
+import model.map.Cell;
 
 public class PickupAction implements Action{
 	Game g;
@@ -15,4 +18,9 @@ public class PickupAction implements Action{
 		return false;
 	}
 
+	private void pickupItem(Cell c){
+		Interactable item = c.getItemHolder().getItem();
+		Character chara = c.getCharacterHolder().getItem();
+		item.interact(chara);	
+	}
 }
