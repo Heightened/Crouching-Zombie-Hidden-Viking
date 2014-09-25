@@ -44,7 +44,7 @@ public class Character {
 	// only for simulator
 	public void move(float dtime)
 	{
-		// calculate new position
+		
 		// if moved outside of cell, us teleportTo
 		// else just update in-cell position
 	}
@@ -92,6 +92,16 @@ public class Character {
 			this.cell.getCharacterHolder().removeItem();
 		
 		this.cell = cell;
+	}
+	
+	public float getX()
+	{
+		return this.x;
+	}
+	
+	public float getY()
+	{
+		return this.y;
 	}
 	
 	public void setPathFinder(PathFinder pathFinder)
