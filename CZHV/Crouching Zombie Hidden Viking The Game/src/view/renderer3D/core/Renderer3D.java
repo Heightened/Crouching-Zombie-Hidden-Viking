@@ -148,6 +148,10 @@ public class Renderer3D {
 		selecter.update(MVP);
 		lightManager.update();
 		
+        for (Dummy3DObj dummy : objList){	        
+	        dummy.update();
+        }
+		
 		shadowManager.update();
 		
 		
@@ -178,7 +182,7 @@ public class Renderer3D {
 		lightShader.bind();
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
-		lightShader.bindTexture("texture", tex);
+		//lightShader.bindTexture("texture", tex);
 		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
