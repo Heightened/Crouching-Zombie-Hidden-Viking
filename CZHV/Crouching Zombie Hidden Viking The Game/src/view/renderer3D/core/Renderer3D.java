@@ -141,6 +141,10 @@ public class Renderer3D {
 		selecter.update(MVP);
 		lightManager.update();
 		
+        for (Dummy3DObj dummy : objList){	        
+	        dummy.update();
+        }
+		
 		shadowManager.update();
 		
 		
@@ -148,11 +152,15 @@ public class Renderer3D {
 		sleep(framedelay);
 		sleeptime = System.currentTimeMillis() - sleeptime;
 
+		frametime = System.currentTimeMillis() - frametime;
+		totalframetime += frametime - sleeptime;
+		frametime = System.currentTimeMillis();
+		
 		
 		framecounter++;
 		if (framecounter == 100){
 			framecounter = 0;
-			System.out.println("100 frames in " + (totalframetime/100) + " ms");
+			System.out.println("100 frames in " + (totalframetime/100f) + " ms");
 			totalframetime = 0;
 		}
 		
@@ -167,12 +175,13 @@ public class Renderer3D {
 		lightShader.bind();
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
-		lightShader.bindTexture("texture", tex);
+		//lightShader.bindTexture("texture", tex);
 		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
 		lightShader.putMat4("projectionMatrix", projectionMatrix);
 		
+		lightShader.putMat4("shadowProjectionMatrix", lightManager.getLight(1).getProjectionMatrix());
 		lightShader.putMat4("shadowMVP", lightManager.getLight(1).getViewMatrix());
 		lightShader.putMat4("biasMatrix", shadowManager.getBiasMatrix());
 		
@@ -203,10 +212,7 @@ public class Renderer3D {
 
 		TOOLBOX.checkGLERROR(true);
 
-		frametime = System.currentTimeMillis();
 		Display.update();
-		frametime = System.currentTimeMillis() - frametime;
-		totalframetime += frametime;
 	}
 	
 	public void bufferGeo(ShaderObject shader){

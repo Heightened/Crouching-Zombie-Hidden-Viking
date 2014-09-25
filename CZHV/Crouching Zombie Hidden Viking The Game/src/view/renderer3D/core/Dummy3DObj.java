@@ -8,10 +8,12 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import view.renderer3D.Animation;
 import view.renderer3D.Model;
 
 public class Dummy3DObj {
-	private static Model mesh;
+	//private static Model mesh;
+	private static Animation mesh;
 	private Vector4f position;
 	private Matrix4f modelMat;
 	private Vector3f rotation;
@@ -27,9 +29,9 @@ public class Dummy3DObj {
 		screenPos = new Vector4f();
 		this.position = position;
 		if (mesh == null){
-			mesh = new Model("tricube.obj");
+			//mesh = new Model("tricube.obj");
+			mesh = new Animation(120, "Animation/Cube/cube");
 		}
-		
 	}
 	
 	public boolean isSelected(){
@@ -72,6 +74,14 @@ public class Dummy3DObj {
 	public void calcModelMatrix(){
 		MatrixCZHV.getModelMatrix(new Vector3f(position.x, position.y, position.z), new Vector3f(scale, scale, scale), rotation, modelMat);
 		MatrixCZHV.MatrixToBuffer(modelMat, modelMatrix);
+	}
+	
+	float animationTime = 0;
+	
+	public void update() {
+		animationTime += 0.005f ;
+		animationTime %= 1.0f;
+		mesh.setTime(animationTime);
 	}
 	
 	public void draw(ShaderObject shader){

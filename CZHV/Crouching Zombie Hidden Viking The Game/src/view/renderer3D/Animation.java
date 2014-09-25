@@ -9,7 +9,7 @@ public class Animation {
 	
 	private String getFramePath(String path, int frame) {
 		char[] digits = new char[6];
-		char[] frameNumber = Integer.toString(frame).toCharArray();
+		char[] frameNumber = Integer.toString(frame + 1).toCharArray();
 		
 		for (int i = 0; i < 6; i++) {
 			int offset = digits.length - frameNumber.length;
@@ -21,7 +21,7 @@ public class Animation {
 			}
 		}
 		
-		return path + "_" + digits.toString() + ".obj";			 
+		return path + "_" + new String(digits) + ".obj";			 
 	}
 	
 	public Animation(int size, String path) {

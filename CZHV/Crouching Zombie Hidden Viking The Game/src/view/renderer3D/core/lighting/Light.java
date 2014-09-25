@@ -82,8 +82,8 @@ public class Light {
     }
     
     public final void calcProjectionMatrix(){
-    	float fieldOfView = 70f;
-		float aspectRatio = Renderer3D.screenSize.width/(float)Renderer3D.screenSize.height;//affected lightmap is square, so x/y = 1
+    	float fieldOfView = 90f;
+		float aspectRatio = 1;//Renderer3D.screenSize.width/(float)Renderer3D.screenSize.height;//affected lightmap is square, so x/y = 1
 		float near_plane = 0.05f;
 		float far_plane = 300;
 

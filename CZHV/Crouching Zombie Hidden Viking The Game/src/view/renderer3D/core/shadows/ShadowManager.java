@@ -144,6 +144,7 @@ public class ShadowManager {
     private void updateShadow(Shadow s){
     	s.getLight().calcViewMatrix();
         glViewport(s.getX(), s.getY(), shadowPartResolution, shadowPartResolution);//map vertices to new window
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
     //    glEnable(GL_SCISSOR_TEST);
         //scissor call likely unnecessary
      //  glScissor(s.getX(), s.getY(), shadowPartResolution, shadowPartResolution);//allow pixel writes only in this window
