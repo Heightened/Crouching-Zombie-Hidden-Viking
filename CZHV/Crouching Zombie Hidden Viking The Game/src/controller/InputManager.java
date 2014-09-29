@@ -6,10 +6,14 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import view.renderer3D.core.RendererInfoInterface;
+
 public class InputManager extends Controller{
 	
-	public InputManager(Game game){
+	private RendererInfoInterface renderer;
+	public InputManager(Game game, RendererInfoInterface renderer){
 		super(game);
+		this.renderer = renderer;
 		try {
 			Keyboard.create();
 			Mouse.create();

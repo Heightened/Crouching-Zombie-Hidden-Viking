@@ -162,6 +162,10 @@ public class ShaderObject {
 		return uniformBlockLocations.get(name);
 	}
 	
+	public int getID(){
+		return shaderID;
+	}
+	
 	public void putUnifFloat(String name, float value){
 		GL20.glUniform1f(uniformLocations.get(name), value);
 	}

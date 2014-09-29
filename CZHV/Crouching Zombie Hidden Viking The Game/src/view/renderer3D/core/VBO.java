@@ -6,12 +6,14 @@ import org.lwjgl.opengl.ARBBufferObject;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 public class VBO {
 	public static final int STATIC_DRAW = ARBVertexBufferObject.GL_STATIC_DRAW_ARB;
 	public static final int DYNAMIC_DRAW = ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB;
 
 	private int index;
+	private int VAO;
 	private boolean bound = false;
 	private int type;
 	private int vertCount = 0;
@@ -19,6 +21,7 @@ public class VBO {
 	public VBO(int type) {
 		this.type = type;
 		index = ARBBufferObject.glGenBuffersARB();
+		VAO = GL30.glGenVertexArrays();
 	}
 
 	public void bind(){
@@ -27,26 +30,36 @@ public class VBO {
 			System.exit(0);
 		}
 		bound = true;
-		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
+		GL30.glBindVertexArray(VAO);
 	}
 
 	public void unbind(){
 		classInv();
 		bound = false;
-		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
+		GL30.glBindVertexArray(0);
 	}
 
 	public void put(FloatBuffer buffer) {
 		classInv();
 		vertCount = buffer.capacity()*4/stride;
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
 		ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, type);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 
+	private int currentShader = -1;
 	public void prepareForDraw(ShaderObject shader){
 		classInv();
+		if (shader.getID() == currentShader){
+			return;
+		}
+		currentShader = shader.getID();
+		
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
 		setAttrPointer(shader,"in_position", 3, GL11.GL_FLOAT, false, 32, 0);
 		setAttrPointer(shader,"in_normal", 3, GL11.GL_FLOAT, false, 32, 12);
 		setAttrPointer(shader,"in_texcoord", 2, GL11.GL_FLOAT, false, 32, 24);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 	
 	private void setAttrPointer(ShaderObject shader, String name, int size, int type, boolean normalize, int stride, int offset){
@@ -54,6 +67,7 @@ public class VBO {
 		if (loc == null){
 			return;
 		}
+        GL20.glEnableVertexAttribArray(loc);
 		GL20.glVertexAttribPointer( loc, size, type, normalize, stride, offset);
 	}
 	
