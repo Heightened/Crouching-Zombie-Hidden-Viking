@@ -77,8 +77,8 @@ public class Renderer3D {
 		tex.unbind();
 		
 		lightShader = new ShaderObject("lighting shader");
-		lightShader.addVertexSource(FileToString.read("defaultlighting\\defaultlighting.vert"));
-		lightShader.addFragmentSource(FileToString.read("defaultlighting\\defaultlighting.frag"));
+		lightShader.addVertexSource(FileToString.read("defaultlighting/defaultlighting.vert"));
+		lightShader.addFragmentSource(FileToString.read("defaultlighting/defaultlighting.frag"));
 		lightShader.compileVertex();
 		lightShader.compileFragment();
 		lightShader.link();
