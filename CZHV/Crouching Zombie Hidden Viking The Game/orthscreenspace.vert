@@ -1,13 +1,10 @@
 #version 330
 
-varying vec3 normal;
-varying vec2 texture_coordinate;
-
 uniform vec4 quadSize;
 
-attribute vec4 in_position;
-attribute vec3 in_normal;
-attribute vec2 in_texcoord;
+in vec4 in_position;
+in vec3 in_normal;
+in vec2 in_texcoord;
 
 void main()
 {
@@ -17,8 +14,5 @@ void main()
     
     gl_Position.x += quadSize.x;
     gl_Position.y += quadSize.y;
-
-    normal = gl_NormalMatrix * in_normal;
-    texture_coordinate = vec2(in_texcoord);
 
 }

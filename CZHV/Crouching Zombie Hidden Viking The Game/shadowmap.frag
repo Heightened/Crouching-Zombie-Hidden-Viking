@@ -1,6 +1,8 @@
 #version 330
 
+out vec4 texelColor;
+
 void main()
 {
-    gl_FragColor = vec4(1,1,1,1);
+    texelColor = vec4(1,1,1,1);
 }

@@ -1,12 +1,10 @@
 #version 330
 
-varying vec3 normal;
-varying vec2 texture_coordinate;
-
 uniform vec4 color;
 
+out vec4 texelColor;
 
 void main()
 {
-    gl_FragColor = color;
+    texelColor = color;
 }
