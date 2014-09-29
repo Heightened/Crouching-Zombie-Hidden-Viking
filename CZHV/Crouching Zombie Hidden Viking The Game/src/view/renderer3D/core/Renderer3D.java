@@ -13,22 +13,22 @@ import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import czhv.mainClass;
 import view.renderer3D.Model;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.core.tempFlocking.FlockingManager;
 import view.renderer3D.core.tempFlocking.Vehicle;
 import view.renderer3D.inputoutput.FileToString;
+import controller.InputManager;
+import czhv.mainClass;
 
-public class Renderer3D {
+public class Renderer3D implements RendererInfoInterface{
 	private Camera camera;
 	private VBO quadVBO;
 	private TextureObject tex;
@@ -45,8 +45,10 @@ public class Renderer3D {
 	private Model quadModel;
 	private FloatBuffer modelz;
 	private Game game;
+	private InputManager inputManager;
 	public Renderer3D(Game game){
 		setupDisplay();
+		inputManager = new InputManager(game, this);
 		this.game = game;
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -140,6 +142,7 @@ public class Renderer3D {
 		if (Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 			mainClass.exit();
 		}
+		inputManager.pollInput();
 		flockingManager.loop();
 		
 		MVP.setIdentity();
@@ -310,5 +313,15 @@ public class Renderer3D {
         
         
 		TOOLBOX.checkGLERROR(true);
+	}
+
+	@Override
+	public Object click(float x, float y) {
+		//check interface, return button
+		//else return world position
+		Vector2f mouse = selecter.normalize(x, y);//selecter.getNormalizedMouse();
+		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
+		Vector3f colPoint = ray.collideXZPlane(0);
+		return new Vector2f(colPoint.x, colPoint.z);
 	}
 }

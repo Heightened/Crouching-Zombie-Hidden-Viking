@@ -16,7 +16,6 @@ import controller.InputManager;
 public class mainClass {
 	private static Game game;
 	private static Renderer3D renderer;
-	private static InputManager inputManager;
 	private static AI_Manager aiManager;
 	
 	private static boolean exit = false;
@@ -30,7 +29,6 @@ public class mainClass {
 	private final static void init(){
 		game = new Game();
 		renderer = new Renderer3D(game);
-		inputManager = new InputManager(game);
 		aiManager = new AI_Manager(game);
 	}
 	
