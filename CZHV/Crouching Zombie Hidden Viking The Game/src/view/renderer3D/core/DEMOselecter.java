@@ -70,4 +70,8 @@ public class DEMOselecter {
 	public Vector2f normalize(Vector2f in){
 		return new Vector2f((in.x/Renderer3D.screenSize.width)*2-1, (in.y/Renderer3D.screenSize.height)*2-1);
 	}
+	
+	public Vector2f normalize(float x, float y){
+		return new Vector2f((x/Renderer3D.screenSize.width)*2-1, (y/Renderer3D.screenSize.height)*2-1);
+	}
 }
