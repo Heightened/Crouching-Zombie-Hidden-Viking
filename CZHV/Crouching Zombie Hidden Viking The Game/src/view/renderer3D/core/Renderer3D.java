@@ -308,10 +308,6 @@ public class Renderer3D {
         GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         
-        //enable fixed pipeline bindings for VBO
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-        GL20.glEnableVertexAttribArray(2);
         
 		TOOLBOX.checkGLERROR(true);
 	}
