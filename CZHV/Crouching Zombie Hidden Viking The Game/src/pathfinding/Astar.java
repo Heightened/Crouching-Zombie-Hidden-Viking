@@ -19,7 +19,7 @@ public class Astar extends PathFinder
 	public List<Node> calculatePath(int x1, int y1, int x2, int y2)
 	{
 		this.currentMap = this.makeMap(x1, y1);
-		return this.calculatePath(this.currentMap.getNode(x1, x2), this.currentMap.getNode(x2, y2));
+		return this.calculatePath(this.currentMap.getNode(x1, y1), this.currentMap.getNode(x2, y2));
 	}
 	
 	private List<Node> calculatePath(Node start, Node goal)
