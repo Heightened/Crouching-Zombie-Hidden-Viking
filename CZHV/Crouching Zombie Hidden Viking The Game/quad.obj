@@ -2,10 +2,10 @@
 # www.blender.org
 mtllib tricube.mtl
 o Cube
-v -1 0 -1
-v -1 0 1
+v 0 0 0
+v 0 0 1
 v 1 0 1
-v 1 0 -1
+v 1 0 0
 vt 0 0
 vt 0 1
 vt 1 1

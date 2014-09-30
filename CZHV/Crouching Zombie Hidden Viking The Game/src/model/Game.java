@@ -15,6 +15,7 @@ public class Game {
 
 	public Game() {
 		//TODO: fill in game mechanic-y things
+		map = new Map(30,30);
 	}
 
 }

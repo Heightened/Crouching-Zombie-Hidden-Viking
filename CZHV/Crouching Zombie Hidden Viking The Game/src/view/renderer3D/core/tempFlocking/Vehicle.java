@@ -22,7 +22,7 @@ public class Vehicle extends Dummy3DObj{
 	int gridy = 0;
 
 	public Vehicle(Vector4f position, Vector4f target, Vector3f rotation){
-		super(position, rotation);
+		super();
 		this.position = position;
 		this.rotation = rotation;
 		prevPosition = new Vector4f(position);

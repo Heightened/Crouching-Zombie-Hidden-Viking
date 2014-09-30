@@ -8,8 +8,9 @@ import model.Item;
 import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFinder;
+import view.renderer3D.core.Dummy3DObj;
 
-public class Character {
+public class Character extends Dummy3DObj{
 	
 	private Inventory bag;
 	
@@ -31,6 +32,7 @@ public class Character {
 	}
 	
 	public Character(int maxHp, int strength, int speed, int inventory_size, boolean infected){
+		super();
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setSpeed(speed);

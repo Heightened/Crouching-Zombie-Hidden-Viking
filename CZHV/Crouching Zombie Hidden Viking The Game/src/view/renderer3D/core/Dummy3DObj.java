@@ -22,16 +22,12 @@ public class Dummy3DObj {
 	private float scale = 0.035f;
 	private boolean selected = false;
 	
-	public Dummy3DObj(Vector4f position, Vector3f rotation){
+	public Dummy3DObj(){
 		modelMatrix = BufferUtils.createFloatBuffer(16);
-		this.rotation = rotation;
+		this.rotation = new Vector3f();
 		modelMat = new Matrix4f();
 		screenPos = new Vector4f();
-		this.position = position;
-		if (mesh == null){
-			//mesh = new Model("tricube.obj");
-			mesh = new Animation(120, "Animation/Cube/cube");
-		}
+		this.position = new Vector4f();
 	}
 	
 	public boolean isSelected(){
@@ -42,6 +38,12 @@ public class Dummy3DObj {
 		position.x = x;
 		position.y = y;
 		position.z = z;
+	}
+	
+	public void setRotation(float x, float y, float z){
+		rotation.x = x;
+		rotation.y = y;
+		rotation.z = z;
 	}
 	
 	public void calcScreenSpace(Matrix4f mvp){
@@ -79,6 +81,10 @@ public class Dummy3DObj {
 	float animationTime = 0;
 	
 	public void update() {
+		if (mesh == null){
+			//mesh = new Model("tricube.obj");
+			mesh = new Animation(120, "Animation/Cube/cube");
+		}
 		animationTime += 0.005f ;
 		animationTime %= 1.0f;
 		mesh.setTime(animationTime);
