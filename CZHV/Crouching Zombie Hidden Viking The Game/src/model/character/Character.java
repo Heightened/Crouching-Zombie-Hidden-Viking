@@ -60,11 +60,13 @@ public class Character extends Dummy3DObj{
 				this.cell.getX(), this.cell.getY(),
 				(int)x, (int)y
 			);
-		
-		for(Node n : nodes)
-		{
-			System.out.println("("+n.getX()+","+n.getY()+")");
-			this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
+
+		if (nodes != null) {
+			for(Node n : nodes)
+			{
+				System.out.println("("+n.getX()+","+n.getY()+")");
+				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
+			}
 		}
 	}
 	
