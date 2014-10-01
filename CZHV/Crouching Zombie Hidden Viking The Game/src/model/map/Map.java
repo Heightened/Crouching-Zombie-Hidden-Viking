@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Random;
 
 import pathfinding.Astar;
-import model.Item;
-import model.character.Character;
+import model.character.GameCharacter;
+import model.item.Item;
 
 
 public class Map
@@ -62,7 +62,7 @@ public class Map
 		for(int i=0; i<nZombies; i++)
 		{
 			int x,y;
-			Character c = new Character(128,16,16,2,true);
+			GameCharacter c = new GameCharacter(128,16,16,2,true);
 			c.setPathFinder(new Astar(this,100,c));
 			
 			do

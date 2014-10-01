@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.HashMap;
 
 import model.map.Cell;
-import model.character.Character;
+import model.character.GameCharacter;
 
 public class PathFindingMap
 {
 	protected Map<Integer, Map<Integer, CellCapsule>> grid;
-	protected Character character;
+	protected GameCharacter character;
 	
-	public PathFindingMap(Collection<Cell> cells, Character character)
+	public PathFindingMap(Collection<Cell> cells, GameCharacter character)
 	{
 		this.grid = new HashMap<Integer, Map<Integer, CellCapsule>>();
 		this.character = character;

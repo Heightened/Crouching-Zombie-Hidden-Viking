@@ -163,7 +163,7 @@ public class Renderer3D implements RendererInfoInterface{
 		activeCells = map.getActiveCells();
 		
 		for (Cell cell : activeCells){
-			model.character.Character c = cell.getCharacterHolder().getItem();
+			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
 			if (c != null){
 				c.update();
 			}
@@ -258,8 +258,8 @@ public class Renderer3D implements RendererInfoInterface{
 	private final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
-			model.character.Character c = cell.getCharacterHolder().getItem();
-			model.Item i = cell.getItemHolder().getItem();
+			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
+			model.item.Item i = cell.getItemHolder().getItem();
 			if (c != null){
 				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
 				if (c.isInfected()){

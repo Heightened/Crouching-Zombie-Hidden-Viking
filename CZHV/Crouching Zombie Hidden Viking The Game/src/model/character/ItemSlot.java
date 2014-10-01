@@ -1,9 +1,10 @@
 package model.character;
 
 import model.Container;
-import model.Item;
+import model.item.Item;
 
-public class ItemSlot extends Container<Item>
-{
-	
+public class ItemSlot extends Container<Item> {
+	public ItemSlot(Item i){
+		
+	}
 }

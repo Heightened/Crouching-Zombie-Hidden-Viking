@@ -1,13 +1,12 @@
 package controller.actions;
 
-import model.Interactable;
-import model.character.Character;
-import model.map.Cell;
+import model.Game;
+
 
 public class MoveAction implements Action{
 
 	@Override
-	public boolean perform() {
+	public boolean perform(Game g) {
 		// TODO Auto-generated method stub
 		return false;
 	}
