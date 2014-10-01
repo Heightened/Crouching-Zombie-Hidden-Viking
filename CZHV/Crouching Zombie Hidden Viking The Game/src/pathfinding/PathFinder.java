@@ -3,16 +3,16 @@ package pathfinding;
 import java.util.List;
 
 import model.map.Map;
-import model.character.Character;
+import model.character.GameCharacter;
 
 public abstract class PathFinder
 {
 	
 	private int radius;
 	private Map map;
-	private Character character;
+	private GameCharacter character;
 	
-	public PathFinder(Map map, int radius, Character character)
+	public PathFinder(Map map, int radius, GameCharacter character)
 	{
 		this.map       = map;
 		this.radius    = radius;

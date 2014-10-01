@@ -1,5 +1,7 @@
 package controller.actions;
 
+import model.Game;
+
 public interface Action {	
-	public boolean perform();
+	public boolean perform(Game g);
 }

@@ -3,7 +3,7 @@ package pathfinding;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.character.Character;
+import model.character.GameCharacter;
 import model.map.Map;
 import util.SortedList;
 
@@ -11,7 +11,7 @@ public class Astar extends PathFinder
 {
 	private PathFindingMap currentMap;
 	
-	public Astar(Map map, int radius, Character character)
+	public Astar(Map map, int radius, GameCharacter character)
 	{
 		super(map, radius, character);
 	}
@@ -19,7 +19,7 @@ public class Astar extends PathFinder
 	public List<Node> calculatePath(int x1, int y1, int x2, int y2)
 	{
 		this.currentMap = this.makeMap(x1, y1);
-		return this.calculatePath(this.currentMap.getNode(x1, x2), this.currentMap.getNode(x2, y2));
+		return this.calculatePath(this.currentMap.getNode(x1, y1), this.currentMap.getNode(x2, y2));
 	}
 	
 	private List<Node> calculatePath(Node start, Node goal)

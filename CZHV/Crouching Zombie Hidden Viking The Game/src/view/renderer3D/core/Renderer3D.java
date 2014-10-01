@@ -3,8 +3,11 @@ package view.renderer3D.core;
 import java.awt.Dimension;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import model.Game;
+import model.map.Cell;
+import model.map.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -20,6 +23,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.Model;
+import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.core.tempFlocking.FlockingManager;
@@ -45,11 +49,18 @@ public class Renderer3D implements RendererInfoInterface{
 	private Model quadModel;
 	private FloatBuffer modelz;
 	private Game game;
+	private Map map;
 	private InputManager inputManager;
+	private ViewGrid viewGrid;
+	private Collection<Cell> activeCells;
+	private Collection<Cell> impassibleCells;
 	public Renderer3D(Game game){
 		setupDisplay();
 		inputManager = new InputManager(game, this);
 		this.game = game;
+		map = game.getMap();
+		map.populate();
+		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
 		MVP = new Matrix4f();
@@ -115,6 +126,8 @@ public class Renderer3D implements RendererInfoInterface{
 		
 		quadModel = new Model("quad.obj");
 		
+		viewGrid = new ViewGrid(quadModel, 2.5f, 1.4f);
+		
 		Matrix4f model = new Matrix4f();
     	MatrixCZHV.getModelMatrix(new Vector3f(1,-0.035f,1), new Vector3f(1,1,1), new Vector3f(0,0,0), model);
     	modelz = BufferUtils.createFloatBuffer(16);
@@ -133,6 +146,10 @@ public class Renderer3D implements RendererInfoInterface{
 	int framedelay = 10;
 	public static float currentTime = 0;
 	Vector4f dummyColor = new Vector4f(1,1,1,1);
+	Vector4f zombieColor = new Vector4f(0,1,0,1);
+	Vector4f vikingColor = new Vector4f(0,0,1,1);
+	Vector4f itemColor = new Vector4f(1,0,0,1);
+	Vector4f decorColor = new Vector4f(0,0,0,1);
 	Vector4f selectedColor = new Vector4f(0,1,1,1);
 	Vector4f selectboxColor = new Vector4f(0,0,0.5f,0.5f);
 	Vector4f floorColor = new Vector4f(1,1,1,1);
@@ -142,6 +159,16 @@ public class Renderer3D implements RendererInfoInterface{
 		if (Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 			mainClass.exit();
 		}
+
+		activeCells = map.getActiveCells();
+		
+		for (Cell cell : activeCells){
+			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
+			if (c != null){
+				c.update();
+			}
+		}
+		
 		inputManager.pollInput();
 		flockingManager.loop();
 		
@@ -150,10 +177,6 @@ public class Renderer3D implements RendererInfoInterface{
 		
 		selecter.update(MVP);
 		lightManager.update();
-		
-        for (Dummy3DObj dummy : objList){	        
-	        dummy.update();
-        }
 		
 		shadowManager.update();
 		
@@ -176,9 +199,14 @@ public class Renderer3D implements RendererInfoInterface{
 		
 		camera.lookThrough();
 		
+
+		viewGrid.update(camera);
+		
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 
+		
+		
 		
 		currentTime += 0.001f;
 		
@@ -197,6 +225,8 @@ public class Renderer3D implements RendererInfoInterface{
 		
 		Vector3f pos = camera.getPosition();
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
+
+		viewGrid.draw(lightShader);
 
 		if (Mouse.isButtonDown(1)){
 			Vector2f mouse = selecter.getNormalizedMouse();
@@ -225,23 +255,33 @@ public class Renderer3D implements RendererInfoInterface{
 		Display.update();
 	}
 	
-	public void bufferGeo(ShaderObject shader){
-    	shader.putUnifFloat4("color", dummyColor);
-    	
-		shader.putMat4("modelMatrix", modelz);
-		
-    	quadModel.draw(shader);
-		
-        
-        for (Dummy3DObj dummy : objList){
-	        if (dummy.isSelected()){
-	        	shader.putUnifFloat4("color", selectedColor);
-	        }else{
-	        	shader.putUnifFloat4("color", dummyColor);
-	        }
-	        
-	        dummy.draw(shader);
-        }
+	private final float cellSize = 0.1f;
+	public void bufferGeo(ShaderObject shader){	
+		for (Cell cell : activeCells){
+			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
+			model.item.Item i = cell.getItemHolder().getItem();
+			if (c != null){
+				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
+				if (c.isInfected()){
+					shader.putUnifFloat4("color", zombieColor);
+				}else{
+					shader.putUnifFloat4("color", vikingColor);
+				}
+		        c.draw(shader);
+			}
+			if (i != null){
+				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+	        	shader.putUnifFloat4("color", itemColor);
+		        i.draw(shader);
+			}
+			
+		}
+		Dummy3DObj d = new Dummy3DObj();
+		for (Cell cell : impassibleCells){
+				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+	        	shader.putUnifFloat4("color", decorColor);
+		        d.draw(shader);
+		}
         
 	}
 

@@ -1,7 +1,7 @@
 package model;
 
-import model.character.Character;
+import model.character.GameCharacter;
 
 public interface Interactable {
-	public void interact(Character interacter);
+	public void interact(GameCharacter interacter);
 }
