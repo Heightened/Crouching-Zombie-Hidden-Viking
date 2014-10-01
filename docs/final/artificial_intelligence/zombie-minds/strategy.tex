@@ -1,0 +1,24 @@
+\section{Zombie minds}
+
+The vikings will be controlled by human players. For the zombies to be a worthy opponent, they should show some intelligence. Just making the zombies stronger, or increasing the amount of zombies will result in a boring game.
+
+Each zombie is controlled by a controller. This controller consists of a number of linked components. A layer of pathfinders and targetfinders adds support for higher level actions (commands) such as ``go to $X$'' or ``attack him''. On top of that there is a layer for the execution of specific strategies. These can range from a simple ``hide'' to a more complex ``ambush''. Zombies will set up a hierarchy so that the big boss give the order ``ambush'' and these eventually translate to a bunch of ``hide there'' strategies on a lower level.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=\textwidth]{zombie-controller.png}
+	\caption{Overview of the components that make up the zombie controller.}
+\end{figure}
+
+\subsection{Leader choosing and Loyalty}
+In order for the zombies to achieve some kind of strategies each zombie can choose a leader to follow. A leader can control his followers until the follower decides to desert. Orders are in the form of ``execute strategy $X$''. A zombie cannot choose a leader from the zombies that are directly or indirectly following him. Zombies will create tree like hierarchies.
+
+Zombies with a small amount of followers (direct and indirect) will have a higher likelihood of following a leader, because on it's own, the group can't achieve much. Zombies with a large amount of followers have a better chance of surviving on their own, they are more likely to desert.
+
+\subsection{Leading}
+A leader is a zombie that is not following anyone, he is at the root of a tree. A leader decides when to switch to what strategy. For this decision he can take into account his amount of followers and the position of his followers, vikings, and other items on the map. Larger groups can try more complex strategies, like ``ambush'', while smaller groups (including lone zombies) should stick to simple strategies like ``wander''.
+
+\subsection{Strategies}
+In order to execute a strategy, zombies can perform actions and commands them selves, but more complex strategies require teamwork. A zombies that has followers can give orders to his direct followers. This can be ``follow me'', be he can also give each of his followers a specific strategy to execute. A zombie with three followers can give the orders ``hide at $X$'', ``hide at $Y$'' and ``follow me'' in order to execute his own strategy ``ambush''.
+
+\FloatBarrier
