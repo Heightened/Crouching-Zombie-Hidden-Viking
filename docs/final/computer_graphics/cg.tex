@@ -1,2 +1,31 @@
 \chapter{Computer Graphics}
-Lorum Ipsum
+
+\section{Lighting}
+The lighting in our program supports multiple dynamic lights as well as shadows and bump mapping.  Before drawing anything, a setup phase is used to provide world-space information about lighting to simplify further calculations. Upon drawing the lighting model is applied to provide realistic per-fragment shading and the overall detail is improved by using bump mapping.
+\subsection{Setup}
+For the setup phase, all visible lights are gathered and their influence is calculated for every cell in an arbitrarily sized grid spanning at least the view. The data of all these lights (radius, color, specular color, direction, cutoffangle, worldposition) as well as the data contained in the grid is then uploaded to the graphics card. This happens every frame to allow for dynamic lighting.  
+\subsection{Ligting Model}
+To provide aesthetically pleasing and semi-realistic lighting, a per-fragment Phong-Blinn lighting scheme is used with a fixed amount of maximum lights which influence a single fragment. For every fragment the lambertian model for diffuse lighting is applied, followed by a blinn calculation for the specular component. This lighting model is extended with several fall-off functions which modulate the light based on distance, light radius, light direction and cutoff angle. The last step in the lighting model is a shadow map test, which decides whether all gathered lighting information for the particular light is written to the framebuffer or discarded. This model supports many lights per scene (currently 128), as well as shadow maps, spotlights, point lights and colored lights. Wrapping this much functionality reduces the number of shader switches the OpenGL context needs to make, which increases performance. It also inscreases client-side code readability, because all geometry and all lights are processed equally.
+\subsection{Bump Mapping}
+The light model uses a normal both for the computation of the Lambertian component and the Blinn specular component. Modulating this model per fragment, via a texture, can greatly enhance the visual fidelity of any scene. The calculation of this normal can be achieved by using a tangent-to-world-space matrix, which can be constructed inside the fragment or vertex shader provided we have access to the normal and tangent of the face being processed. A specially made texture, a normal map, can then be used as input for this matrix transformation to perform proper per-fragment normal modulation. The beauty of this method is that the lighting model does not have to change. Instead of giving the lighting model the same normal for every fragment in a triangle, we give it a different normal. All calculations are still valid.
+
+\section{Shadow Mapping}
+Shadows are implemented via a shadow-mapping technique. This technique is the most commonly used and the most performant way of implementing accurate shadows for a dynamic scene. The technique consists of two phases. The first phase is  a depth pre-pass where the entire scene is rendered from the point of view of the light into a buffer (the shadow map). The second phase is when this shadow map is used while drawing the scene the "normal" way to compute whether a single fragment is in shadows or not.\\
+The first phase starts with setting up a ModelViewProjection matrix for the perspective of the light. This matrix is used to transform every vertex in the scene to the screenspace of the light, effectively taking a picture from the lights perspective. The picture itself does not contain any colors of the scene, instead it contains the depth of the scene for every pixel the light can see.\\
+In the second phase the same ModelViewProjection matrix is used once again, transforming every vertex in the scene to the screenspace of the light. The depth of this pixel is then compared to the depth in the shadow map. If there is any occluder between the light and this pixel, the depth found in the shadowmap should be different to the calculated depth. This allows the shader to distinguish between lit and shadowed pixels. \\
+This setup can easily be extended to support multiple lights by partitioning the shadow map into equals parts for each light, and translating the vertices with each of the lights ModelViewProjection matrices. Fillrate or quality will suffer heavily when too many lights are casting shadows, limiting the amount of shadowcasters, therefore the lights which do cast shadows should be carefully selected.
+
+\section{Geometry}
+All geometry used within the program is loaded from external model files and converted into a usable format for OpenGL.
+\subsection{Models}
+Models are imported into the engine through the .obj specification. This file specification describes a generic way to form any mesh from a set of vertices, normals, texture coordinates and faces, and has the additional advantage of being a plaintext specification (as opposed to bytecode), which makes it easy to read and debug. When loaded into memory, the data contained within the original .obj file is expanded upon by calculating a corresponding tangent vector with each normal. This resulting dataset is then uploaded to the graphics card in a tightly packed buffer, and is now ready for use via a simple glDrawArrays call.
+\subsection{Animations}
+After considering skeletal animations, a technique where each vertex of the model is displaced depending on the displacement of a corresponding virtual "bone", and after consecutively dismissing this method as overly complicated for our limited quality models, the decision was made to implement the most straightforward animation technique: keyframe animations. In keyframe animations, a new set of vertices is created for every instance of a discrete timestep of the animation. As such, the entire animation is simply a collection of models, and can be treated as such. By using this method, the code for displaying animations is nearly identical to the code needed to display a static model, the only difference being that the drawn model instance changes every (couple of) frames.
+
+\section{Post Processing}
+\subsection{FXAA}
+TBA
+\subsection{Bloom}
+TBA
+\subsection{Reflections}
+TBA
