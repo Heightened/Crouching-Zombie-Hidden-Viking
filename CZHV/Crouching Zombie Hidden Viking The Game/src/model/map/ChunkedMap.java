@@ -38,6 +38,26 @@ public class ChunkedMap implements ChangeListener<Cell>
 	{
 		return this.getChunk(x, y).getCharacters();
 	}
+	
+	public Collection<model.map.Cell> getActiveCells()
+	{
+		Collection<model.map.Cell> allCells = new LinkedList<>();
+		
+		for(Chunk c : this.chunks)
+			allCells.addAll(c.getActiveCells());
+		
+		return allCells;
+	}
+
+	public Collection<model.character.GameCharacter> getCharacters()
+	{
+		Collection<model.character.GameCharacter> allChars = new LinkedList<>();
+		
+		for(Chunk c : this.chunks)
+			allChars.addAll(c.getCharacters());
+		
+		return allChars;
+	}
 
 	@Override
 	public void setActive(Cell changed)
