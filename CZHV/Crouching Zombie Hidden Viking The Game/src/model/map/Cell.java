@@ -46,7 +46,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	public boolean isFree(GameCharacter c)
 	{
 		return this.isPassible()
-				&& this.characterHolder.isEmpty()
+				&& (this.characterHolder.isEmpty() || this.characterHolder.getItem().contains(c))
 				&& (this.decorHolder.isEmpty() || this.decorHolder.getItem().isPassible(c));
 	}
 	

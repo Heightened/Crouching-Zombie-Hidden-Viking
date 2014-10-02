@@ -2,22 +2,20 @@ package controller.actions;
 
 import model.Game;
 import model.character.GameCharacter;
+import model.item.Item;
 
-
-public class MoveAction implements Action{
+public class UseItem implements Action{
 	private GameCharacter c;
-	private float x,y;
+	private Item i;
 	
-	
-	public MoveAction(GameCharacter c, float x, float y){
+	public UseItem(GameCharacter c, Item i){
 		this.c = c;
-		this.x = x;
-		this.y = y;
+		this.i = i;
 	}
 
 	@Override
 	public boolean perform(Game g) {
-		c.moveTo(x, y);
-		return true;
+		return i.interact(c);
 	}
+
 }

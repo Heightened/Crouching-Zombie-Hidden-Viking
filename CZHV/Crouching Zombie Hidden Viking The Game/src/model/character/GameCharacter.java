@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.item.Item;
+import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
 import simulator.tempFlocking.Vehicle;
@@ -23,8 +24,10 @@ public class GameCharacter extends Vehicle{
 	private Map<Skill, Boolean> skills = new HashMap<>();
 	private boolean infected;
 	
-	private model.map.Cell cell = null;
+	private Cell cell = null;
 	private PathFinder pathFinder;
+	
+	private boolean selected;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -67,6 +70,14 @@ public class GameCharacter extends Vehicle{
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}
 		}
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	public void setSelected(boolean sel){
+		this.selected = sel;
 	}
 	
 	public void teleportTo(float x, float y)
@@ -161,6 +172,11 @@ public class GameCharacter extends Vehicle{
 
 	public void applyDamage(int Damage) {
 		currentHp = currentHp-Damage;
+		if(isDead()){
+			if(cell!=null){
+				cell.getCharacterHolder().removeItem();
+			}
+		}
 	}
 	
 	public void heal(int hp){
@@ -170,7 +186,7 @@ public class GameCharacter extends Vehicle{
 	public boolean isDead(){
 		return getCurrentHp()<=0;
 	}
-	
+
 	public boolean hasSkill(Skill skill)
 	{
 		return this.skills.containsValue(skill) && this.skills.get(skill);

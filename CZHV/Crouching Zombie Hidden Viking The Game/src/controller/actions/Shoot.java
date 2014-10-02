@@ -7,10 +7,17 @@ import model.item.Weapon;
 
 public class Shoot implements Action {
 	GameCharacter c1, c2;
+	float accuracy = 1;	//accuracy
 
 	public Shoot(GameCharacter c1, GameCharacter c2) {
 		this.c1 = c1;
 		this.c2 = c2;
+	}
+	
+
+	public Shoot(GameCharacter c1, GameCharacter c2, float accuracy){
+		this(c1,c2);
+		this.accuracy = accuracy;
 	}
 
 	@Override
@@ -18,22 +25,23 @@ public class Shoot implements Action {
 		int appliedDamage = 0;
 		ItemSlot[] inventory = c1.getBag().getInventory();
 		for (int i = 0; i < inventory.length; i++) {
-			//TODO: multiple weapons?
 			if(inventory[i].getItem() instanceof Weapon){
 				Weapon w = (Weapon) inventory[i].getItem();
 				appliedDamage = w.getPower();
 				if(w.isMeleeWeapon()){
 					appliedDamage += c1.getStrength();
 				}
-				c2.applyDamage(appliedDamage);
-				
-				if(c2.isDead()){
-					//TODO: remove character from the map
+				if(hitSuccess()){
+					c2.applyDamage(appliedDamage);
 				}
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	private boolean hitSuccess(){
+		return Math.random() < accuracy;
 	}
 
 }

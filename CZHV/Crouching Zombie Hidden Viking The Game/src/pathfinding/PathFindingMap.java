@@ -25,7 +25,7 @@ public class PathFindingMap
 	
 	public void addCell(Cell c)
 	{
-		if(!this.grid.containsValue(c.getX()))
+		if(!this.grid.containsKey(c.getX()))
 			this.grid.put(c.getX(), new HashMap<Integer, CellCapsule>());
 		
 		CellType value;
@@ -33,7 +33,7 @@ public class PathFindingMap
 			value = CellType.PASSIBLE;
 		else
 			value = CellType.IMPASSIBLE;
-		
+
 		this.grid.get(c.getX()).put(c.getY(), new CellCapsule(value));
 	}
 	
@@ -49,7 +49,7 @@ public class PathFindingMap
 	{
 		if(!this.grid.containsKey(x))
 			this.grid.put(x, new HashMap<Integer, CellCapsule>());
-		
+
 		if(!this.grid.get(x).containsKey(y))
 			this.grid.get(x).put(y, new CellCapsule(CellType.UNKNOWN));
 		

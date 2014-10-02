@@ -10,7 +10,7 @@ public class Item extends Dummy3DObj implements Interactable {
 		
 	}
 
-	public void interact(GameCharacter interacter) {
-		// pick up from map?
+	public boolean interact(GameCharacter interacter) {
+		return false;
 	}
 }
