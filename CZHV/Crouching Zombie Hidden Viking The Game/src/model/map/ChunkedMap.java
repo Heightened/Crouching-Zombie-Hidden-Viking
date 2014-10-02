@@ -1,5 +1,6 @@
 package model.map;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -39,9 +40,9 @@ public class ChunkedMap implements ChangeListener<Cell>
 		return this.getChunk(x, y).getCharacters();
 	}
 	
-	public Collection<model.map.Cell> getActiveCells()
+	public ArrayList<model.map.Cell> getActiveCells()
 	{
-		Collection<model.map.Cell> allCells = new LinkedList<>();
+		ArrayList<model.map.Cell> allCells = new ArrayList<>();
 		
 		for(Chunk c : this.chunks)
 			allCells.addAll(c.getActiveCells());
@@ -49,9 +50,9 @@ public class ChunkedMap implements ChangeListener<Cell>
 		return allCells;
 	}
 
-	public Collection<model.character.GameCharacter> getCharacters()
+	public ArrayList<model.character.GameCharacter> getCharacters()
 	{
-		Collection<model.character.GameCharacter> allChars = new LinkedList<>();
+		ArrayList<model.character.GameCharacter> allChars = new ArrayList<>();
 		
 		for(Chunk c : this.chunks)
 			allChars.addAll(c.getCharacters());

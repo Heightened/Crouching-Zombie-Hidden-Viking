@@ -17,8 +17,8 @@ public class GameCharacter extends Vehicle{
 	private int maxHp = 0;
 	private int currentHp = 0;
 	private int strength = 0;
-	private int speed = 0;
-	private float direction = 0;
+	private float maxSpeed = 0;
+	private float speedX = 0, speedY = 0;
 	private float x=0.5f,y=0.5f; // in-cell position 0<=x<1 and 0<=y<1
 	
 	private Map<Skill, Boolean> skills = new HashMap<>();
@@ -33,11 +33,11 @@ public class GameCharacter extends Vehicle{
 		this(100,16,16,2,false);
 	}
 	
-	public GameCharacter(int maxHp, int strength, int speed, int inventory_size, boolean infected){
+	public GameCharacter(int maxHp, int strength, int maxSpeed, int inventory_size, boolean infected){
 		super();
 		setMaxHp(maxHp);
 		setStrength(strength);
-		setSpeed(speed);
+		setMaxSpeed(maxSpeed);
 		setBag(new Inventory(inventory_size));
 		setInfected(infected);
 		currentHp = maxHp;
@@ -118,6 +118,18 @@ public class GameCharacter extends Vehicle{
 		return this.y;
 	}
 	
+	public float getAbsX()
+	{
+		// TODO optimize
+		return this.x + this.cell.getX();
+	}
+	
+	public float getAbsY()
+	{
+		// TODO optimize
+		return this.y + this.cell.getY();
+	}
+	
 	public void setPathFinder(PathFinder pathFinder)
 	{
 		this.pathFinder = pathFinder;
@@ -146,21 +158,26 @@ public class GameCharacter extends Vehicle{
 	public void setStrength(int strength) {
 		this.strength = strength;
 	}
-
-	public int getSpeed() {
-		return speed;
+	
+	public float getMaxSpeed() {
+		return this.maxSpeed;
+	}
+	
+	public void setMaxSpeed(float maxSpeed) {
+		this.maxSpeed = maxSpeed;
 	}
 
-	public void setSpeed(int speed) {
-		this.speed = speed;
+	public float[] getSpeed() {
+		return new float[] {this.speedX, this.speedY};
+	}
+
+	public void setSpeed(float speedX, float speedY) {
+		this.speedX = speedX;
+		this.speedY = speedY;
 	}
 	
 	public float getDirection() {
-		return direction;
-	}
-	
-	public void setDirection(float direction) {
-		this.direction = direction;
+		return (float) Math.atan2(this.speedX,this.speedY);
 	}
 
 	public int getCurrentHp() {

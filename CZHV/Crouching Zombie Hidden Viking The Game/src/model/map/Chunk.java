@@ -1,14 +1,14 @@
 package model.map;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import model.character.GameCharacter;
 
 public class Chunk implements ChangeListener<Cell>
 {
 	private Collection<Cell> cells;
-	private Collection<GameCharacter> chars = new HashSet<>();
+	private Collection<GameCharacter> chars = new ArrayList<>();
 	private int lx,ly;
 	
 	public Chunk(int lx, int ly, Collection<Cell> cells)
@@ -20,7 +20,7 @@ public class Chunk implements ChangeListener<Cell>
 	
 	public Chunk(int lx, int ly)
 	{
-		this(lx, ly, new HashSet<Cell>());
+		this(lx, ly, new ArrayList<Cell>());
 	}
 	
 	public boolean is(int lx, int ly)
