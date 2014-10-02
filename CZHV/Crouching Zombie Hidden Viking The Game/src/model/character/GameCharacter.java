@@ -26,6 +26,8 @@ public class GameCharacter extends Vehicle{
 	private model.map.Cell cell = null;
 	private PathFinder pathFinder;
 	
+	private boolean selected;
+	
 	public GameCharacter(){
 		this(100,16,16,2,false);
 	}
@@ -67,6 +69,14 @@ public class GameCharacter extends Vehicle{
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}
 		}
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	public void setSelected(boolean sel){
+		this.selected = sel;
 	}
 	
 	public void teleportTo(float x, float y)
