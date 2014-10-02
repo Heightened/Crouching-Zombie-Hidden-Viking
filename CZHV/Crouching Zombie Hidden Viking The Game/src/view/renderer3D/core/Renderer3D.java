@@ -278,7 +278,7 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		Dummy3DObj d = new Dummy3DObj();
 		for (Cell cell : impassibleCells){
-				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", decorColor);
 		        d.draw(shader);
 		}
@@ -363,5 +363,21 @@ public class Renderer3D implements RendererInfoInterface{
 		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
 		Vector3f colPoint = ray.collideXZPlane(0);
 		return new Vector2f(colPoint.x, colPoint.z);
+	}
+	
+	@Override
+	public Collection<Cell> squareSelect(float xStart, float yStart, float xEnd, float yEnd){
+		Collection<Cell> retCollection = new ArrayList<Cell>();
+		Line3D ray1 = MatrixCZHV.getPickingRayStartDir(xStart, yStart, camera.getWorldPosition(), viewMat, projMat);
+		Vector3f start = ray1.collideXZPlane(0);
+		Line3D ray2 = MatrixCZHV.getPickingRayStartDir(xEnd, yEnd, camera.getWorldPosition(), viewMat, projMat);
+		Vector3f end = ray2.collideXZPlane(0);
+		for (Cell c : activeCells){
+			if (c.getX()*cellSize > start.x && c.getX()*cellSize < end.x &&
+					c.getY()*cellSize < start.y && c.getY()*cellSize > end.y){
+				retCollection.add(c);
+			}
+		}
+		return retCollection;
 	}
 }
