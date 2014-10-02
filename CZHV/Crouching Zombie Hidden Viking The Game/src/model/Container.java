@@ -1,9 +1,14 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+
+import model.map.ChangeListener;
 	
 public class Container<I> {
 	private I item = null;
+	private Collection<ChangeListener<Container<? extends Object>>> listeners = new LinkedList<>();
 	
 	public Container()
 	{
@@ -15,6 +20,11 @@ public class Container<I> {
 		this.setItem(item);
 	}
 	
+	public void addListener(ChangeListener<Container<? extends Object>> l)
+	{
+		this.listeners.add(l);
+	}
+	
 	public I getItem()
 	{
 		return this.item;
@@ -22,6 +32,10 @@ public class Container<I> {
 	
 	public void setItem(I item)
 	{
+		if(this.isEmpty())
+			for(ChangeListener<Container<? extends Object>> l : this.listeners)
+				l.setActive(this);
+		
 		this.item = item;
 	}
 	

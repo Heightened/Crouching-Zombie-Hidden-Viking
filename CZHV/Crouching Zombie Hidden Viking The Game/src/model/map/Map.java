@@ -2,6 +2,7 @@ package model.map;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 
 import pathfinding.Astar;
@@ -9,9 +10,10 @@ import model.character.GameCharacter;
 import model.item.Item;
 
 
-public class Map
+public class Map implements ChangeListener<Cell>
 {
 	protected Cell[][] grid;
+	private Collection<ChangeListener<Cell>> listeners = new LinkedList<>();
 	
 	public Map(int width, int height)
 	{
@@ -151,18 +153,32 @@ public class Map
 		return impassibleCells;
 	}
 	
+	//DEPRICATED
 	public Collection<Cell> getActiveCells()
 	{
-		// TODO:
-		// - optimise by caching this
-		// - update cached version after changes, instead of recreating a new cached version
-		// - cache in blocks
-		// - return only blocks that overlap with given area (add parameters like x,y,x2,y2)
-		
 		Collection<Cell> activeCells = new HashSet<>();
 		
 		for(int x=0; x<this.grid.length; x++)
 			for(int y=0; y<this.grid[x].length; y++)
+				if(this.getCell(x,y).isActive())
+					activeCells.add(this.getCell(x,y));
+		
+		return activeCells;
+	}
+	
+	// returns all active cells such that
+	// x1 <= c.getX() < x2 OR x2 <= c.getX() < x1
+	// AND
+	// y1 <= c.getY() < y2 OR y2 <= c.getY() < y1
+	public Collection<Cell> getActiveCells(int x1, int y1, int x2, int y2)
+	{
+		assert this.isInGrid(x1, y2);
+		assert this.isInGrid(x1, y2);
+		
+		Collection<Cell> activeCells = new HashSet<>();
+		
+		for(int x=Math.min(x1, x2); x<Math.max(x1, x2); x++)
+			for(int y=Math.min(y1, y2); y<Math.max(y1, y2); y++)
 				if(this.getCell(x,y).isActive())
 					activeCells.add(this.getCell(x,y));
 		
@@ -181,5 +197,24 @@ public class Map
 	    int randomNum = rand.nextInt((max - min) + 1) + min;
 
 	    return randomNum;
+	}
+	
+	public void addListener(ChangeListener<Cell> l)
+	{
+		this.listeners.add(l);
+	}
+
+	@Override
+	public void setActive(Cell changed)
+	{
+		for(ChangeListener<Cell> l : this.listeners)
+			l.setActive(changed);
+	}
+
+	@Override
+	public void setInactive(Cell changed)
+	{
+		for(ChangeListener<Cell> l : this.listeners)
+			l.setInactive(changed);
 	}
 }

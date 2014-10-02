@@ -9,21 +9,25 @@ import model.character.GameCharacter;
 import model.item.Item;
 import model.map.decor.Decor;
 
-public class Cell {
-	
+public class Cell implements ChangeListener<Container<? extends Object>>
+{
 	private boolean isPassible = true; // should be taken over by decor later;
 	private Container<Item> itemHolder = new Container<>();
 	private Container<ArrayList<GameCharacter>> characterHolder = new Container<>();
 	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
-
+	
 	public Cell(Map map, int x, int y)
 	{
 		this.map = map;
 		this.x   = x;
 		this.y   = y;
-		characterHolder.setItem(new ArrayList<GameCharacter>());
+		this.itemHolder.addListener(this);
+		this.characterHolder.addListener(this);
+		this.decorHolder.addListener(this);
+		this.characterHolder.setItem(new ArrayList<GameCharacter>());
+		
 	}
 	
 	// should be taken over by decor later
@@ -83,5 +87,17 @@ public class Cell {
 	
 	public boolean isActive() {
 		return !this.itemHolder.isEmpty() || !this.characterHolder.isEmpty();
+	}
+
+	@Override
+	public void setActive(Container<? extends Object> cell)
+	{
+		this.map.setActive(this);
+	}
+
+	@Override
+	public void setInactive(Container<? extends Object> cell)
+	{
+		this.map.setInactive(this);
 	}
 }

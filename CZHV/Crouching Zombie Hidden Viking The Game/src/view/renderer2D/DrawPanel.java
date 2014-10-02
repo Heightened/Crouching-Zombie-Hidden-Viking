@@ -58,15 +58,19 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			for (Cell c : cells){
 				if(!c.getCharacterHolder().isEmpty())
 				{
-					GameCharacter character = c.getCharacterHolder().getItem();
-					Color color;
-					if(character.isInfected())
-						color = Color.RED;
-					else if(character.isDead())
-						color = Color.DARK_GRAY;
-					else
-						color = Color.BLUE;
-					drawCharacter(g2, color, c.getX(), c.getY());
+					ArrayList<GameCharacter> characters = c.getCharacterHolder().getItem();
+					
+					for(GameCharacter gc : characters)
+					{
+						Color color;
+						if(gc.isInfected())
+							color = Color.RED;
+						else if(gc.isDead())
+							color = Color.DARK_GRAY;
+						else
+							color = Color.BLUE;
+						drawCharacter(g2, color, c.getX(), c.getY());
+					}
 				}
 				if(!c.getItemHolder().isEmpty())
 				{
