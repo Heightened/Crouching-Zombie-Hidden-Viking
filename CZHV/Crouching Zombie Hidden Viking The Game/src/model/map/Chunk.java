@@ -35,8 +35,18 @@ public class Chunk implements ChangeListener<Cell>
 	
 	public Collection<model.character.GameCharacter> getCharacters()
 	{
-		throw new UnsupportedOperationException("Dit werkt nog niet");
-		//return this.chars;
+		//TODO optimize
+		Collection<model.character.GameCharacter> characters = new ArrayList<>();
+		
+		for(Cell c : this.cells)
+		{
+			if(c.getCharacterHolder().isEmpty())
+			{
+				characters.addAll(c.getCharacterHolder().getItem());
+			}
+		}
+		
+		return characters;
 	}
 
 	@Override
