@@ -10,7 +10,7 @@ Vikings will walk faster in the light, and zombies slow down in the light. This 
 
 \section{Targeting}
 
-A player can order a group of vikings to attack a group of zombies. Which viking will attack which viking is a problem that is relatively easy as long as there are are at least as much zombies as vikings. However, this is rarely the case. The vikings will have to decide which zombie to attack, and when to change target.
+A player can order a group of vikings to attack a group of zombies. Which viking will attack which zombie is a problem that is relatively easy as long as there are at least as much zombies as vikings. However, this is rarely the case. The vikings will have to decide which zombie to attack, and when to change target.
 
 When zombies attack a viking, the viking might need to fight back automatically. Decisions about when to start defending, and when to stop fighting (when the zombie flees) will need to be made by the viking itself.
 
@@ -29,10 +29,17 @@ Each zombie is controlled by a controller. This controller consists of a number 
 \subsection{Leader choosing and Loyalty}
 In order for the zombies to achieve some kind of strategies each zombie can choose a leader to follow. A leader can control his followers until the follower decides to desert. Orders are in the form of ``execute strategy $X$''. A zombie cannot choose a leader from the zombies that are directly or indirectly following him. Zombies will create tree like hierarchies.
 
-Zombies with a small amount of followers (direct and indirect) will have a higher likelihood of following a leader, because on it's own, the group can't achieve much. Zombies with a large amount of followers have a better chance of surviving on their own, they are more likely to desert.
+Zombies with a small amount of followers (direct and indirect) will have a higher likelihood of following a leader, because on it's own, the group can't achieve much. With a large amount of followers however, zombies have a better chance of surviving with their group, their leader is less inclined to follow his leader and is more likely to desert.
 
 \subsection{Leading}
-A leader is a zombie that is not following anyone, he is at the root of a tree. A leader decides when to switch to what strategy. For this decision he can take into account his amount of followers and the position of his followers, vikings, and other items on the map. Larger groups can try more complex strategies, like ``ambush'', while smaller groups (including lone zombies) should stick to simple strategies like ``wander''.
+A leader is a zombie that is not following anyone, he is at the root of a tree. A leader decides when to switch strategy and to what strategy. For this decision he can take into account his amount of followers and the position of his followers, vikings, and other items on the map. Larger groups can try more complex strategies, like ``ambush'', while smaller groups (including lone zombies) should stick to simple strategies like ``wander''.
 
 \subsection{Strategies}
 In order to execute a strategy, zombies can perform actions and commands them selves, but more complex strategies require teamwork. A zombies that has followers can give orders to his direct followers. This can be ``follow me'', be he can also give each of his followers a specific strategy to execute. A zombie with three followers can give the orders ``hide at $X$'', ``hide at $Y$'' and ``follow me'' in order to execute his own strategy ``ambush''.
+
+\subsection{Scoring}
+Since we have only one type of zombie each game, we can score the AI based on the results of a game. This scoring function depends on the number of zombies killed, the time it took for the vikings to reach their goal, the damage done to the vikings, and possibly more.
+
+We can make some simple training games where no user action is required. For example a game where the goal of the vikings is to walk to a location. This way we can disable user input and output and speed up the game massively so that we can simulate a large amount of games to give the zombies a basic training.
+
+With different of these zombie training levels, we train zombies for the different types of missions, and with different levels of intelligence. If time allows we can use different types of equally intelligent (e.g. same score in training levels) zombies in a single game and based on a ``kill/death''-like ratio choose the best couple of zombie types with a higher likelihood for new spawns. If we would be able to collect enough data from real games, we could even try to use that information to predict what zombie types will be effective against this particular player.
