@@ -28,11 +28,11 @@ In order to fix this problem, determine the radii of the cells upon creation or 
 \subsubsection{Wall Hugging Slowdown}
 A problem that arises with diagonal movement using flocking is that moving along a wall gets slower. The initial slowdown comes from the unit pushing a bit into the wall as it moves along, if the wall is not smooth. A group also cannot take enough space to move in at the wall side. The solution for the scooping problem worsens this, as the radii for cells next to a wall are very small. We solve these problems at once by increasing the weight of cells, depending on their travel radii and the group size. The weight of cells at least the radius of the group away should be uninfluenced. From the group radius up to the cells adjacent to obstacles, the weight should increase at a faster-than-linear rate. We will determine the weight influence based on the following formula:
 $$f(r_g, r_t) = \left\{\begin{array}{l l}
-					(r_g - r_t)^p / s & \text{if } r_g - r_t > 0\\
+					\frac{(r_g - r_t)^p}{s} & \text{if } r_g - r_t > 0\\
 					0 & \text{otherwise}
                 \end{array}\right.
                 $$
-Here $r_g$ is the radius of the group, $r_t$ is the travel radius of the cell, and $p$ and $s$ are to be determined by simulation. The radius of the group is actually a function $r_g(n) = \sqrt{n * h_u / \pi}$, where $n$ is the number of units and $h_u$ is the surface of the bounding hexagon around a unit.
+Here $r_g$ is the radius of the group, $r_t$ is the travel radius of the cell, and $p$ and $s$ are to be determined by simulation. The radius of the group is actually a function $$r_g(n) = \sqrt{\frac{n * h_u}{\pi}}$$ where $n$ is the number of units and $h_u$ is the surface of the bounding hexagon around a unit.
 
 \subsection{Large Numbers}
 We want our maps to be large and the number of zombies to be great, so paths to be calculated have to be long and plentiful. In order to do this, we need to make sure that our path finding is extra efficient.
