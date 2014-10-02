@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.item.Item;
-import pathfinding.Astar;
+import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
 import view.renderer3D.core.Dummy3DObj;
@@ -24,7 +24,7 @@ public class GameCharacter extends Dummy3DObj{
 	private Map<Skill, Boolean> skills = new HashMap<>();
 	private boolean infected;
 	
-	private model.map.Cell cell = null;
+	private Cell cell = null;
 	private PathFinder pathFinder;
 	
 	public GameCharacter(){
@@ -162,6 +162,11 @@ public class GameCharacter extends Dummy3DObj{
 
 	public void applyDamage(int Damage) {
 		currentHp = currentHp-Damage;
+		if(isDead()){
+			if(cell!=null){
+				cell.getCharacterHolder().removeItem();
+			}
+		}
 	}
 	
 	public void heal(int hp){
@@ -171,7 +176,7 @@ public class GameCharacter extends Dummy3DObj{
 	public boolean isDead(){
 		return getCurrentHp()<=0;
 	}
-	
+
 	public boolean hasSkill(Skill skill)
 	{
 		return this.skills.containsValue(skill) && this.skills.get(skill);

@@ -5,8 +5,9 @@ import model.character.GameCharacter;
 public class Door extends Decor
 {
 	@Override
-	public void interact(GameCharacter interacter)
+	public boolean interact(GameCharacter interacter)
 	{
+		return false;
 		
 	}
 	
