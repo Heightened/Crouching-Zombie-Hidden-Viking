@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.item.Item;
-import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFinder;
-import view.renderer3D.core.Dummy3DObj;
+import simulator.tempFlocking.Vehicle;
 
-public class GameCharacter extends Dummy3DObj{
+public class GameCharacter extends Vehicle{
 	
 	private Inventory bag;
 	

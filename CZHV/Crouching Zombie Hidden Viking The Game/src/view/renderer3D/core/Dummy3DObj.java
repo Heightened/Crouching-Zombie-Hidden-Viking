@@ -14,9 +14,9 @@ import view.renderer3D.Model;
 public class Dummy3DObj {
 	//private static Model mesh;
 	private static Animation mesh;
-	private Vector4f position;
+	protected Vector4f position;
 	private Matrix4f modelMat;
-	private Vector3f rotation;
+	protected Vector3f rotation;
 	private FloatBuffer modelMatrix;
 	private Vector4f screenPos;
 	private float scale = 0.035f;

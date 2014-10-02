@@ -23,12 +23,12 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import simulator.tempFlocking.FlockingManager;
+import simulator.tempFlocking.Vehicle;
 import view.renderer3D.Model;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
-import view.renderer3D.core.tempFlocking.FlockingManager;
-import view.renderer3D.core.tempFlocking.Vehicle;
 import view.renderer3D.inputoutput.FileToString;
 import controller.InputManager;
 import czhv.mainClass;
@@ -119,7 +119,7 @@ public class Renderer3D implements RendererInfoInterface{
 		flockingTarget = new Vector4f(0.5f,0,0.5f,1);
 		for (int i = 0; i < 10; i++){
 			for (int j = 0; j < 10; j++){
-				objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
+				//objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
 			}
 		}
 		

@@ -167,28 +167,34 @@ public class ShaderObject {
 	}
 	
 	public void putUnifFloat(String name, float value){
-		GL20.glUniform1f(uniformLocations.get(name), value);
+		if (uniformLocations.get(name) != null){
+			GL20.glUniform1f(uniformLocations.get(name), value);
+		}
 	}
 	
 	public void putUnifFloat4(String name, Vector4f value){
-		Integer loc = uniformLocations.get(name);
-		if (loc == null){
-			return;
+		if (uniformLocations.get(name) != null){
+			GL20.glUniform4f(uniformLocations.get(name), value.x, value.y, value.z, value.w);
 		}
-		GL20.glUniform4f(loc, value.x, value.y, value.z, value.w);
 	}
 	
 	public void putUnifFloat4(String name, float x, float y, float z, float w){
-		GL20.glUniform4f(uniformLocations.get(name), x, y, z, w);
+		if (uniformLocations.get(name) != null){
+			GL20.glUniform4f(uniformLocations.get(name), x, y, z, w);
+		}
 	}
 	
 	public void putMat4(String name, FloatBuffer value){
-		GL20.glUniformMatrix4(uniformLocations.get(name), false, value);
+		if (uniformLocations.get(name) != null){
+			GL20.glUniformMatrix4(uniformLocations.get(name), false, value);
+		}
 	}
 	
 	public void bindTexture(String texName, TextureObject tex){
-		int activeNum = samplerLocations.get(texName);
-		tex.bind(activeNum);
+		Integer activeNum = samplerLocations.get(texName);
+		if (activeNum != null){
+			tex.bind(activeNum);
+		}
 	}
 	
 	public void bind(){

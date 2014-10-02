@@ -1,4 +1,4 @@
-package view.renderer3D.core.tempFlocking;
+package simulator.tempFlocking;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -13,18 +13,14 @@ public class Vehicle extends Dummy3DObj{
 	final float max_speed = 0.7f;//final for performance
 	final float max_force = 0.05f;
 	final float mass = 10;
-	Vector4f position;
 	Vector4f prevPosition;
 	Vector4f target;
-	Vector3f rotation;
 	
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(Vector4f position, Vector4f target, Vector3f rotation){
+	public Vehicle(){
 		super();
-		this.position = position;
-		this.rotation = rotation;
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
 		this.target = target;
