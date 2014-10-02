@@ -21,4 +21,11 @@ A leader is a zombie that is not following anyone, he is at the root of a tree. 
 \subsection{Strategies}
 In order to execute a strategy, zombies can perform actions and commands them selves, but more complex strategies require teamwork. A zombies that has followers can give orders to his direct followers. This can be ``follow me'', be he can also give each of his followers a specific strategy to execute. A zombie with three followers can give the orders ``hide at $X$'', ``hide at $Y$'' and ``follow me'' in order to execute his own strategy ``ambush''.
 
+\subsection{Scoring}
+Since we have only one type of zombie each game, we can score the AI based on the results of a game. This scoring function depends on the number of zombies killed, the time it took for the vikings to reach their goal, the damage done to the vikings, and possibly more.
+
+We can make some simple training games where no user action is required. For example a game where the goal of the vikings is to walk to a location. This way we can disable user input and output and speed up the game massively so that we can simulate a large amount of games to give the zombies a basic training.
+
+With different of these zombie training levels, we train zombies for the different types of missions, and with different levels of intelligence. If time allows we can use different types of zombies with a similar score in a single game. During the game we can alter the likelihood of spawning a particular type of zombie based on a ``kill/death''-like ratio for that type. If we would be able to collect enough data from real games, we could even try to use that information to predict what zombie types will be effective against a given player.
+
 \FloatBarrier
