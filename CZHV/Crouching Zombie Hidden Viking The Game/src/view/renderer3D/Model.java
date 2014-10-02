@@ -1,11 +1,9 @@
 package view.renderer3D;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -43,7 +41,7 @@ public class Model {
 			int i = 0;
 			for (String[] face : faces) {
 				System.out.println(Arrays.toString(face));
-				for (String vertex : face) {					
+				for (String vertex : face) {
 					if (vertex.equals("f")) {
 						continue;
 					}
