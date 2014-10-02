@@ -42,7 +42,7 @@ public class Cell {
 	public boolean isFree(GameCharacter c)
 	{
 		return this.isPassible()
-				&& this.characterHolder.isEmpty()
+				&& (this.characterHolder.isEmpty() || this.characterHolder.getItem().contains(c))
 				&& (this.decorHolder.isEmpty() || this.decorHolder.getItem().isPassible(c));
 	}
 	
