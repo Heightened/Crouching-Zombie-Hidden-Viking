@@ -19,17 +19,6 @@ public class Game {
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
 		
-		startNewSimulator();
-		
-		new Thread(){
-			@Override
-			public void run(){
-				running = true;
-				while(running){
-					update();
-				}
-			}
-		}.start();
 	}
 
 	private void createMap() {
@@ -41,26 +30,6 @@ public class Game {
 		controlBuffer.drainTo(actionBuffer);
 		while(!actionBuffer.isEmpty()){
 			actionBuffer.remove().perform(this);
-		}
-	}
-	
-	public void quit(){
-		stopSimulator();
-		running = false;
-	}
-	
-	public void startNewSimulator(){
-		//no duplicate simulators
-		if(sim != null){
-			sim.quit();
-		}
-		sim = new Simulator(this);
-		sim.start();
-	}
-
-	public void stopSimulator(){
-		if(sim != null){
-			sim.quit();
 		}
 	}
 	

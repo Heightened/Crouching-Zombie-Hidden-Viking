@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.item.Item;
-import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFinder;
-import view.renderer3D.core.Dummy3DObj;
+import simulator.tempFlocking.Vehicle;
 
-public class GameCharacter extends Dummy3DObj{
+public class GameCharacter extends Vehicle{
 	
 	private Inventory bag;
 	
@@ -79,7 +78,7 @@ public class GameCharacter extends Dummy3DObj{
 		model.map.Cell oldCell = this.cell;
 		model.map.Cell newCell = this.cell.getMap().getCell(xi, yi);
 		
-		newCell.getCharacterHolder().setItem(this);
+		newCell.getCharacterHolder().getItem().add(this);
 		this.x = x-xi;
 		this.y = y-yi;
 		
@@ -90,7 +89,7 @@ public class GameCharacter extends Dummy3DObj{
 	
 	public void teleportTo(model.map.Cell cell)
 	{
-		cell.getCharacterHolder().setItem(this);
+		cell.getCharacterHolder().getItem().add(this);
 		
 		if(this.cell != null)
 			this.cell.getCharacterHolder().removeItem();

@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
-import view.renderer3D.core.tempFlocking.Vehicle;
+import simulator.tempFlocking.Vehicle;
 
 public class DEMOselecter {
 	ArrayList<Vehicle> objList;

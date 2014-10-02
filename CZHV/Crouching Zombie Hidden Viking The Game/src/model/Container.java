@@ -1,4 +1,6 @@
 package model;
+
+import java.util.ArrayList;
 	
 public class Container<I> {
 	private I item = null;
@@ -30,6 +32,9 @@ public class Container<I> {
 	
 	public boolean isEmpty()
 	{
+		if (this.item instanceof ArrayList<?> ){
+			return ((ArrayList<?>)this.item).isEmpty();
+		}
 		return this.item == null;
 	}
 }

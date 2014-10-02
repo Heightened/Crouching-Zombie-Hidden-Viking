@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import model.Game;
+import model.character.GameCharacter;
 import model.map.Cell;
 import model.map.Map;
 
@@ -22,12 +23,12 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import simulator.tempFlocking.FlockingManager;
+import simulator.tempFlocking.Vehicle;
 import view.renderer3D.Model;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
-import view.renderer3D.core.tempFlocking.FlockingManager;
-import view.renderer3D.core.tempFlocking.Vehicle;
 import view.renderer3D.inputoutput.FileToString;
 import controller.InputManager;
 import czhv.mainClass;
@@ -59,7 +60,9 @@ public class Renderer3D implements RendererInfoInterface{
 		inputManager = new InputManager(game, this);
 		this.game = game;
 		map = game.getMap();
+		System.out.println("henk123");
 		map.populate();
+		System.out.println("henk124");
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -116,7 +119,7 @@ public class Renderer3D implements RendererInfoInterface{
 		flockingTarget = new Vector4f(0.5f,0,0.5f,1);
 		for (int i = 0; i < 10; i++){
 			for (int j = 0; j < 10; j++){
-				objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
+				//objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
 			}
 		}
 		
@@ -163,9 +166,11 @@ public class Renderer3D implements RendererInfoInterface{
 		activeCells = map.getActiveCells();
 		
 		for (Cell cell : activeCells){
-			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
-			if (c != null){
-				c.update();
+			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter gameChar : gameChars){
+				if (gameChar != null){
+					gameChar.update();
+				}
 			}
 		}
 		
@@ -258,9 +263,8 @@ public class Renderer3D implements RendererInfoInterface{
 	private final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
-			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
-			model.item.Item i = cell.getItemHolder().getItem();
-			if (c != null){
+			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter c : gameChars){
 				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
 				if (c.isInfected()){
 					shader.putUnifFloat4("color", zombieColor);
@@ -269,6 +273,7 @@ public class Renderer3D implements RendererInfoInterface{
 				}
 		        c.draw(shader);
 			}
+			model.item.Item i = cell.getItemHolder().getItem();
 			if (i != null){
 				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", itemColor);
@@ -278,7 +283,7 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		Dummy3DObj d = new Dummy3DObj();
 		for (Cell cell : impassibleCells){
-				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", decorColor);
 		        d.draw(shader);
 		}
@@ -363,5 +368,21 @@ public class Renderer3D implements RendererInfoInterface{
 		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
 		Vector3f colPoint = ray.collideXZPlane(0);
 		return new Vector2f(colPoint.x, colPoint.z);
+	}
+	
+	@Override
+	public Collection<Cell> squareSelect(float xStart, float yStart, float xEnd, float yEnd){
+		Collection<Cell> retCollection = new ArrayList<Cell>();
+		Line3D ray1 = MatrixCZHV.getPickingRayStartDir(xStart, yStart, camera.getWorldPosition(), viewMat, projMat);
+		Vector3f start = ray1.collideXZPlane(0);
+		Line3D ray2 = MatrixCZHV.getPickingRayStartDir(xEnd, yEnd, camera.getWorldPosition(), viewMat, projMat);
+		Vector3f end = ray2.collideXZPlane(0);
+		for (Cell c : activeCells){
+			if (c.getX()*cellSize > start.x && c.getX()*cellSize < end.x &&
+					c.getY()*cellSize < start.y && c.getY()*cellSize > end.y){
+				retCollection.add(c);
+			}
+		}
+		return retCollection;
 	}
 }
