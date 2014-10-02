@@ -3,13 +3,10 @@ package model;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import model.map.Map;
-import simulator.Simulator;
 import controller.actions.Action;
 
 public class Game {
 	private Map map;
-	private Simulator sim;
-	private Boolean running;
 	private LinkedBlockingQueue<Action> controlBuffer;
 	private LinkedBlockingQueue<Action> actionBuffer;
 	
