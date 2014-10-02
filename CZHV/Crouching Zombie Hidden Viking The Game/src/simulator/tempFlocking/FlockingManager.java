@@ -1,4 +1,4 @@
-package view.renderer3D.core.tempFlocking;
+package simulator.tempFlocking;
 
 import java.awt.Dimension;
 import java.util.ArrayList;

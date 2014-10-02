@@ -1,4 +1,4 @@
-package view.renderer3D.core.tempFlocking;
+package simulator.tempFlocking;
 
 public class Grid {
 	int[][] pointers;

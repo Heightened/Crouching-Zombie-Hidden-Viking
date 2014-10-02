@@ -8,9 +8,9 @@ import model.item.Item;
 import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
-import view.renderer3D.core.Dummy3DObj;
+import simulator.tempFlocking.Vehicle;
 
-public class GameCharacter extends Dummy3DObj{
+public class GameCharacter extends Vehicle{
 	
 	private Inventory bag;
 	
@@ -26,6 +26,8 @@ public class GameCharacter extends Dummy3DObj{
 	
 	private Cell cell = null;
 	private PathFinder pathFinder;
+	
+	private boolean selected;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -68,6 +70,14 @@ public class GameCharacter extends Dummy3DObj{
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}
 		}
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	public void setSelected(boolean sel){
+		this.selected = sel;
 	}
 	
 	public void teleportTo(float x, float y)
