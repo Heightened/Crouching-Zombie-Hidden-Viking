@@ -55,7 +55,7 @@ public class DEMOselecter {
 	        quadShader.putUnifFloat4("color", color);
 	        quadShader.putUnifFloat4("quadSize", new Vector4f(startnorm.x, startnorm.y,endnorm.x - startnorm.x, endnorm.y - startnorm.y));
 	        quadVBO.bind();
-	        quadVBO.prepareForDraw(quadShader);
+	        quadVBO.prepareForDrawAdvanced(quadShader);
 	        quadVBO.draw();
 	        quadVBO.unbind();
 		}

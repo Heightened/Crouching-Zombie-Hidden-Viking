@@ -28,14 +28,10 @@ public class mainClass {
 	
 	private final static void init(){
 		game = new Game();
-		System.out.println("henk4");
 		renderer = new Renderer3D(game);
-		System.out.println("henk3");
 		aiManager = new AI_Manager(game);
-		System.out.println("henk2");
 		simulator = new Simulator(game);
-		System.out.println("henk1");
-		//simulator.start();
+		simulator.start();
 	}
 	
 	private final static void loop(){

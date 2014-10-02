@@ -51,7 +51,9 @@ public class VBO {
 	public void put(ByteBuffer buffer) {
 		classInv();
 		vertCount = buffer.capacity() / stride;
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
 		ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, type);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 
 	private int currentShader = -1;
@@ -71,10 +73,17 @@ public class VBO {
 	
 	public void prepareForDrawAdvanced(ShaderObject shader) {
 		classInv();
+		if (shader.getID() == currentShader){
+			return;
+		}
+		currentShader = shader.getID();
+		
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, index);
 		setAttrPointer(shader,"in_position", 3, GL11.GL_FLOAT, false, 32, 0);
 		setAttrPointer(shader,"in_normal", 3, GL30.GL_HALF_FLOAT, false, 32, 12);
-		setAttrPointer(shader,"in_tangent", 4, GL30.GL_HALF_FLOAT, false, 32, 18);
-		setAttrPointer(shader,"in_texcoord", 2, GL30.GL_HALF_FLOAT, false, 32, 26);
+		setAttrPointer(shader,"in_tangent", 3, GL30.GL_HALF_FLOAT, false, 32, 18);
+		setAttrPointer(shader,"in_texcoord", 2, GL30.GL_HALF_FLOAT, false, 32, 24);
+		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 	
 	private void setAttrPointer(ShaderObject shader, String name, int size, int type, boolean normalize, int stride, int offset){

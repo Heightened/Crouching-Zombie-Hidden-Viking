@@ -11,8 +11,10 @@ import model.map.Cell;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 
 import view.renderer3D.core.RendererInfoInterface;
+import controller.actions.MoveAction;
 
 public class InputManager extends Controller{
 	
@@ -34,15 +36,14 @@ public class InputManager extends Controller{
 	}
 	
 	
-	public Point startClick;
-	public Point endClick;
+	private Point startClick;
+	private Point endClick;
+	private ArrayList<GameCharacter> selected;
 	public void pollInput(){
 		while(Mouse.next()){
 			if(Mouse.getEventButton() == 0){
 				if(Mouse.getEventButtonState()){
-					startClick = new Point();
-					startClick.x = Mouse.getX();
-					startClick.y = Mouse.getY();
+					startClick = new Point(Mouse.getX(), Mouse.getY());
 				}else{
 					if (startClick != null){
 						endClick = new Point(Mouse.getX(), Mouse.getY());
@@ -50,19 +51,18 @@ public class InputManager extends Controller{
 						//distance determines whether we select with selectbox or a single point
 						if (distance > 10){
 							Collection<Cell> selectedCells = renderer.squareSelect(startClick, endClick);
-							System.out.println("Selected cells:");
 							for (Cell cell : selectedCells){
-								ArrayList<GameCharacter> chars = cell.getCharacterHolder().getItem();
-								for (GameCharacter c : chars){
+								selected = cell.getCharacterHolder().getItem();
+								for (GameCharacter c : selected){
 									c.setSelected(true);
 								}
 							}
 						}else{
-							Object selected = renderer.click(startClick.x, startClick.y);
-							if (selected != null){
-								if (selected instanceof Cell){
-									ArrayList<GameCharacter> chars = ((Cell)selected).getCharacterHolder().getItem();
-									for (GameCharacter c : chars){
+							Object obj = renderer.click(startClick.x, startClick.y);
+							if (obj != null){
+								if (obj instanceof Cell){
+									selected = ((Cell)obj).getCharacterHolder().getItem();
+									for (GameCharacter c : selected){
 										c.setSelected(true);
 									}
 								}	
@@ -76,6 +76,15 @@ public class InputManager extends Controller{
 			if(Mouse.getEventButton() == 1){
 				if(Mouse.getEventButtonState()){
 					//TODO: do stuff here
+				}else{
+					startClick = new Point(Mouse.getX(), Mouse.getY());
+					Object obj = renderer.click(startClick.x, startClick.y);
+					if (obj != null){
+						if (obj instanceof Vector2f){
+							MoveAction m = new MoveAction(selected.get(0), ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
+							getGame().getActionBuffer().add(m);
+						}	
+					}
 				}
 			}
 		}

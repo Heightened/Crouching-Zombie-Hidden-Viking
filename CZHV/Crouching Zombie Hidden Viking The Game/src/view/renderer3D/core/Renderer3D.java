@@ -61,9 +61,7 @@ public class Renderer3D implements RendererInfoInterface{
 		inputManager = new InputManager(game, this);
 		this.game = game;
 		map = game.getMap();
-		System.out.println("henk123");
 		map.populate();
-		System.out.println("henk124");
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -378,7 +376,8 @@ public class Renderer3D implements RendererInfoInterface{
 				return c;
 			}
 		}
-		return new Vector2f(colPoint.x, colPoint.z);
+		System.out.println(colPoint);
+		return new Vector2f(colPoint.x/cellSize, colPoint.z/cellSize);
 	}
 	
 	@Override
