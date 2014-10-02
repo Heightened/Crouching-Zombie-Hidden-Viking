@@ -1,5 +1,6 @@
 package model.map;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -12,7 +13,7 @@ public class Cell {
 	
 	private boolean isPassible = true; // should be taken over by decor later;
 	private Container<Item> itemHolder = new Container<>();
-	private Container<GameCharacter> characterHolder = new Container<>();
+	private Container<ArrayList<GameCharacter>> characterHolder = new Container<>();
 	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
@@ -22,6 +23,7 @@ public class Cell {
 		this.map = map;
 		this.x   = x;
 		this.y   = y;
+		characterHolder.setItem(new ArrayList<GameCharacter>());
 	}
 	
 	// should be taken over by decor later
@@ -69,7 +71,7 @@ public class Cell {
 		return this.itemHolder;
 	}
 	
-	public Container<GameCharacter> getCharacterHolder()
+	public Container<ArrayList<GameCharacter>> getCharacterHolder()
 	{
 		return this.characterHolder;
 	}

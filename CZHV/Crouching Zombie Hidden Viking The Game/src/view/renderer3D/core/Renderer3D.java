@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import model.Game;
+import model.character.GameCharacter;
 import model.map.Cell;
 import model.map.Map;
 
@@ -59,7 +60,9 @@ public class Renderer3D implements RendererInfoInterface{
 		inputManager = new InputManager(game, this);
 		this.game = game;
 		map = game.getMap();
+		System.out.println("henk123");
 		map.populate();
+		System.out.println("henk124");
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -163,9 +166,11 @@ public class Renderer3D implements RendererInfoInterface{
 		activeCells = map.getActiveCells();
 		
 		for (Cell cell : activeCells){
-			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
-			if (c != null){
-				c.update();
+			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter gameChar : gameChars){
+				if (gameChar != null){
+					gameChar.update();
+				}
 			}
 		}
 		
@@ -258,9 +263,8 @@ public class Renderer3D implements RendererInfoInterface{
 	private final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
-			model.character.GameCharacter c = cell.getCharacterHolder().getItem();
-			model.item.Item i = cell.getItemHolder().getItem();
-			if (c != null){
+			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter c : gameChars){
 				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
 				if (c.isInfected()){
 					shader.putUnifFloat4("color", zombieColor);
@@ -269,6 +273,7 @@ public class Renderer3D implements RendererInfoInterface{
 				}
 		        c.draw(shader);
 			}
+			model.item.Item i = cell.getItemHolder().getItem();
 			if (i != null){
 				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", itemColor);

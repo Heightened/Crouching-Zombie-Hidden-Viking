@@ -79,7 +79,7 @@ public class GameCharacter extends Dummy3DObj{
 		model.map.Cell oldCell = this.cell;
 		model.map.Cell newCell = this.cell.getMap().getCell(xi, yi);
 		
-		newCell.getCharacterHolder().setItem(this);
+		newCell.getCharacterHolder().getItem().add(this);
 		this.x = x-xi;
 		this.y = y-yi;
 		
@@ -90,7 +90,7 @@ public class GameCharacter extends Dummy3DObj{
 	
 	public void teleportTo(model.map.Cell cell)
 	{
-		cell.getCharacterHolder().setItem(this);
+		cell.getCharacterHolder().getItem().add(this);
 		
 		if(this.cell != null)
 			this.cell.getCharacterHolder().removeItem();
