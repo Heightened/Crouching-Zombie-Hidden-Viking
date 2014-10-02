@@ -40,6 +40,10 @@ public class Dummy3DObj {
 		position.z = z;
 	}
 	
+	public Vector4f getPosition(){
+		return position;
+	}
+	
 	public void setRotation(float x, float y, float z){
 		rotation.x = x;
 		rotation.y = y;

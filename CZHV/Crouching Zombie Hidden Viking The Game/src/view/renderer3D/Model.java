@@ -37,6 +37,7 @@ public class Model {
 			float[] vertices = new float[size * 3];
 			float[] uvcoords = new float[size * 2];
 			float[] normals = new float[size * 3];
+			float[] tangents = new float[size * 3];
 			
 			int i = 0;
 			for (String[] face : faces) {
@@ -69,7 +70,7 @@ public class Model {
 				}
 			}
 			
-			initialize(size, vertices, uvcoords, normals);
+			initialize(size, vertices, uvcoords, normals, normals);
 			
 			// Delete reference to unused information
 			

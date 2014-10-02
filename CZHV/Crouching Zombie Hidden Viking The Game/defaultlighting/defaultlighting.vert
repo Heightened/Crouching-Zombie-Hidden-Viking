@@ -14,6 +14,7 @@ out vec3 tangents;
 
 in vec4 in_position;
 in vec3 in_normal;
+in vec3 in_tangent;
 in vec2 in_texcoord;
 
 uniform mat4 modelMatrix;
@@ -26,8 +27,8 @@ void main()
 	worldspacePos = modelMatrix*in_position;
 	gl_Position = projectionMatrix*viewMatrix*worldspacePos;
 
-	normal =  mat3(modelMatrix)*in_normal;
-	tangents =  mat3(modelMatrix)*vec3(1,0,0);
+	normal =  in_normal;
+	tangents =  mat3(modelMatrix)*in_tangent;
 
   	texture_coordinate = vec2(in_texcoord);
 }
