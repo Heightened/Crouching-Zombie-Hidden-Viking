@@ -1,12 +1,8 @@
 package czhv;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-
 import model.Game;
 import view.renderer3D.core.Renderer3D;
 import controller.AI_Manager;
-import controller.InputManager;
 
 /**
  * 

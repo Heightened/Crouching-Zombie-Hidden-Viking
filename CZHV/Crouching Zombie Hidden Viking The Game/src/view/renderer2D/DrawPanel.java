@@ -12,11 +12,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import model.Item;
-import model.character.Character;
+import model.character.GameCharacter;
 
 import javax.swing.JPanel;
 
+import model.item.Item;
 import model.map.Cell;
 
 @SuppressWarnings("serial")
@@ -58,7 +58,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			for (Cell c : cells){
 				if(!c.getCharacterHolder().isEmpty())
 				{
-					Character character = c.getCharacterHolder().getItem();
+					GameCharacter character = c.getCharacterHolder().getItem();
 					Color color;
 					if(character.isInfected())
 						color = Color.RED;

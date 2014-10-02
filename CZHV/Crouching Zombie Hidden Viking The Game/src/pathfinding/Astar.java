@@ -3,7 +3,7 @@ package pathfinding;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.character.Character;
+import model.character.GameCharacter;
 import model.map.Map;
 import util.SortedList;
 
@@ -11,7 +11,7 @@ public class Astar extends PathFinder
 {
 	private PathFindingMap currentMap;
 	
-	public Astar(Map map, int radius, Character character)
+	public Astar(Map map, int radius, GameCharacter character)
 	{
 		super(map, radius, character);
 	}

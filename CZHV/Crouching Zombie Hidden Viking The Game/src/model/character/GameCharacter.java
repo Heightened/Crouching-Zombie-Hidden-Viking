@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.Item;
+import model.item.Item;
 import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFinder;
 import view.renderer3D.core.Dummy3DObj;
 
-public class Character extends Dummy3DObj{
+public class GameCharacter extends Dummy3DObj{
 	
 	private Inventory bag;
 	
@@ -27,11 +27,11 @@ public class Character extends Dummy3DObj{
 	private model.map.Cell cell = null;
 	private PathFinder pathFinder;
 	
-	public Character(){
+	public GameCharacter(){
 		this(100,16,16,2,false);
 	}
 	
-	public Character(int maxHp, int strength, int speed, int inventory_size, boolean infected){
+	public GameCharacter(int maxHp, int strength, int speed, int inventory_size, boolean infected){
 		super();
 		setMaxHp(maxHp);
 		setStrength(strength);

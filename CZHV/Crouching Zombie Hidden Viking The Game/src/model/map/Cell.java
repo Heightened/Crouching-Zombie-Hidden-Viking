@@ -4,15 +4,15 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import model.Container;
-import model.Item;
-import model.character.Character;
+import model.character.GameCharacter;
+import model.item.Item;
 import model.map.decor.Decor;
 
 public class Cell {
 	
 	private boolean isPassible = true; // should be taken over by decor later;
 	private Container<Item> itemHolder = new Container<>();
-	private Container<Character> characterHolder = new Container<>();
+	private Container<GameCharacter> characterHolder = new Container<>();
 	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
@@ -37,7 +37,7 @@ public class Cell {
 	}
 	
 	// returns false even if temporarily impassible
-	public boolean isFree(Character c)
+	public boolean isFree(GameCharacter c)
 	{
 		return this.isPassible()
 				&& this.characterHolder.isEmpty()
@@ -69,7 +69,7 @@ public class Cell {
 		return this.itemHolder;
 	}
 	
-	public Container<Character> getCharacterHolder()
+	public Container<GameCharacter> getCharacterHolder()
 	{
 		return this.characterHolder;
 	}
