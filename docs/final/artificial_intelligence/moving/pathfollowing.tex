@@ -1,1 +1,21 @@
 \subsection{Path Following}
+We want the movement of units to appear at least somewhat smooth rather than having them jerk from cell to cell. Additionally, we do not want units to simply pass through one another, so some form of collision avoidance is required. Both of these problems can be solved by flocking.
+
+\subsubsection{Flocking}
+
+\subsubsection{Group Movement}
+Group movement will be done slightly differently from the movement of singular units. First of all, when a group of units get to their goal, they do not adjust to the exact position. Instead of adjusting or trying to get into once cell together, they all flock to the center of the cell until they are within a radius from it, based on the group size. Group movement also brings the problem of narrow passages. When a path returns and a narrow passage is included, we can opt to increase the weight of the cells in that path and calculate a new path for part of the group.
+
+\subsubsection{The Scooping Problem}
+Since flocking allows groups to move together, we do not want to force all members of a group to first get into a cell before moving to the next one. Instead, we just let them flock to within a radius of the target cell, its travel radius, then they move on to the next. This creates a problem when a group encounters the start of a wall. The units have to walk on one side of the wall to reach their final destination. The wall may scoop some of the group to the other side, because it is still within travel radius of their target cell.
+
+In order to fix this problem, determine the radii of the cells upon creation or loading of the map. These radii will be the distance from the center of the cell to the edge of the closest static obstacle. This allows groups to move very freely towards their goal in open fields, while making sure they correctly funnel into finer areas.
+
+\subsubsection{Wall Hugging Slowdown}
+A problem that arises with diagonal movement using flocking is that moving along a wall gets slower. The initial slowdown comes from the unit pushing a bit into the wall as it moves along, if the wall is not smooth. A group also cannot take enough space to move in at the wall side. The solution for the scooping problem worsens this, as the radii for cells next to a wall are very small. We solve these problems at once by increasing the weight of cells, depending on their travel radii and the group size. The weight of cells at least the radius of the group away should be uninfluenced. From the group radius up to the cells adjacent to obstacles, the weight should increase at a faster-than-linear rate. We will determine the weight influence based on the following formula:
+$$f(r_g, r_t) = \left\{\begin{array}{l l}
+					\frac{(r_g - r_t)^p}{s} & \text{if } r_g - r_t > 0\\
+					0 & \text{otherwise}
+                \end{array}\right.
+                $$
+Here $r_g$ is the radius of the group, $r_t$ is the travel radius of the cell, and $p$ and $s$ are to be determined by simulation. The radius of the group is actually a function $$r_g(n) = \sqrt{\frac{n * h_u}{\pi}}$$ where $n$ is the number of units and $h_u$ is the surface of the bounding hexagon around a unit.

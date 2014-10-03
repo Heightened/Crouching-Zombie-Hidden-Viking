@@ -1,1 +1,11 @@
 \subsection{Enhancements}
+We want our maps to be large and the number of zombies to be great, so paths to be calculated have to be long and plentiful. In order to do this, we need to make sure that our path finding is extra efficient.
+
+\subsubsection{Less Path Finding}
+Next to path finding, there are a couple of other movement options we can use to keep units busy. We can for instance make zombies wander aimlessly, or follow something by flocking towards that thing constantly. Finding a path to a choke point in the map and just guarding it could also be an option, if we design maps that motivate the AI to do so.
+
+\subsubsection{Ignoring Parts of the Map}
+The group of Vikings the player will typically control is extremely small compared to the map size. Zombies outside of a certain proximity of the Vikings can be simplified in their navigation. Additionally, paths will be only as long as the size of the relevant area.
+
+\subsubsection{Non-perfect Paths}
+We can use the fact that A* can be adjusted to make sub-optimal paths and apply it to D*-Lite. The output of the heuristic function used to estimate distance to the goal can be multiplied by $1 + \epsilon$, Static Heuristic Weighting (SHW). This way, the evaluated points that are already close to the goal take priority over those still around the starting point. The value of $\epsilon$ can even be adjusted according to the current performance.
