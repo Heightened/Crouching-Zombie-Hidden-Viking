@@ -1,7 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import model.character.GameCharacter;
 import model.map.ChunkedMap;
 import model.map.Map;
 import controller.actions.Action;
@@ -31,6 +33,18 @@ public class Game {
 		while(!actionBuffer.isEmpty()){
 			actionBuffer.remove().perform(this);
 		}
+	}
+	
+	public void tick(float dtime)
+	{
+		// update characters
+		ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
+		for(GameCharacter c : chars)
+		{
+			c.move(dtime);
+		}
+		
+		//update moar!
 	}
 	
 	public ChunkedMap getFlockingMap(){

@@ -45,6 +45,7 @@ public class Chunk implements ChangeListener<Cell>
 	public Collection<model.character.GameCharacter> getCharacters()
 	{
 		return this.chars;
+		
 	}
 
 	@Override

@@ -102,13 +102,12 @@ public class GameCharacter extends Vehicle{
 			newCell = this.cell.getMap().getCell(xi, yi);
 		else
 			newCell = oldCell;
-		
 		newCell.getCharacterHolder().getItem().add(this);
 		this.x = x-xi;
 		this.y = y-yi;
 		
 		this.cell = newCell;
-		oldCell.getCharacterHolder().removeItem();
+		oldCell.getCharacterHolder().getItem().remove(this);
 		
 		newCell.characterMoved(this);
 		oldCell.characterMoved(this);

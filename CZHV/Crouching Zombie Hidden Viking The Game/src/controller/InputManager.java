@@ -1,8 +1,8 @@
 package controller;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
@@ -38,7 +38,7 @@ public class InputManager extends Controller{
 	
 	private Point startClick;
 	private Point endClick;
-	private ArrayList<GameCharacter> selected;
+	private List<GameCharacter> selected;
 	public void pollInput(){
 		while(Mouse.next()){
 			if(Mouse.getEventButton() == 0){

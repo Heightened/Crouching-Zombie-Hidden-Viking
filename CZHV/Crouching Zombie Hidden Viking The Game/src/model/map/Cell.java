@@ -2,7 +2,9 @@ package model.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import model.Container;
 import model.character.GameCharacter;
@@ -13,7 +15,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 {
 	private boolean isPassible = true; // should be taken over by decor later;
 	private Container<Item> itemHolder = new Container<>();
-	private Container<ArrayList<GameCharacter>> characterHolder = new Container<>();
+	private Container<List<GameCharacter>> characterHolder = new Container<>();
 	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
@@ -75,7 +77,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		return this.itemHolder;
 	}
 	
-	public Container<ArrayList<GameCharacter>> getCharacterHolder()
+	public Container<List<GameCharacter>> getCharacterHolder()
 	{
 		return this.characterHolder;
 	}
