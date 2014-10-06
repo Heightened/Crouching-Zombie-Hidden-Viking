@@ -22,29 +22,37 @@ public class Simulator extends Thread{
 		this.flockingMap = game.getFlockingMap();
 		this.map = game.getMap();
 		flockingManager = new FlockingManager();
+		System.out.println("START");
 	}
 
 	public void quit(){
+		System.out.println("QUIT");
 		running = false;
 	}
 	
+	long time = 0;
 	@Override
 	public void run(){
 		running = true;
 		while(running){
 			//TODO: push updates to game
+			time = System.currentTimeMillis() - time;
+			if (time > 1000){
+				time = 0;
+			}
+			float dtime = time/16;
+			ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
+			flockingManager.setVehicleList(chars);
+			flockingManager.loop(flockingMap);
+			for (GameCharacter c : chars){
+				c.move(dtime);
+			}
+			time = System.currentTimeMillis();
 			try{
 				Thread.sleep(10);
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			Collection<Cell> activeCells = flockingMap.getActiveCells();
-			for (Cell c : activeCells){
-				ArrayList<GameCharacter> chars = c.getCharacterHolder().getItem();
-				flockingManager.setVehicleList(chars);
-				
-			}
-			flockingManager.loop(flockingMap);
 		}
 	}
 }

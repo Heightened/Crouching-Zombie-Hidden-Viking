@@ -1,6 +1,11 @@
 package simulator.tempFlocking;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import model.character.GameCharacter;
+import model.map.ChunkedMap;
+
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Dummy3DObj;
@@ -19,8 +24,8 @@ public class Vehicle extends Dummy3DObj{
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(){
-		super();
+	public Vehicle(int i, int j){
+		super(i,j);
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
 		this.target = target;
@@ -29,19 +34,20 @@ public class Vehicle extends Dummy3DObj{
 	}
 
 	float targetSlowRadius = 100;
-	public void update(FlockingManager main, Grid grid){
+	public void update(ChunkedMap map, int gridx, int gridy){
 		gridx = (int)(position.x/FlockingManager.GRID_CELL_SIZE);
 		gridy = (int)(position.z/FlockingManager.GRID_CELL_SIZE);
 
 		steering.x = 0;
 		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
-			for (int y = gridy - 1; y < gridy+2; y++ ){
-				Vehicle[] tempv = grid.getArray(x, y);
-				int size = grid.getSize(x, y);
-				for (int i = 0; i < size; i++){
-					Vehicle v = tempv[i];
+			int y = gridy-1;
+			for (y = gridy - 1; y < gridy+2; y++ ){
+				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
+				while(iter.hasNext()){
+					Vehicle v = iter.next();
 					if (v != this){
+						System.out.println("NEIGHBOUR");
 						Vector2f vec = fleeTarget(v.position, 0.13f);//all performance issues here
 						steering.x += vec.x*1f;
 						steering.y += vec.y*1f;
@@ -50,8 +56,9 @@ public class Vehicle extends Dummy3DObj{
 			}
 		}
 		
-		addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		addSteeringForce( seekTarget(target, 100), 5);
+		
+		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
+		//addSteeringForce( seekTarget(target, 100), 5);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);
@@ -77,6 +84,10 @@ public class Vehicle extends Dummy3DObj{
 		if (position.z < 0){
 			position.z += FlockingManager.screenSize.y;
 		}
+	}
+	
+	public Vector2f getVelocity(){
+		return velocity;
 	}
 	
 	public void truncate(Vector2f in, float max){

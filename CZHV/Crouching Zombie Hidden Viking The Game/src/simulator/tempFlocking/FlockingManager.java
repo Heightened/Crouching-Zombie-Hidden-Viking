@@ -7,25 +7,34 @@ import model.map.ChunkedMap;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import view.renderer3D.core.Renderer3D;
+
 
 public class FlockingManager {
-	Grid grid;
-
 	ArrayList<GameCharacter> vlist;	
 	public static final Vector2f screenSize = new Vector2f(2,2);
 	public static final float GRID_CELL_SIZE = 0.15f;
 	public FlockingManager(){
-		grid = new Grid((int)(2/GRID_CELL_SIZE+2),(int)(2/GRID_CELL_SIZE+2));
+		
 	}
 	
 	public void setVehicleList(ArrayList<GameCharacter> vehicles){
 		this.vlist = vehicles;
+		if (vlist.isEmpty()){
+			System.out.println("EMPTY");
+		}
 	}
 
 	public void loop(ChunkedMap flockingMap){
 		for (GameCharacter v : vlist){
-			v.update(this, grid);
-			v.update(this, grid);
+			v.setPosition(v.getAbsX()*Renderer3D.cellSize, 0, v.getAbsY()*Renderer3D.cellSize);
+		}
+		for (GameCharacter v : vlist){
+			int gridx = (int)(v.getAbsX());
+			int gridy = (int)(v.getAbsY());
+			v.update(flockingMap, gridx, gridy);
+			v.update(flockingMap, gridx, gridy);
+			v.setSpeed(v.getVelocity().x, v.getVelocity().y);
 		}
 	}
 }

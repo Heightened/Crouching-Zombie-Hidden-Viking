@@ -34,7 +34,7 @@ public class GameCharacter extends Vehicle{
 	}
 	
 	public GameCharacter(int maxHp, int strength, int maxSpeed, int inventory_size, boolean infected){
-		super();
+		super(0,0);
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setMaxSpeed(maxSpeed);
@@ -48,8 +48,19 @@ public class GameCharacter extends Vehicle{
 	// only for simulator
 	public void move(float dtime)
 	{
-		// if moved outside of cell, us teleportTo
-		// else just update in-cell position
+
+		float newX = this.x+dtime*this.speedX;
+		float newY = this.y+dtime*this.speedY;
+		
+		if(newX <= -.5 || newX > 0.5 || newY <= -.5 || newY > 0.5)
+		{
+			this.teleportTo(newX+this.cell.getX(), newY+this.cell.getY());
+		}
+		else
+		{
+			this.x = newX;
+			this.y = newY;
+		}
 	}
 	
 	// only for controller
@@ -86,7 +97,11 @@ public class GameCharacter extends Vehicle{
 		int xi = (int)x;
 		int yi = (int)y;
 		model.map.Cell oldCell = this.cell;
-		model.map.Cell newCell = this.cell.getMap().getCell(xi, yi);
+		model.map.Cell newCell;
+		if(this.cell.getMap().isInGrid(xi, yi))
+			newCell = this.cell.getMap().getCell(xi, yi);
+		else
+			newCell = oldCell;
 		
 		newCell.getCharacterHolder().getItem().add(this);
 		this.x = x-xi;

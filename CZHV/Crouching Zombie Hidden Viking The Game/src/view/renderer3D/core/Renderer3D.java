@@ -62,6 +62,12 @@ public class Renderer3D implements RendererInfoInterface{
 		this.game = game;
 		map = game.getMap();
 		map.populate();
+
+		for (int i = 0; i < 15; i++){
+			for (int j = 0; j < 15; j++){
+				game.getFlockingMap().getActiveCells(i, j);
+			}
+		}
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -112,17 +118,6 @@ public class Renderer3D implements RendererInfoInterface{
 		quadShader.findUniforms();
 		quadShader.findAttributes();
 		quadShader.unbind();
-
-		objList = new ArrayList<>();
-		
-		flockingTarget = new Vector4f(0.5f,0,0.5f,1);
-		for (int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
-				//objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
-			}
-		}
-		
-		flockingManager = new FlockingManager(objList);
 		
 		selecter = new DEMOselecter( objList);
 		
@@ -174,12 +169,11 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		
 		inputManager.pollInput();
-		flockingManager.loop();
 		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
-		selecter.update(MVP);
+		//selecter.update(MVP);
 		lightManager.update();
 		
 		shadowManager.update();
@@ -231,16 +225,6 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
 
 		viewGrid.draw(lightShader);
-
-		if (Mouse.isButtonDown(1)){
-			Vector2f mouse = selecter.getNormalizedMouse();
-			Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
-			Vector3f colPoint = ray.collideXZPlane(0);
-			flockingTarget.x = colPoint.x;
-			flockingTarget.y = 0;
-			flockingTarget.z = colPoint.z;
-			flockingTarget.w = 1;
-		}
 		
 		bufferGeo(lightShader);
     	
@@ -259,12 +243,12 @@ public class Renderer3D implements RendererInfoInterface{
 		Display.update();
 	}
 	
-	private final float cellSize = 0.1f;
+	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
 			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter c : gameChars){
-				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
+				//c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
 				if (c.isSelected()){
 					shader.putUnifFloat4("color", selectedColor);
 				}else if (c.isInfected()){
@@ -282,7 +266,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 			
 		}
-		Dummy3DObj d = new Dummy3DObj();
+		Dummy3DObj d = new Dummy3DObj(0,0);
 		for (Cell cell : impassibleCells){
 				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", decorColor);
