@@ -62,6 +62,12 @@ public class Renderer3D implements RendererInfoInterface{
 		this.game = game;
 		map = game.getMap();
 		map.populate();
+
+		for (int i = 0; i < 15; i++){
+			for (int j = 0; j < 15; j++){
+				game.getFlockingMap().getActiveCells(i, j);
+			}
+		}
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -112,17 +118,6 @@ public class Renderer3D implements RendererInfoInterface{
 		quadShader.findUniforms();
 		quadShader.findAttributes();
 		quadShader.unbind();
-
-		objList = new ArrayList<>();
-		
-		flockingTarget = new Vector4f(0.5f,0,0.5f,1);
-		for (int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
-				//objList.add(new Vehicle( new Vector4f(0.2f*i,0,0.2f*j,1),flockingTarget, new Vector3f(0,0,0)));
-			}
-		}
-		
-		flockingManager = new FlockingManager(objList);
 		
 		selecter = new DEMOselecter( objList);
 		
@@ -174,12 +169,11 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		
 		inputManager.pollInput();
-		flockingManager.loop();
 		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
-		selecter.update(MVP);
+		//selecter.update(MVP);
 		lightManager.update();
 		
 		shadowManager.update();
@@ -231,16 +225,6 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
 
 		viewGrid.draw(lightShader);
-
-		if (Mouse.isButtonDown(1)){
-			Vector2f mouse = selecter.getNormalizedMouse();
-			Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
-			Vector3f colPoint = ray.collideXZPlane(0);
-			flockingTarget.x = colPoint.x;
-			flockingTarget.y = 0;
-			flockingTarget.z = colPoint.z;
-			flockingTarget.w = 1;
-		}
 		
 		bufferGeo(lightShader);
     	

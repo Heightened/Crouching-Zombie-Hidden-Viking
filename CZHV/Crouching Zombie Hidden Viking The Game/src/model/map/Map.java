@@ -74,11 +74,11 @@ public class Map implements ChangeListener<Cell>
 			}
 			while(!this.getCell(x, y).isFree(c));
 			
-			c.teleportTo(this.getCell(x,y));
+			c.teleportTo(this.getCell(i,1));
 			
 			//if(this.randInt(0,5)==2)
 			{
-				c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
+				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
 			}
 		}
 		
