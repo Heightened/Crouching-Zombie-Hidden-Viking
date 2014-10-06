@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import model.character.GameCharacter;
+
 public class ChunkedMap implements ChangeListener<Cell>
 {
 	public final Map map;
@@ -72,6 +74,16 @@ public class ChunkedMap implements ChangeListener<Cell>
 	{
 		if(this.isLoaded(changed.getX(), changed.getY()))
 			this.getChunk(changed.getX(), changed.getY()).setInactive(changed);
+	}
+	
+	@Override
+	public void characterMoved(GameCharacter character)
+	{
+		int x = character.getCell().getX();
+		int y = character.getCell().getY();
+		
+		if(this.isLoaded(x, y))
+			this.getChunk(x, y).characterMoved(character);
 	}
 	
 	private boolean isLoaded(int x, int y)

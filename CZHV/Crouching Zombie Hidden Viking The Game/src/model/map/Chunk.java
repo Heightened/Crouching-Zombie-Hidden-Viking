@@ -16,6 +16,14 @@ public class Chunk implements ChangeListener<Cell>
 		this.lx = lx;
 		this.ly = ly;
 		this.cells = cells;
+		
+		for(Cell c : this.cells)
+		{
+			if(!c.getCharacterHolder().isEmpty())
+			{
+				this.chars.addAll(c.getCharacterHolder().getItem());
+			}
+		}
 	}
 	
 	public Chunk(int lx, int ly)
@@ -23,6 +31,7 @@ public class Chunk implements ChangeListener<Cell>
 		this(lx, ly, new ArrayList<Cell>());
 	}
 	
+	//returns true if this is the chunk at chunkposition (lx, ly)
 	public boolean is(int lx, int ly)
 	{
 		return this.lx == lx && this.ly == ly;
@@ -35,18 +44,7 @@ public class Chunk implements ChangeListener<Cell>
 	
 	public Collection<model.character.GameCharacter> getCharacters()
 	{
-		//TODO optimize
-		Collection<model.character.GameCharacter> characters = new ArrayList<>();
-		
-		for(Cell c : this.cells)
-		{
-			if(c.getCharacterHolder().isEmpty())
-			{
-				characters.addAll(c.getCharacterHolder().getItem());
-			}
-		}
-		
-		return characters;
+		return this.chars;
 	}
 
 	@Override
@@ -59,5 +57,14 @@ public class Chunk implements ChangeListener<Cell>
 	public void setInactive(Cell changed)
 	{
 		this.cells.remove(changed);
+	}
+	
+	@Override
+	public void characterMoved(GameCharacter character)
+	{
+		if(this.cells.contains(character.getCell()) && !this.chars.contains(character))
+			this.chars.add(character);
+		else if(!this.cells.contains(character.getCell()) && this.chars.contains(character))
+			this.chars.remove(character);
 	}
 }

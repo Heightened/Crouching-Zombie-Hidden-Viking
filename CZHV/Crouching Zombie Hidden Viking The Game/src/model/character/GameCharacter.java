@@ -48,7 +48,6 @@ public class GameCharacter extends Vehicle{
 	// only for simulator
 	public void move(float dtime)
 	{
-		
 		// if moved outside of cell, us teleportTo
 		// else just update in-cell position
 	}
@@ -95,6 +94,9 @@ public class GameCharacter extends Vehicle{
 		
 		this.cell = newCell;
 		oldCell.getCharacterHolder().removeItem();
+		
+		newCell.characterMoved(this);
+		oldCell.characterMoved(this);
 		
 	}
 	
@@ -202,6 +204,11 @@ public class GameCharacter extends Vehicle{
 	
 	public boolean isDead(){
 		return getCurrentHp()<=0;
+	}
+	
+	public Cell getCell()
+	{
+		return this.cell;
 	}
 
 	public boolean hasSkill(Skill skill)

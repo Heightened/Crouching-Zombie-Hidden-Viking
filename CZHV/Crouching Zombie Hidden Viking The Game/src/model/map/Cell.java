@@ -90,14 +90,20 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	}
 
 	@Override
-	public void setActive(Container<? extends Object> cell)
+	public void setActive(Container<? extends Object> container)
 	{
 		this.map.setActive(this);
 	}
 
 	@Override
-	public void setInactive(Container<? extends Object> cell)
+	public void setInactive(Container<? extends Object> container)
 	{
 		this.map.setInactive(this);
+	}
+	
+	@Override
+	public void characterMoved(GameCharacter c)
+	{
+		this.map.characterMoved(c);
 	}
 }

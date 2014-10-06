@@ -185,7 +185,7 @@ public class Map implements ChangeListener<Cell>
 		return activeCells;
 	}
 	
-	//This should in in some util class
+	//TODO: This should in in some util class
 	private int randInt(int min, int max) {
 
 	    // NOTE: Usually this should be a field rather than a method
@@ -216,5 +216,12 @@ public class Map implements ChangeListener<Cell>
 	{
 		for(ChangeListener<Cell> l : this.listeners)
 			l.setInactive(changed);
+	}
+	
+	@Override
+	public void characterMoved(GameCharacter character)
+	{
+		for(ChangeListener<Cell> l : this.listeners)
+			l.characterMoved(character);
 	}
 }
