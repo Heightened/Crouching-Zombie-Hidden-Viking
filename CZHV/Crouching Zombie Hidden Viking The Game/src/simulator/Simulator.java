@@ -31,22 +31,25 @@ public class Simulator extends Thread{
 		running = false;
 	}
 	
-	long time = 0;
+	long time = System.currentTimeMillis();
 	@Override
 	public void run(){
 		running = true;
 		while(running){
+			float dtime = (System.currentTimeMillis() - time)/1000f;
+			time = System.currentTimeMillis();
+			System.out.println("t: "+time);
 			//TODO: push updates to game
-			time = System.currentTimeMillis() - time;
-			if (time > 1000){
-				time = 0;
-			}
-			float dtime = time/16;
+			//time = System.currentTimeMillis() - time;
+			//if (time > 1000){
+			//	time = 0;
+			//}
+			//float dtime = time/16;
 			ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
 			flockingManager.setVehicleList(chars);
 			flockingManager.loop(flockingMap);
 			this.game.getActionBuffer().add(new Tick(dtime));
-			time = System.currentTimeMillis();
+			//time = System.currentTimeMillis();
 			try{
 				Thread.sleep(10);
 			}catch(Exception e){

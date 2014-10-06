@@ -36,6 +36,7 @@ public class HalfPrecisionFloat {
 		
 //		System.out.println(Integer.toBinaryString(bits));
 		
+		bytes = new byte[2];
 		bytes[0] = (byte) ((bits & (((1 << 8) - 1) << 8)) >>> 8);
 		bytes[1] = (byte) (bits & ((1 << 8) - 1));
 		

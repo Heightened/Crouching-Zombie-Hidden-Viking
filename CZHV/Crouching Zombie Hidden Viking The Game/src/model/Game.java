@@ -37,6 +37,11 @@ public class Game {
 	
 	public void tick(float dtime)
 	{
+		if(dtime == 0.0)
+			return;
+		
+		System.out.println("TICK! (dtime="+dtime+")");
+		
 		// update characters
 		ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
 		for(GameCharacter c : chars)
