@@ -172,14 +172,16 @@ public class Map implements ChangeListener<Cell>
 	// y1 <= c.getY() < y2 OR y2 <= c.getY() < y1
 	public Collection<Cell> getActiveCells(int x1, int y1, int x2, int y2)
 	{
-		assert this.isInGrid(x1, y2);
-		assert this.isInGrid(x1, y2);
+		assert this.isInGrid(x1, y1);
+		assert this.isInGrid(x2, y2);
+		
+		
 		
 		Collection<Cell> activeCells = new HashSet<>();
 		
 		for(int x=Math.min(x1, x2); x<Math.max(x1, x2); x++)
 			for(int y=Math.min(y1, y2); y<Math.max(y1, y2); y++)
-				if(this.getCell(x,y).isActive())
+				if(isInGrid(x, y) && this.getCell(x,y).isActive())
 					activeCells.add(this.getCell(x,y));
 		
 		return activeCells;

@@ -30,21 +30,29 @@ public class Simulator extends Thread{
 		running = false;
 	}
 	
+	long time = 0;
 	@Override
 	public void run(){
-		System.out.println("EMPTY");
 		running = true;
 		while(running){
 			//TODO: push updates to game
-			System.out.println("EMPTY");
+			time = System.currentTimeMillis() - time;
+			if (time > 1000){
+				time = 0;
+			}
+			float dtime = time/16;
+			ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
+			flockingManager.setVehicleList(chars);
+			flockingManager.loop(flockingMap);
+			for (GameCharacter c : chars){
+				c.move(dtime);
+			}
+			time = System.currentTimeMillis();
 			try{
 				Thread.sleep(10);
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
-			flockingManager.setVehicleList(chars);
-			flockingManager.loop(flockingMap);
 		}
 	}
 }

@@ -40,12 +40,12 @@ public class Chunk implements ChangeListener<Cell>
 		
 		for(Cell c : this.cells)
 		{
-			if(c.getCharacterHolder().isEmpty())
+			if(!c.getCharacterHolder().isEmpty())
 			{
 				characters.addAll(c.getCharacterHolder().getItem());
 			}
 		}
-		
+
 		return characters;
 	}
 

@@ -56,7 +56,6 @@ public class ChunkedMap implements ChangeListener<Cell>
 		
 		for(Chunk c : this.chunks)
 			allChars.addAll(c.getCharacters());
-		
 		return allChars;
 	}
 

@@ -24,8 +24,8 @@ public class Vehicle extends Dummy3DObj{
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(){
-		super();
+	public Vehicle(int i, int j){
+		super(i,j);
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
 		this.target = target;
@@ -37,17 +37,17 @@ public class Vehicle extends Dummy3DObj{
 	public void update(ChunkedMap map, int gridx, int gridy){
 		gridx = (int)(position.x/FlockingManager.GRID_CELL_SIZE);
 		gridy = (int)(position.z/FlockingManager.GRID_CELL_SIZE);
-		System.out.println("update");
 
 		steering.x = 0;
 		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
-			for (int y = gridy - 1; y < gridy+2; y++ ){
+			int y = gridy-1;
+			for (y = gridy - 1; y < gridy+2; y++ ){
 				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
 				while(iter.hasNext()){
 					Vehicle v = iter.next();
-					System.out.println("NEIGHBOUR");
 					if (v != this){
+						System.out.println("NEIGHBOUR");
 						Vector2f vec = fleeTarget(v.position, 0.13f);//all performance issues here
 						steering.x += vec.x*1f;
 						steering.y += vec.y*1f;
@@ -56,8 +56,9 @@ public class Vehicle extends Dummy3DObj{
 			}
 		}
 		
-		addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		addSteeringForce( seekTarget(target, 100), 5);
+		
+		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
+		//addSteeringForce( seekTarget(target, 100), 5);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);

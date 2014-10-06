@@ -243,12 +243,12 @@ public class Renderer3D implements RendererInfoInterface{
 		Display.update();
 	}
 	
-	private final float cellSize = 0.1f;
+	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
 			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter c : gameChars){
-				c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
+				//c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
 				if (c.isSelected()){
 					shader.putUnifFloat4("color", selectedColor);
 				}else if (c.isInfected()){
@@ -266,7 +266,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 			
 		}
-		Dummy3DObj d = new Dummy3DObj();
+		Dummy3DObj d = new Dummy3DObj(0,0);
 		for (Cell cell : impassibleCells){
 				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", decorColor);

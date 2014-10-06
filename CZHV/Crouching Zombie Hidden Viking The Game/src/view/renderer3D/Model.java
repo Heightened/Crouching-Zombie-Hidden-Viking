@@ -41,14 +41,14 @@ public class Model {
 			
 			int i = 0;
 			for (String[] face : faces) {
-				System.out.println(Arrays.toString(face));
+				//System.out.println(Arrays.toString(face));
 				for (String vertex : face) {
 					if (vertex.equals("f")) {
 						continue;
 					}
 					
 					int[] attributes = getIntArray(0, vertex.split("/"));
-					System.out.println(Arrays.toString(attributes));
+					//System.out.println(Arrays.toString(attributes));
 					
 					float[] position = distinctVertices.get(attributes[0] - 1);
 					//float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);

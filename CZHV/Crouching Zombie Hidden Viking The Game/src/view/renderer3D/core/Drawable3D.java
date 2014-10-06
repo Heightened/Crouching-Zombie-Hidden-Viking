@@ -36,11 +36,11 @@ public class Drawable3D {
 			//buffer vertex position vector
 			vertexBuffer.putFloat(vertices[i*3]).putFloat(vertices[i*3 + 1]).putFloat(vertices[i*3 + 2]);
 			//buffer vertex normal vector
-			System.out.println("normal " + normals[i*3+0] + " " + normals[i*3+1] + " " + normals[i*3+2] );
+			//System.out.println("normal " + normals[i*3+0] + " " + normals[i*3+1] + " " + normals[i*3+2] );
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3 + 1])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3 + 2])).bytes);
-			System.out.println("endnormals");
+			//System.out.println("endnormals");
 			//buffer vertex tangent vector
 			vertexBuffer.put((new HalfPrecisionFloat(tangents[i*3])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(tangents[i*3 + 1])).bytes);

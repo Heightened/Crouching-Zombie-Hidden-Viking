@@ -34,7 +34,7 @@ public class GameCharacter extends Vehicle{
 	}
 	
 	public GameCharacter(int maxHp, int strength, int maxSpeed, int inventory_size, boolean infected){
-		super();
+		super(0,0);
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setMaxSpeed(maxSpeed);

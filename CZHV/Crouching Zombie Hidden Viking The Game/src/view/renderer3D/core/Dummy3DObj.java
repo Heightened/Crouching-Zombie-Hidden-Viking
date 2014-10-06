@@ -22,12 +22,12 @@ public class Dummy3DObj {
 	private float scale = 0.035f;
 	private boolean selected = false;
 	
-	public Dummy3DObj(){
+	public Dummy3DObj(int i, int j){
 		modelMatrix = BufferUtils.createFloatBuffer(16);
 		this.rotation = new Vector3f();
 		modelMat = new Matrix4f();
 		screenPos = new Vector4f();
-		this.position = new Vector4f();
+		this.position = new Vector4f(Renderer3D.cellSize*i, 0, Renderer3D.cellSize*j,1);
 	}
 	
 	public boolean isSelected(){

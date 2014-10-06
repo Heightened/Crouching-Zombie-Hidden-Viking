@@ -7,6 +7,8 @@ import model.map.ChunkedMap;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import view.renderer3D.core.Renderer3D;
+
 
 public class FlockingManager {
 	ArrayList<GameCharacter> vlist;	
@@ -24,14 +26,12 @@ public class FlockingManager {
 	}
 
 	public void loop(ChunkedMap flockingMap){
-		System.out.println("EMPTY");
 		for (GameCharacter v : vlist){
-			
-			v.setPosition(v.getAbsX(), 0, v.getAbsY());
+			v.setPosition(v.getAbsX()*Renderer3D.cellSize, 0, v.getAbsY()*Renderer3D.cellSize);
 		}
 		for (GameCharacter v : vlist){
-			int gridx = (int)(v.getAbsX()%1);
-			int gridy = (int)(v.getAbsY()%1);
+			int gridx = (int)(v.getAbsX());
+			int gridy = (int)(v.getAbsY());
 			v.update(flockingMap, gridx, gridy);
 			v.update(flockingMap, gridx, gridy);
 			v.setSpeed(v.getVelocity().x, v.getVelocity().y);
