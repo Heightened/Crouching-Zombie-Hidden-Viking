@@ -38,6 +38,7 @@ public class Chunk implements ChangeListener<Cell>
 		//TODO optimize
 		Collection<model.character.GameCharacter> characters = new ArrayList<>();
 		
+		
 		for(Cell c : this.cells)
 		{
 			if(!c.getCharacterHolder().isEmpty())

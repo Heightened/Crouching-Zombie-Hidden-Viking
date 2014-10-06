@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
@@ -160,7 +161,7 @@ public class Renderer3D implements RendererInfoInterface{
 		activeCells = map.getActiveCells();
 		
 		for (Cell cell : activeCells){
-			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter gameChar : gameChars){
 				if (gameChar != null){
 					gameChar.update();
@@ -246,9 +247,9 @@ public class Renderer3D implements RendererInfoInterface{
 	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
-			ArrayList<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter c : gameChars){
-				//c.setPosition(cell.getX()*cellSize + c.getX()*cellSize, 0, cell.getY()*cellSize + c.getY()*cellSize);
+				c.setPosition(c.getAbsX()*cellSize, 0, c.getAbsY()*cellSize);
 				if (c.isSelected()){
 					shader.putUnifFloat4("color", selectedColor);
 				}else if (c.isInfected()){

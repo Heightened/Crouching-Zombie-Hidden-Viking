@@ -3,6 +3,7 @@ package simulator;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import controller.actions.Tick;
 import model.Game;
 import model.character.GameCharacter;
 import model.map.Cell;
@@ -44,9 +45,7 @@ public class Simulator extends Thread{
 			ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
 			flockingManager.setVehicleList(chars);
 			flockingManager.loop(flockingMap);
-			for (GameCharacter c : chars){
-				c.move(dtime);
-			}
+			this.game.getActionBuffer().add(new Tick(dtime));
 			time = System.currentTimeMillis();
 			try{
 				Thread.sleep(10);
