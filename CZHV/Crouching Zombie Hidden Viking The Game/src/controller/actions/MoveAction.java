@@ -8,7 +8,6 @@ public class MoveAction implements Action{
 	private GameCharacter c;
 	private float x,y;
 	
-	
 	public MoveAction(GameCharacter c, float x, float y){
 		this.c = c;
 		this.x = x;

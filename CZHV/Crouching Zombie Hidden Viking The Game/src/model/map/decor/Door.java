@@ -4,6 +4,10 @@ import model.character.GameCharacter;
 
 public class Door extends Decor
 {
+	public Door(int i, int j) {
+		super(i, j);
+	}
+
 	@Override
 	public boolean interact(GameCharacter interacter)
 	{
