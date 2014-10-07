@@ -26,6 +26,7 @@ uniform sampler2D shadowMap;
 uniform mat4 shadowMVP;
 uniform mat4 shadowProjectionMatrix;
 uniform mat4 biasMatrix;
+uniform vec4 gridOffset;
 
 out vec4 texelColor;
 
@@ -69,8 +70,8 @@ void main(void)
 
 
 
-    int cellx = int(worldspacePos.x/0.25);
-    int cellz = int(worldspacePos.z/0.25);
+    int cellx = int((worldspacePos.x-gridOffset.x)/0.25);
+    int cellz = int((worldspacePos.z-gridOffset.z)/0.25);
     float temp = float((cellx*cellz))/256;
     vec4 lightindex = indices[cellx+cellz*16];
     
@@ -121,7 +122,7 @@ void main(void)
     texelColor = vec4(final_color.rgb*color.rgb,1);
     //texelColor = vec4(shadow, shadow, shadow,1);
     //texelColor = vec4(final_color.rgb,1);
-    texelColor = vec4(color.rgb,1);
+    //texelColor = vec4(color.rgb,1);
     //texelColor.r = lights[1].color.a;
   //texelColor.g = color.r;
    // texelColor.b = 0;

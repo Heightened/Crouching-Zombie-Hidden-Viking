@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.ARBVertexBufferObject;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -46,8 +47,10 @@ public class LightManager {
     private static int flipflop = 0;
     private static boolean inits = false;
     private ShadowManager shadowManger;
+    private static Vector3f gridOffset;
     public LightManager(ShadowManager shadowManager){
     	this.shadowManger = shadowManager;
+    	gridOffset = new Vector3f(0,0,0);
         inits = true;
         Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector4f(0,0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
@@ -102,12 +105,17 @@ public class LightManager {
         bound = true;
         glBindBufferBase(GL_UNIFORM_BUFFER, shader.getUnifBlockBindingPoint("lightblock"), getLightBuffer());
         glBindBufferBase(GL_UNIFORM_BUFFER, shader.getUnifBlockBindingPoint("indexblock"), getIndexBuffer());
+        shader.putUnifFloat4("gridOffset", gridOffset.x, gridOffset.y, gridOffset.z, 0);
     }
     
     public void unbind(){
     	bound = false;
         glBindBufferBase(GL_UNIFORM_BUFFER, lightBindingPoint, 0);
         glBindBufferBase(GL_UNIFORM_BUFFER, indexBindingPoint, 0);
+    }
+    
+    public void setGridOffset(float x, float y, float z){
+    	this.gridOffset.set(x, y, z);
     }
     
     public int getLightBuffer(){
@@ -168,10 +176,10 @@ public class LightManager {
         for (int i = 1; i < lights.size(); i++){
             Light l = lights.get(i);
             Vector3f pos = l.position;
-            int left = (int)((l.position.x-l.radius)/GRID_CELL_SIZE);
-            int right = (int)((l.position.x+l.radius)/GRID_CELL_SIZE);
-            int top = (int)((l.position.z+l.radius)/GRID_CELL_SIZE);
-            int bottom = (int)((l.position.z-l.radius)/GRID_CELL_SIZE);
+            int left = (int)((l.position.x-gridOffset.x-l.radius)/GRID_CELL_SIZE);
+            int right = (int)((l.position.x-gridOffset.x+l.radius)/GRID_CELL_SIZE);
+            int top = (int)((l.position.z-gridOffset.z+l.radius)/GRID_CELL_SIZE);
+            int bottom = (int)((l.position.z-gridOffset.z-l.radius)/GRID_CELL_SIZE);
           //  System.out.println(left + " " + right);
            // System.out.println(bottom + " " + top);
            // System.out.println(pos.x + " " + pos.y + " " + pos.z);
@@ -179,7 +187,7 @@ public class LightManager {
            // System.exit(0);
             for (int x = left-1; x < right+1; x++){
                 for (int z = bottom-1; z < top+1; z++){
-                    float distance = (float)Math.pow((x+0.5)*GRID_CELL_SIZE-pos.x,2) + (float)Math.pow((z+0.5)*GRID_CELL_SIZE-pos.z,2);
+                    float distance = (float)Math.pow((x+0.5)*GRID_CELL_SIZE-pos.x-gridOffset.x,2) + (float)Math.pow((z+0.5)*GRID_CELL_SIZE-pos.z-gridOffset.z,2);
                     influenceCell(i, x, z, distance);
                 }
             }
