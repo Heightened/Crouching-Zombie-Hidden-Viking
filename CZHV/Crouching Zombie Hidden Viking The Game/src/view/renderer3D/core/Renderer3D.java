@@ -53,13 +53,11 @@ public class Renderer3D implements RendererInfoInterface{
 	private FloatBuffer modelz;
 	private Game game;
 	private Map map;
-	private InputManager inputManager;
 	private ViewGrid viewGrid;
 	private Collection<Cell> activeCells;
 	private Collection<Cell> impassibleCells;
 	public Renderer3D(Game game){
 		setupDisplay();
-		inputManager = new InputManager(game, this);
 		this.game = game;
 		map = game.getMap();
 		map.populate();
@@ -168,8 +166,6 @@ public class Renderer3D implements RendererInfoInterface{
 				}
 			}
 		}
-		
-		inputManager.pollInput();
 		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
