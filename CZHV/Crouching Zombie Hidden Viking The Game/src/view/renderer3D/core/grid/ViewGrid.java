@@ -31,8 +31,8 @@ public class ViewGrid {
 		gridX = (int)(camera.getWorldPosition().x/gridSizeX);
 		gridY = (int)(camera.getWorldPosition().z/gridSizeY);
 		
-		gridX = clamp(gridX, 1, numGridCells-1);
-		gridY = clamp(gridY, 2, numGridCells);
+		gridX = clamp(gridX, -2, numGridCells-1);
+		gridY = clamp(gridY, -2, numGridCells);
 	}
 	
 	public int clamp(int in, int down, int up){

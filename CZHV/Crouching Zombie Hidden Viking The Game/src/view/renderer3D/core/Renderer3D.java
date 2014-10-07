@@ -171,6 +171,7 @@ public class Renderer3D implements RendererInfoInterface{
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
 		//selecter.update(MVP);
+		lightManager.setGridOffset(camera.getWorldPosition().x-2f,0, camera.getWorldPosition().z-3f);
 		lightManager.update();
 		
 		shadowManager.update();

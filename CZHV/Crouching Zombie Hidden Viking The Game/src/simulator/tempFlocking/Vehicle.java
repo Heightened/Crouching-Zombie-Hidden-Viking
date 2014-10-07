@@ -9,14 +9,15 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Dummy3DObj;
+import view.renderer3D.core.Renderer3D;
 
 
 public class Vehicle extends Dummy3DObj{
 	Vector2f steering;
 	Vector2f velocity;
 	Vector2f targetVelocity;
-	final float max_speed = 0.7f;//final for performance
-	final float max_force = 0.05f;
+	final float max_speed = 2f;//final for performance
+	final float max_force = 0.15f;
 	final float mass = 10;
 	Vector4f prevPosition;
 	Vector4f target;
@@ -27,29 +28,26 @@ public class Vehicle extends Dummy3DObj{
 	public Vehicle(){
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
-		this.target = target;
+		this.target = new Vector4f(0.5f,0,0.5f,1);
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
 	}
 
 	float targetSlowRadius = 100;
 	public void update(ChunkedMap map, int gridx, int gridy){
-		gridx = (int)(position.x/FlockingManager.GRID_CELL_SIZE);
-		gridy = (int)(position.z/FlockingManager.GRID_CELL_SIZE);
 
 		steering.x = 0;
 		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
-			int y = gridy-1;
-			for (y = gridy - 1; y < gridy+2; y++ ){
+			for (int y = gridy - 1; y < gridy+2; y++ ){
 				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
 				while(iter.hasNext()){
 					Vehicle v = iter.next();
 					if (v != this){
-						System.out.println("NEIGHBOUR");
-						Vector2f vec = fleeTarget(v.position, 0.13f);//all performance issues here
-						steering.x += vec.x*1f;
-						steering.y += vec.y*1f;
+						//System.out.println("NEIGHBOUR " + v.position + " " + position);
+						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*2);//all performance issues here
+						steering.x += vec.x*2f;
+						steering.y += vec.y*2f;
 					}
 				}
 			}
@@ -57,7 +55,7 @@ public class Vehicle extends Dummy3DObj{
 		
 		
 		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		//addSteeringForce( seekTarget(target, 100), 5);
+		addSteeringForce( seekTarget(new Vector4f(0.5f,0,0.5f,1), 0.3f), 3);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);
@@ -73,16 +71,16 @@ public class Vehicle extends Dummy3DObj{
 		//	rotation.y = angle*180;
 		}
 		
-		position.x += velocity.x;
-		position.z += velocity.y;
-		position.x %= FlockingManager.screenSize.x;
-		position.z %= FlockingManager.screenSize.y;
-		if (position.x < 0){
-			position.x += FlockingManager.screenSize.x;
-		}
-		if (position.z < 0){
-			position.z += FlockingManager.screenSize.y;
-		}
+	//	position.x += velocity.x;
+	//	position.z += velocity.y;
+	//	position.x %= FlockingManager.screenSize.x;
+	//	position.z %= FlockingManager.screenSize.y;
+	//	if (position.x < 0){
+	//		position.x += FlockingManager.screenSize.x;
+	//	}
+	//	if (position.z < 0){
+	//		position.z += FlockingManager.screenSize.y;
+	//	}
 	}
 	
 	public Vector2f getVelocity(){
