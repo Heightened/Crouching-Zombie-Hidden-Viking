@@ -38,7 +38,6 @@ public class Simulator extends Thread{
 		while(running){
 			float dtime = (System.currentTimeMillis() - time)/1000f;
 			time = System.currentTimeMillis();
-			System.out.println("t: "+time);
 			//TODO: push updates to game
 			//time = System.currentTimeMillis() - time;
 			//if (time > 1000){

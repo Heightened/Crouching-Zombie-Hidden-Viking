@@ -46,9 +46,11 @@ public class ChunkedMap implements ChangeListener<Cell>
 	{
 		ArrayList<model.map.Cell> allCells = new ArrayList<>();
 		
-		for(Chunk c : this.chunks)
-			allCells.addAll(c.getActiveCells());
-		
+		synchronized(this.chunks)
+		{
+			for(Chunk c : this.chunks)
+				allCells.addAll(c.getActiveCells());
+		}
 		return allCells;
 	}
 
@@ -56,8 +58,11 @@ public class ChunkedMap implements ChangeListener<Cell>
 	{
 		ArrayList<model.character.GameCharacter> allChars = new ArrayList<>();
 		
-		for(Chunk c : this.chunks)
-			allChars.addAll(c.getCharacters());
+		synchronized(this.chunks)
+		{
+			for(Chunk c : this.chunks)
+				allChars.addAll(c.getCharacters());
+		}
 		return allChars;
 	}
 
@@ -87,9 +92,12 @@ public class ChunkedMap implements ChangeListener<Cell>
 	
 	private boolean isLoaded(int x, int y)
 	{
-		for(Chunk chunk : this.chunks)
-			if(chunk.is(x/this.chunkWidth, y/this.chunkHeight))
-				return true;
+		synchronized(this.chunks)
+		{
+			for(Chunk chunk : this.chunks)
+				if(chunk.is(x/this.chunkWidth, y/this.chunkHeight))
+					return true;
+		}
 		
 		return false;
 	}
@@ -100,21 +108,27 @@ public class ChunkedMap implements ChangeListener<Cell>
 			this.unload();
 		
 		// insert at start
-		this.chunks.add(0, new Chunk(
-				x/this.chunkWidth,
-				y/this.chunkHeight,
-				this.map.getActiveCells(x, y, x+this.chunkWidth, y+this.chunkHeight)
-			));
+		synchronized(this.chunks)
+		{
+			this.chunks.add(0, new Chunk(
+					x/this.chunkWidth,
+					y/this.chunkHeight,
+					this.map.getActiveCells(x, y, x+this.chunkWidth, y+this.chunkHeight)
+				));
+		}
 		
 		return this.chunks.get(0);
 	}
 	
 	private void unload()
 	{
-		this.chunks.remove(this.chunks.size()-1);
+		synchronized(this.chunks)
+		{
+			this.chunks.remove(this.chunks.size()-1);
+		}
 	}
 	
-	private Chunk getChunk(int x, int y)
+	private synchronized Chunk getChunk(int x, int y)
 	{
 		Chunk chunk = null;
 		
@@ -128,8 +142,11 @@ public class ChunkedMap implements ChangeListener<Cell>
 		if(chunk == null)
 			throw new RuntimeException("This cannot happen");
 		
-		this.chunks.remove(chunk);
-		this.chunks.add(0,chunk);
+		synchronized(this.chunks)
+		{
+			this.chunks.remove(chunk);
+			this.chunks.add(0,chunk);
+		}
 		
 		return chunk;
 	}

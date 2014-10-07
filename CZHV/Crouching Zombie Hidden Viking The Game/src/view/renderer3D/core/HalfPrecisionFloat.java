@@ -24,7 +24,7 @@ public class HalfPrecisionFloat {
 	public HalfPrecisionFloat(float singlePrecisionFloat) {
 		SinglePrecisionFloat oldFloat = new SinglePrecisionFloat(singlePrecisionFloat);
 		
-		System.out.println("\nHalfPrecisionFloat created");
+		//System.out.println("\nHalfPrecisionFloat created");
 		sign = oldFloat.sign;
 		exponent = (oldFloat.exponent == 0) ? 0 : oldFloat.exponent - 127 + 15; // 2 ^ (HalfPrecisionFloat.exponent - 15) = 2 ^(SinglePrecisionFloat.exponent - 127)
 		mantissa = oldFloat.mantissa >>> (23 - 10);
