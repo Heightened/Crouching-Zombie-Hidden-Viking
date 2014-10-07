@@ -4,8 +4,8 @@ import model.character.GameCharacter;
 
 public class Door extends Decor
 {
-	public Door(int i, int j) {
-		super(i, j);
+	public Door() {
+
 	}
 
 	@Override

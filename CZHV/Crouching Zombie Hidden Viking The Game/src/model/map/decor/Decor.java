@@ -6,8 +6,7 @@ import model.character.GameCharacter;
 
 public abstract class Decor extends Dummy3DObj implements Interactable
 {
-	public Decor(int i, int j) {
-		super(i, j);
+	public Decor() {
 	}
 
 	// returns false only if permanently impassible
