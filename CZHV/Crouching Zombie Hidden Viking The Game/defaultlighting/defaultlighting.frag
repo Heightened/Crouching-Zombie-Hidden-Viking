@@ -122,7 +122,7 @@ void main(void)
     texelColor = vec4(final_color.rgb*color.rgb,1);
     //texelColor = vec4(shadow, shadow, shadow,1);
     //texelColor = vec4(final_color.rgb,1);
-    //texelColor = vec4(color.rgb,1);
+    texelColor = vec4(color.rgb,1);
     //texelColor.r = lights[1].color.a;
   //texelColor.g = color.r;
    // texelColor.b = 0;

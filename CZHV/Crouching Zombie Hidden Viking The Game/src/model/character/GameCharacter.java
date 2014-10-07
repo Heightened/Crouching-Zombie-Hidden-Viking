@@ -47,7 +47,7 @@ public class GameCharacter extends Vehicle{
 	// only for simulator
 	public void move(float dtime)
 	{
-		System.out.println("speed= ("+speedX+","+speedY+")");
+		//System.out.println("speed= ("+speedX+","+speedY+")");
 		
 		float newX = this.x+dtime*this.speedX;
 		float newY = this.y+dtime*this.speedY;

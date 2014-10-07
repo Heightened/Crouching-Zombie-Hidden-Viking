@@ -27,9 +27,12 @@ public class FlockingManager {
 
 	public void loop(ChunkedMap flockingMap){
 		for (GameCharacter v : vlist){
+			v.setPosition(v.getAbsX()*Renderer3D.cellSize, 0, v.getAbsY()*Renderer3D.cellSize);
+		}
+		for (GameCharacter v : vlist){
 			int gridx = (int)(v.getAbsX());
 			int gridy = (int)(v.getAbsY());
-			v.update(flockingMap, gridx, gridy);
+			//v.update(flockingMap, gridx, gridy);
 			v.update(flockingMap, gridx, gridy);
 			v.setSpeed(v.getVelocity().x,v.getVelocity().y);
 		}
