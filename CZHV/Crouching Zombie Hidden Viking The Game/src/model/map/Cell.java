@@ -104,8 +104,8 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	}
 	
 	@Override
-	public void characterMoved(GameCharacter c)
+	public void characterMoved(GameCharacter c, Cell cell)
 	{
-		this.map.characterMoved(c);
+		this.map.characterMoved(c, this);
 	}
 }

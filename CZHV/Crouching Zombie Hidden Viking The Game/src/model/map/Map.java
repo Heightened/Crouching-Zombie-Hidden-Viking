@@ -59,7 +59,7 @@ public class Map implements ChangeListener<Cell>
 			}
 		}
 		
-		int nZombies = 5; //this.randInt(size/600, size/300);
+		int nZombies = 50; //this.randInt(size/600, size/300);
 		
 		for(int i=0; i<nZombies; i++)
 		{
@@ -74,7 +74,7 @@ public class Map implements ChangeListener<Cell>
 			}
 			while(!this.getCell(x, y).isFree(c));
 			
-			c.teleportTo(this.getCell(i,1));
+			c.teleportTo(this.getCell(x,y));
 			
 			//if(this.randInt(0,5)==2)
 			{
@@ -221,9 +221,9 @@ public class Map implements ChangeListener<Cell>
 	}
 	
 	@Override
-	public void characterMoved(GameCharacter character)
+	public void characterMoved(GameCharacter character, Cell cell)
 	{
 		for(ChangeListener<Cell> l : this.listeners)
-			l.characterMoved(character);
+			l.characterMoved(character, cell);
 	}
 }

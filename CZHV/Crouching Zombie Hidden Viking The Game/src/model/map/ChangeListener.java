@@ -8,5 +8,5 @@ public interface ChangeListener<T>
 	
 	public void setInactive(T changed);
 	
-	public void characterMoved(GameCharacter character);
+	public void characterMoved(GameCharacter character, Cell cell);
 }

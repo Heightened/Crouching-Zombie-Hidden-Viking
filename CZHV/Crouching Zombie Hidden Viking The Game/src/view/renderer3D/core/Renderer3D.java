@@ -66,7 +66,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 		for (int i = 0; i < 15; i++){
 			for (int j = 0; j < 15; j++){
-				game.getFlockingMap().getActiveCells(i, j);
+				game.getFlockingMap().getActiveCells(2*i, 2*j);
 			}
 		}
 		impassibleCells = map.getImpassibleCells();
@@ -268,7 +268,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 			
 		}
-		Dummy3DObj d = new Dummy3DObj(0,0);
+		Dummy3DObj d = new Dummy3DObj();
 		for (Cell cell : impassibleCells){
 				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
 	        	shader.putUnifFloat4("color", decorColor);
