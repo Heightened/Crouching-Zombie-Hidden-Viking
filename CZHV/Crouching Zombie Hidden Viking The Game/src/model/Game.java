@@ -67,8 +67,4 @@ public class Game {
 	public LinkedBlockingQueue<Action> getActionBuffer() {
 		return actionBuffer;
 	}
-
-	public void setActionBuffer(LinkedBlockingQueue<Action> actionBuffer) {
-		this.actionBuffer = actionBuffer;
-	}
 }
