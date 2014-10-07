@@ -6,8 +6,8 @@ import model.character.GameCharacter;
 
 public class Item extends Dummy3DObj implements Interactable {
 	
-	public Item(){
-		
+	public Item(int i, int j){
+		super(i, j);
 	}
 
 	public boolean interact(GameCharacter interacter) {
