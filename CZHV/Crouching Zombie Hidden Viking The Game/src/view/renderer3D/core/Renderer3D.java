@@ -66,7 +66,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 		for (int i = 0; i < 15; i++){
 			for (int j = 0; j < 15; j++){
-				game.getFlockingMap().getActiveCells(i, j);
+				game.getFlockingMap().getActiveCells(2*i, 2*j);
 			}
 		}
 		impassibleCells = map.getImpassibleCells();

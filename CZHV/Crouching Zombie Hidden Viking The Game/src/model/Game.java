@@ -25,7 +25,7 @@ public class Game {
 	private void createMap() {
 		//TODO do map creation
 		map = new Map(30,30);
-		flockingMap = new ChunkedMap(map, 2, 200);
+		flockingMap = new ChunkedMap(map, 2, 225);
 	}	
 	
 	public void update(){
