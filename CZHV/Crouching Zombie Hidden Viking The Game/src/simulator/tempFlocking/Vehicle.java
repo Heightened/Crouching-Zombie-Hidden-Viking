@@ -24,8 +24,7 @@ public class Vehicle extends Dummy3DObj{
 	int gridx = 0;
 	int gridy = 0;
 
-	public Vehicle(int i, int j){
-		super(i,j);
+	public Vehicle(){
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
 		this.target = target;
