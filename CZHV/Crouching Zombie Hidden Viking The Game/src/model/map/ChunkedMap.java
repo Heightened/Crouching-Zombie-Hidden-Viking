@@ -81,13 +81,13 @@ public class ChunkedMap implements ChangeListener<Cell>
 	}
 	
 	@Override
-	public void characterMoved(GameCharacter character)
+	public void characterMoved(GameCharacter character, Cell cell)
 	{
-		int x = character.getCell().getX();
-		int y = character.getCell().getY();
+		int x = cell.getX();
+		int y = cell.getY();
 		
 		if(this.isLoaded(x, y))
-			this.getChunk(x, y).characterMoved(character);
+			this.getChunk(x, y).characterMoved(character, cell);
 	}
 	
 	private boolean isLoaded(int x, int y)
@@ -113,6 +113,8 @@ public class ChunkedMap implements ChangeListener<Cell>
 			this.chunks.add(0, new Chunk(
 					x/this.chunkWidth,
 					y/this.chunkHeight,
+					this.chunkWidth,
+					this.chunkHeight,
 					this.map.getActiveCells(x, y, x+this.chunkWidth, y+this.chunkHeight)
 				));
 		}

@@ -48,7 +48,8 @@ public class GameCharacter extends Vehicle{
 	// only for simulator
 	public void move(float dtime)
 	{
-
+		System.out.println("speed= ("+speedX+","+speedY+")");
+		
 		float newX = this.x+dtime*this.speedX;
 		float newY = this.y+dtime*this.speedY;
 		
@@ -109,19 +110,27 @@ public class GameCharacter extends Vehicle{
 		this.cell = newCell;
 		oldCell.getCharacterHolder().getItem().remove(this);
 		
-		newCell.characterMoved(this);
-		oldCell.characterMoved(this);
+		newCell.characterMoved(this, null);
+		oldCell.characterMoved(this, null);
 		
 	}
 	
 	public void teleportTo(model.map.Cell cell)
 	{
+
+		model.map.Cell oldCell = this.cell;
+		model.map.Cell newCell = cell;
+		
 		cell.getCharacterHolder().getItem().add(this);
 		
 		if(this.cell != null)
-			this.cell.getCharacterHolder().removeItem();
+			this.cell.getCharacterHolder().getItem().remove(this);
 		
 		this.cell = cell;
+		
+		newCell.characterMoved(this, null);
+		if(oldCell != null)
+			oldCell.characterMoved(this, null);
 	}
 	
 	public float getX()
@@ -207,7 +216,7 @@ public class GameCharacter extends Vehicle{
 		currentHp = currentHp-Damage;
 		if(isDead()){
 			if(cell!=null){
-				cell.getCharacterHolder().removeItem();
+				cell.getCharacterHolder().getItem().remove(this);
 			}
 		}
 	}

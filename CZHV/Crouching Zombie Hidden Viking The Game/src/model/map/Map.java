@@ -221,9 +221,9 @@ public class Map implements ChangeListener<Cell>
 	}
 	
 	@Override
-	public void characterMoved(GameCharacter character)
+	public void characterMoved(GameCharacter character, Cell cell)
 	{
 		for(ChangeListener<Cell> l : this.listeners)
-			l.characterMoved(character);
+			l.characterMoved(character, cell);
 	}
 }
