@@ -373,9 +373,13 @@ public class Renderer3D implements RendererInfoInterface{
 		Vector3f startCol = ray1.collideXZPlane(0);
 		Line3D ray2 = MatrixCZHV.getPickingRayStartDir(endMouse.x, endMouse.y, camera.getWorldPosition(), viewMat, projMat);
 		Vector3f endCol = ray2.collideXZPlane(0);
+		float minX = Math.min(startCol.x, endCol.x);
+		float maxX = Math.max(startCol.x, endCol.x);
+		float minZ = Math.min(startCol.z, endCol.z);
+		float maxZ = Math.max(startCol.z, endCol.z);
 		for (Cell c : activeCells){
-			if (c.getX()*cellSize > startCol.x && c.getX()*cellSize < endCol.x &&
-					c.getY()*cellSize > startCol.z && c.getY()*cellSize < endCol.z){
+			if (c.getX()*cellSize > minX && c.getX()*cellSize < maxX &&
+					c.getY()*cellSize > minZ && c.getY()*cellSize < maxZ){
 				retCollection.add(c);
 			}
 		}
