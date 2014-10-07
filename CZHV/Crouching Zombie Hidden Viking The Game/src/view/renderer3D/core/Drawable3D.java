@@ -30,17 +30,15 @@ public class Drawable3D {
 		vbo.unbind();
 	}
 	
-	public void initialize(int size, float[] vertices, float[] uvcoords, float[] normals, float[] tangents) {
+	public void initialize(int size, float[] vertices, float[] uvcoords, float[] normals, float[] tangents, boolean halfFloat) {
 		ByteBuffer vertexBuffer = BufferUtils.createByteBuffer(32 * size); //position, uv, normal, tangent (, color)
 		for (int i = 0; i < size; i++) {
 			//buffer vertex position vector
 			vertexBuffer.putFloat(vertices[i*3]).putFloat(vertices[i*3 + 1]).putFloat(vertices[i*3 + 2]);
 			//buffer vertex normal vector
-			//System.out.println("normal " + normals[i*3+0] + " " + normals[i*3+1] + " " + normals[i*3+2] );
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3 + 1])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(normals[i*3 + 2])).bytes);
-			//System.out.println("endnormals");
 			//buffer vertex tangent vector
 			vertexBuffer.put((new HalfPrecisionFloat(tangents[i*3])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(tangents[i*3 + 1])).bytes);
@@ -51,6 +49,37 @@ public class Drawable3D {
 			//padding
 			vertexBuffer.put((new HalfPrecisionFloat(uvcoords[i*2 + 1])).bytes);
 			vertexBuffer.put((new HalfPrecisionFloat(uvcoords[i*2 + 1])).bytes);
+		}
+		
+		vertexBuffer.flip();
+		vbo.bind();
+		vbo.put(vertexBuffer);
+		vbo.unbind();
+	}
+	
+	private short getShortDecimal(float value, int places) {
+		return (short) (value * (float) (Math.pow(2, places) - 1));
+	}
+	
+	private short getShort(float value) {
+		//Short max value: 65536
+		return getShortDecimal(value, 15);
+	}
+	
+	public void initialize(int size, float[] vertices, float[] uvcoords, float[] normals, float[] tangents) {
+		ByteBuffer vertexBuffer = BufferUtils.createByteBuffer(32 * size); //position, uv, normal, (, tangent, color)
+		//BufferUtils.createByteBuffer(32 * size);
+		for (int i = 0; i < size; i++) {
+			//buffer vertex position vector
+			vertexBuffer.putFloat(vertices[i*3]).putFloat(vertices[i*3 + 1]).putFloat(vertices[i*3 + 2]);
+			//buffer vertex normal vector
+			vertexBuffer.putShort(getShort(normals[i*3])).putShort(getShort(normals[i*3 + 1])).putShort(getShort(normals[i*3 + 2]));
+			//buffer vertex tangent vector
+			vertexBuffer.putShort(getShort(tangents[i*3])).putShort(getShort(tangents[i*3 + 1])).putShort(getShort(tangents[i*3 + 2]));
+			//buffer vertex texture coordinates
+			vertexBuffer.putShort(getShort(uvcoords[i*2])).putShort(getShort(uvcoords[i*2 + 1]));
+			//padding
+			vertexBuffer.putShort(getShort(uvcoords[i*2])).putShort(getShort(uvcoords[i*2 + 1]));
 		}
 		
 		vertexBuffer.flip();
