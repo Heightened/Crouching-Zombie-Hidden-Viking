@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import model.Game;
 import model.character.GameCharacter;
+import model.map.MapChangeListener;
 
 public class AIManager implements MapChangeListener{
 	private static int POOL_SIZE = 10; //maybe read this in from a file?

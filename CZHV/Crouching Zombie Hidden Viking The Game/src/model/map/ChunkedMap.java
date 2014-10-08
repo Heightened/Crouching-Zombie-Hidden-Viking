@@ -7,12 +7,13 @@ import java.util.LinkedList;
 
 import model.character.GameCharacter;
 
-public class ChunkedMap implements ChangeListener<Cell>
+public class ChunkedMap implements ChangeListener<Cell>, MapChangeListener
 {
 	public final Map map;
 	private final int chunkWidth;
 	private final int chunkHeight;
 	private final int numChunks;
+	private List<MapChangeListener> listeners = new LinkedList<>();
 	
 	private final List<Chunk> chunks = new LinkedList<>();
 
@@ -28,6 +29,11 @@ public class ChunkedMap implements ChangeListener<Cell>
 		this.chunkHeight = chunkHeight;
 		this.chunkWidth  = chunkWidth;
 		this.numChunks   = numChunks;
+	}
+	
+	public void addListener(MapChangeListener l)
+	{
+		this.listeners.add(l);
 	}
 	
 	// returns all active cells inside the chunk that contains the cell at (x,y)
@@ -89,6 +95,20 @@ public class ChunkedMap implements ChangeListener<Cell>
 		if(this.isLoaded(x, y))
 			this.getChunk(x, y).characterMoved(character, cell);
 	}
+
+	@Override
+	public void setActive(GameCharacter character)
+	{
+		for(MapChangeListener l : this.listeners)
+			l.setActive(character);
+	}
+
+	@Override
+	public void setInactive(GameCharacter character)
+	{
+		for(MapChangeListener l : this.listeners)
+			l.setInactive(character);
+	}
 	
 	private boolean isLoaded(int x, int y)
 	{
@@ -110,13 +130,16 @@ public class ChunkedMap implements ChangeListener<Cell>
 		// insert at start
 		synchronized(this.chunks)
 		{
-			this.chunks.add(0, new Chunk(
+			Chunk chunk = new Chunk(
 					x/this.chunkWidth,
 					y/this.chunkHeight,
 					this.chunkWidth,
 					this.chunkHeight,
 					this.map.getActiveCells(x, y, x+this.chunkWidth, y+this.chunkHeight)
-				));
+				);
+			chunk.addListener(this);
+			
+			this.chunks.add(0, chunk);
 		}
 		
 		return this.chunks.get(0);
@@ -126,7 +149,7 @@ public class ChunkedMap implements ChangeListener<Cell>
 	{
 		synchronized(this.chunks)
 		{
-			this.chunks.remove(this.chunks.size()-1);
+			this.chunks.remove(this.chunks.size()-1).deactivate();
 		}
 	}
 	

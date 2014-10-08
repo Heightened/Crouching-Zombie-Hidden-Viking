@@ -22,6 +22,7 @@ public class SimpleAIController extends AIController
 	{
 		WANDER,
 		ATTACK,
+		FOLLOW,
 		FLEE;
 	}
 	

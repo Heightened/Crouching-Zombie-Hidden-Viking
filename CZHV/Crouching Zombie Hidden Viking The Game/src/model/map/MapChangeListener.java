@@ -1,4 +1,4 @@
-package controller;
+package model.map;
 
 import model.character.GameCharacter;
 
