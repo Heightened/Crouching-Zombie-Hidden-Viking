@@ -3,10 +3,8 @@ package czhv;
 import model.Game;
 import simulator.Simulator;
 import view.renderer3D.core.Renderer3D;
-import controller.AIController;
-import controller.Controller;
+import controller.AIManager;
 import controller.InputManager;
-import controller.ThreadedController;
 
 /**
  * 
@@ -16,7 +14,7 @@ import controller.ThreadedController;
 public class mainClass {
 	private static Game game;
 	private static Renderer3D renderer;
-	private static ThreadedController aiController;
+	private static AIManager aiController;
 	private static InputManager inputManager;
 	private static Simulator simulator;
 	
@@ -34,7 +32,7 @@ public class mainClass {
 		game = new Game();
 		renderer = new Renderer3D(game);
 		inputManager = new InputManager(game, renderer);
-		aiController = new AIController(game);
+		aiController = new AIManager(game);
 		simulator = new Simulator(game);
 		simulator.start();
 	}

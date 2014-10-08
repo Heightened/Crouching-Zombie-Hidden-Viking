@@ -1,42 +1,26 @@
 package controller;
 
-import java.util.Collection;
-
 import model.Game;
 import model.character.GameCharacter;
-import model.map.Cell;
 
-public class AIController extends ThreadedController
-{
-	private Controller leader;
-	private Collection<AIController> followers;
-	private GameCharacter zombie;
-	private State currentState = State.WANDER;
+public abstract class AIController implements Controller {
+	private Game game;
+	private GameCharacter gameChar;
 	
-	public AIController(Game game)
-	{
-		super(game);
-	}
-
-	enum State
-	{
-		WANDER,
-		ATTACK,
-		FLEE;
+	public AIController(Game game, GameCharacter gameChar) {
+		this.game = game;
+		this.gameChar = gameChar;
 	}
 	
+	public abstract void update();
+
 	@Override
-	public void run() // and don't look back
-	{
-		
+	public Game getGame() {
+		return game;
 	}
-	
-	public void lookAround()
-	{
-		Collection<Cell> cells = this.getGame().getMap().getNearbyCells(
-				this.zombie.getCell().getX(),
-				this.zombie.getCell().getY(),
-				10
-			);
+
+	@Override
+	public void setGame(Game game) {
+		this.game = game;
 	}
 }
