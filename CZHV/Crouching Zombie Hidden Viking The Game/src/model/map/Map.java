@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import pathfinding.Astar;
+import util.Rand;
 import model.character.GameCharacter;
 import model.item.Item;
 
@@ -27,21 +28,21 @@ public class Map implements ChangeListener<Cell>
 	public void populate()
 	{
 		int size = this.grid.length * this.grid[0].length;
-		int n = this.randInt(size/60, size/30);
+		int n = Rand.randInt(size/60, size/30);
 		
 		for(int i=0; i<n; i++)
 		{
-			int l = this.randInt(10, 20);
+			int l = Rand.randInt(10, 20);
 			
-			int x = this.randInt(0, this.grid.length);
-			int y = this.randInt(0, this.grid[0].length);
+			int x = Rand.randInt(0, this.grid.length);
+			int y = Rand.randInt(0, this.grid[0].length);
 			
 			for(int j=0; j<l; j++)
 			{
 				if(this.isInGrid(x,y))
 					this.getCell(x,y).setPassible(false);
 				
-				switch(this.randInt(0, 3))
+				switch(Rand.randInt(0, 3))
 				{
 					case 0:
 						x--;
@@ -69,8 +70,8 @@ public class Map implements ChangeListener<Cell>
 			
 			do
 			{
-				x = this.randInt(0, this.getWidth() - 1);
-				y = this.randInt(0, this.getHeight() - 1);
+				x = Rand.randInt(0, this.getWidth() - 1);
+				y = Rand.randInt(0, this.getHeight() - 1);
 			}
 			while(!this.getCell(x, y).isFree(c));
 			
@@ -185,20 +186,6 @@ public class Map implements ChangeListener<Cell>
 					activeCells.add(this.getCell(x,y));
 		
 		return activeCells;
-	}
-	
-	//TODO: This should in in some util class
-	private int randInt(int min, int max) {
-
-	    // NOTE: Usually this should be a field rather than a method
-	    // variable so that it is not re-seeded every call.
-	    Random rand = new Random();
-
-	    // nextInt is normally exclusive of the top value,
-	    // so add 1 to make it inclusive
-	    int randomNum = rand.nextInt((max - min) + 1) + min;
-
-	    return randomNum;
 	}
 	
 	public void addListener(ChangeListener<Cell> l)

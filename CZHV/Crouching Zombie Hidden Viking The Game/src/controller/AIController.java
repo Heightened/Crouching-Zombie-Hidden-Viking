@@ -23,4 +23,12 @@ public abstract class AIController implements Controller {
 	public void setGame(Game game) {
 		this.game = game;
 	}
+
+	public GameCharacter getCharacter() {
+		return this.gameChar;
+	}
+
+	public void setCharacter(GameCharacter character) {
+		this.gameChar = character;
+	}
 }

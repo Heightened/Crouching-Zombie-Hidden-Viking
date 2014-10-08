@@ -8,7 +8,7 @@ import model.Game;
 import model.character.GameCharacter;
 import model.map.MapChangeListener;
 
-public class AIManager implements MapChangeListener{
+public class AIManager implements MapChangeListener {
 	private static int POOL_SIZE = 10; //maybe read this in from a file?
 	private ManagerThread[] threadPool;
 	private LinkedBlockingQueue<AIController> activeControllers;
@@ -21,6 +21,11 @@ public class AIManager implements MapChangeListener{
 		activeControllers = new LinkedBlockingQueue<AIController>();
 		inactiveControllers = new ArrayList<AIController>();
 		controlBinding = new HashMap<GameCharacter, AIController>();
+		
+		this.game.getFlockingMap().addListener(this);
+		
+		for(GameCharacter c : this.game.getFlockingMap().getCharacters())
+			this.setActive(c);
 		
 		threadPool = new ManagerThread[POOL_SIZE];
 		for(int i = 0; i<threadPool.length; i++){
