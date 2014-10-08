@@ -3,6 +3,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import model.character.GameCharacter;
+import model.map.Cell;
 import model.map.ChunkedMap;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -20,7 +21,8 @@ public class Vehicle extends Dummy3DObj{
 	final float max_force = 0.15f;
 	final float mass = 10;
 	Vector4f prevPosition;
-	Vector4f target;
+	private Vector4f target;
+	private float targetRadius;
 	
 	int gridx = 0;
 	int gridy = 0;
@@ -28,12 +30,25 @@ public class Vehicle extends Dummy3DObj{
 	public Vehicle(){
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
-		this.target = new Vector4f(0.5f,0,0.5f,1);
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
+		this.target = prevPosition;
+		targetRadius = Renderer3D.cellSize*10;
+	}
+	
+	public void setFlockingTargetCell(Cell c){
+		float scaling = Renderer3D.cellSize;
+		float tX = ((float) c.getX() - 0.5f) * scaling;
+		float tZ = ((float) c.getY() - 0.5f) * scaling;
+		this.target = new Vector4f(tX, 0, tZ, 1);
+		this.targetRadius = c.getSpaceRadius() * scaling;
+	}
+	
+	public void setFlockingTargetRadius(float r){
+		this.targetRadius = r * Renderer3D.cellSize;
 	}
 
-	float targetSlowRadius = 100;
+	//float targetSlowRadius = 100;
 	public void update(ChunkedMap map, int gridx, int gridy){
 
 		steering.x = 0;
@@ -62,7 +77,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		
 		
 		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		addSteeringForce( seekTarget(new Vector4f(0.5f,0,0.5f,1), 0.3f), 3);
+		addSteeringForce( seekTarget(this.target, targetRadius), 3);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);
