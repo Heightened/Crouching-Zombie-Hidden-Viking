@@ -83,6 +83,12 @@ public class AIManager implements MapChangeListener{
 					AIController temp = activeControllers.take();
 					temp.update();
 					activeControllers.put(temp);
+					try{
+						//sleep for one millisecond
+						Thread.sleep(1);
+					}catch(Exception e){
+						e.printStackTrace();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

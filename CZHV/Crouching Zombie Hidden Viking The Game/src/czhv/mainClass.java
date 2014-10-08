@@ -44,6 +44,7 @@ public class mainClass {
 			inputManager.pollInput();
 		}
 		simulator.quit();
+		aiController.stopManager();
 	}
 	
 	public final static void exit(){

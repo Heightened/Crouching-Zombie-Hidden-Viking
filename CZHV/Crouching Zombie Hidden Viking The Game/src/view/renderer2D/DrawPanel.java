@@ -58,7 +58,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			for (Cell c : cells){
 				if(!c.getCharacterHolder().isEmpty())
 				{
-					ArrayList<GameCharacter> characters = c.getCharacterHolder().getItem();
+					ArrayList<GameCharacter> characters = new ArrayList<GameCharacter>();
 					
 					for(GameCharacter gc : characters)
 					{
