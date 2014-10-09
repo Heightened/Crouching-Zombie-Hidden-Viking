@@ -6,12 +6,14 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -44,7 +46,12 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	}
 
 	public static void setSelectedObject(LVLEditorObject obj){
-		obj.writeToInterface(VariableList);
+		if (obj != null){
+			obj.writeToInterface(VariableList);
+		}else{
+			DefaultListModel listModel = (DefaultListModel) VariableList.getModel();
+	        listModel.removeAllElements();
+		}
 	}
 	
 	public void close(){
@@ -92,10 +99,12 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		JButton btnLoadLevel = new JButton("Import Level");
 		btnLoadLevel.setBounds(128, 85, 188, 23);
 		panel.add(btnLoadLevel);
+		btnLoadLevel.addActionListener(this);
 		
 		JButton btnExportLevel = new JButton("Export Level");
 		btnExportLevel.setBounds(128, 119, 188, 23);
 		panel.add(btnExportLevel);
+		btnExportLevel.addActionListener(this);
 	}
 
 	@Override
@@ -111,6 +120,26 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 					Selection.setMoving();
 				}
 			
+		}
+		if (source.getText().equals("Import Level")){
+			System.out.println("Importing...");
+			JFileChooser c = new JFileChooser();
+			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			int returnVal = c.showOpenDialog(this.frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		        XMLShit.read(c.getSelectedFile());
+				System.out.println("Imported");
+		    }
+		}
+		if (source.getText().equals("Export Level")){
+			System.out.println("Exporting...");
+			JFileChooser c = new JFileChooser();
+			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			int returnVal = c.showOpenDialog(this.frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		        XMLShit.write(c.getSelectedFile());
+				System.out.println("Exported");
+		    }
 		}
 	}
 

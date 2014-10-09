@@ -1,7 +1,11 @@
 package view.renderer3D.leveleditor.objtypes;
 
+import java.util.HashMap;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import view.renderer3D.core.Dummy3DObj;
 
@@ -65,6 +69,29 @@ public class LVLEditorObject extends Dummy3DObj{
 		}catch(Exception e){
 			System.out.println("FOR THE LOVE OF GOD, FORMAT YOUR INPUT PROPERLY: " + e.getMessage());
 		}
+	}
+	
+	public void writeToXML(XMLStreamWriter writer) throws XMLStreamException{
+		writer.writeAttribute("Type", "" + type);
+		writer.writeAttribute("P", getVariableString("P"));
+		writer.writeAttribute("R", getVariableString("R"));
+	}
+	
+	public static LVLEditorObject parse(HashMap<String, String> values){
+		if (values.get("Type") == null){
+			return null;
+		}
+		int type = Integer.parseInt(values.get("Type"));
+		values.remove("Type");
+		if (type == LIGHT){
+			LVLEditorLight light = new LVLEditorLight();
+			for (String key : values.keySet()){
+				light.parseVariableString(key, values.get(key));
+			}
+			return light;
+		}
+		
+		return null;
 	}
 	
 }
