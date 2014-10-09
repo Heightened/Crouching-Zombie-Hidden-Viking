@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import model.character.GameCharacter;
 
@@ -58,8 +59,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			for (Cell c : cells){
 				if(!c.getCharacterHolder().isEmpty())
 				{
-					ArrayList<GameCharacter> characters = c.getCharacterHolder().getItem();
-					
+					List<GameCharacter> characters = c.getCharacterHolder().getItem();
+
 					for(GameCharacter gc : characters)
 					{
 						Color color;

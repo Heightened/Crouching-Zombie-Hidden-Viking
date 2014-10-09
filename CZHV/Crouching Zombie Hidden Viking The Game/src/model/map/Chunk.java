@@ -2,6 +2,7 @@ package model.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import model.character.GameCharacter;
@@ -12,6 +13,7 @@ public class Chunk implements ChangeListener<Cell>
 	private Collection<GameCharacter> chars = new ArrayList<>();
 	private int lx,ly;
 	private int width,height;
+	private List<MapChangeListener> listeners = new LinkedList<>();
 	
 	public Chunk(int lx, int ly, int width, int height, Collection<Cell> cells)
 	{
@@ -22,12 +24,12 @@ public class Chunk implements ChangeListener<Cell>
 		this.cells = cells;
 		
 		for(Cell c : this.cells)
-		{
 			if(!c.getCharacterHolder().isEmpty())
-			{
 				this.chars.addAll(c.getCharacterHolder().getItem());
-			}
-		}
+		
+		for(MapChangeListener l : this.listeners)
+			for(GameCharacter c : this.chars)
+				l.setActive(c);
 	}
 	
 	public Chunk(int lx, int ly, int width, int height)
@@ -60,6 +62,18 @@ public class Chunk implements ChangeListener<Cell>
 	{
 		return this.chars;
 	}
+	
+	public void addListener(MapChangeListener l)
+	{
+		this.listeners.add(l);
+	}
+	
+	public void deactivate()
+	{
+		for(MapChangeListener l : this.listeners)
+			for(GameCharacter c : this.chars)
+				l.setInactive(c);
+	}
 
 	@Override
 	public void setActive(Cell changed)
@@ -77,11 +91,16 @@ public class Chunk implements ChangeListener<Cell>
 	public void characterMoved(GameCharacter character, Cell cell)
 	{
 		if(this.contains(character.getCell()) && !this.chars.contains(character))
+		{
 			this.chars.add(character);
+			for(MapChangeListener l : this.listeners)
+				l.setActive(character);
+		}
 		else if(!this.contains(character.getCell()) && this.chars.contains(character))
 		{
-			System.out.println("REMOVED!!! [huib]");
 			this.chars.remove(character);
+			for(MapChangeListener l : this.listeners)
+				l.setInactive(character);
 		}
 	}
 }

@@ -19,6 +19,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	private Container<Decor> decorHolder = new Container<>();
 	private Map map;
 	private int x,y;
+	private float spaceRadius;
 	
 	public Cell(Map map, int x, int y)
 	{
@@ -29,7 +30,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		this.characterHolder.addListener(this);
 		this.decorHolder.addListener(this);
 		this.characterHolder.setItem(new ArrayList<GameCharacter>());
-		
+		spaceRadius = 2;
 	}
 	
 	// should be taken over by decor later
@@ -107,5 +108,15 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	public void characterMoved(GameCharacter c, Cell cell)
 	{
 		this.map.characterMoved(c, this);
+	}
+	
+	public float getSpaceRadius()
+	{
+		return this.spaceRadius;
+	}
+	
+	protected void setSpaceRadius(float r)
+	{
+		this.spaceRadius = r;
 	}
 }

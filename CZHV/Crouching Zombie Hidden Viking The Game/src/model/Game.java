@@ -35,12 +35,16 @@ public class Game {
 		}
 	}
 	
+	int tickCount = 0;
 	public void tick(float dtime)
 	{
+		tickCount++;
+		
 		if(dtime == 0.0)
 			return;
 		
-		System.out.println("TICK! (dtime="+dtime+")");
+		if(tickCount%100 == 0)
+			System.out.println("100 ticks");
 		
 		// update characters
 		ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
@@ -66,9 +70,5 @@ public class Game {
 	
 	public LinkedBlockingQueue<Action> getActionBuffer() {
 		return actionBuffer;
-	}
-
-	public void setActionBuffer(LinkedBlockingQueue<Action> actionBuffer) {
-		this.actionBuffer = actionBuffer;
 	}
 }

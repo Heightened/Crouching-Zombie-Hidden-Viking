@@ -2,18 +2,9 @@ package controller;
 
 import model.Game;
 
-public class Controller {
-	private Game game;
-	
-	public Controller(Game game) {
-		this.setGame(game);
-	}
+public interface Controller
+{
+	public Game getGame();
 
-	public Game getGame() {
-		return game;
-	}
-
-	public void setGame(Game game) {
-		this.game = game;
-	}
+	public void setGame(Game game);
 }

@@ -1,7 +1,9 @@
 package simulator.tempFlocking;
-import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import model.character.GameCharacter;
+import model.map.Cell;
 import model.map.ChunkedMap;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -15,11 +17,12 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f steering;
 	Vector2f velocity;
 	Vector2f targetVelocity;
-	final float max_speed = 4f;//final for performance
-	final float max_force = 0.3f;
-	final float mass = 5;
+	final float max_speed = 2f;//final for performance
+	final float max_force = 0.15f;
+	final float mass = 10;
 	Vector4f prevPosition;
-	Vector4f target;
+	private Vector4f target;
+	private float targetRadius;
 	
 	int gridx = 0;
 	int gridy = 0;
@@ -27,23 +30,44 @@ public class Vehicle extends Dummy3DObj{
 	public Vehicle(){
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
-		this.target = new Vector4f(0.5f,0,0.5f,1);
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
+		this.target = prevPosition;
+		targetRadius = Renderer3D.cellSize*10;
+	}
+	
+	public void setFlockingTargetCell(Cell c){
+		float scaling = Renderer3D.cellSize;
+		float tX = ((float) c.getX() - 0.5f) * scaling;
+		float tZ = ((float) c.getY() - 0.5f) * scaling;
+		this.target = new Vector4f(tX, 0, tZ, 1);
+		this.targetRadius = c.getSpaceRadius() * scaling;
+	}
+	
+	public void setFlockingTargetRadius(float r){
+		this.targetRadius = r * Renderer3D.cellSize;
 	}
 
-	float targetSlowRadius = 100;
+	//float targetSlowRadius = 100;
 	public void update(ChunkedMap map, int gridx, int gridy){
 
 		steering.x = 0;
 		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
 			for (int y = gridy - 1; y < gridy+2; y++ ){
-				Collection<GameCharacter> iter = map.getCharacters(x, y);
-				for (GameCharacter v : iter){
+				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
+				while(iter.hasNext()){
+					Vehicle v = iter.next();
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
 						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*2);//all performance issues here
+						/*
+Ik heb in simulator speed x10 gedaan (door ms te delen too 100 ipv 1000), en toen kreeg ik dit:
+Exception in thread "Thread-11" java.lang.NullPointerException
+	at simulator.tempFlocking.Vehicle.update(Vehicle.java:48)
+	at simulator.tempFlocking.FlockingManager.loop(FlockingManager.java:36)
+	at simulator.Simulator.run(Simulator.java:49)
+						 */
 						steering.x += vec.x*2f;
 						steering.y += vec.y*2f;
 					}
@@ -53,7 +77,7 @@ public class Vehicle extends Dummy3DObj{
 		
 		
 		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		addSteeringForce( seekTarget(new Vector4f(0.5f,0,0.5f,1), 0.3f), 4);
+		addSteeringForce( seekTarget(this.target, targetRadius), 3);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);

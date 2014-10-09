@@ -16,7 +16,7 @@ import org.lwjgl.util.vector.Vector2f;
 import view.renderer3D.core.RendererInfoInterface;
 import controller.actions.MoveAction;
 
-public class InputManager extends Controller{
+public class InputManager extends ConcreteController{
 	
 	private RendererInfoInterface renderer;
 	public InputManager(Game game, RendererInfoInterface renderer){
