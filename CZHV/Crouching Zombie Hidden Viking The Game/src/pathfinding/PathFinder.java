@@ -21,7 +21,8 @@ public abstract class PathFinder
 	
 	protected PathFindingMap makeMap(int x, int y)
 	{
-		return new PathFindingMap(this.map.getNearbyCells(x, y, this.radius), this.character);
+		return new PathFindingMap(this.map.getNearbyCells(x, y, this.radius), this.character, 
+				this.map.getWidth(), this.map.getHeight());
 	}
 	
 	// returns a path from (x1,y1) to (x2,y2)

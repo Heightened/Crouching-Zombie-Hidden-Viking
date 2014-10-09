@@ -24,6 +24,8 @@ public class Astar extends PathFinder
 	
 	private List<Node> calculatePath(Node start, Node goal)
 	{
+		if(start == goal) return null;
+		
 		System.out.println("START PATHFINDING");
 		SortedList<Node> closedset = new SortedList<>();
 		SortedList<Node> openset = new SortedList<>();
@@ -59,7 +61,7 @@ public class Astar extends PathFinder
 			openset.remove(current);
 			closedset.add(current);
 			for (Node n : current.getNeighbours()){
-				System.out.println(n.x + " " + n.y);
+				//System.out.println(n.x + " " + n.y);
 				if (n.isSolid()){System.out.println("SOLID");}
 				if(n.isSolid()) continue;//non-passable terrain, ignore
 				
