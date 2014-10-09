@@ -95,6 +95,11 @@ public class GameCharacter extends Vehicle{
 				(int)x, (int)y
 			);
 
+		followPath(nodes);
+	}
+	
+	public void followPath(List<Node> nodes)
+	{
 		if (nodes != null) {
 			/*for(Node n : nodes)
 			{
