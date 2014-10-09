@@ -1,6 +1,5 @@
 package simulator.tempFlocking;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Collection;
 
 import model.character.GameCharacter;
 import model.map.ChunkedMap;
@@ -16,9 +15,9 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f steering;
 	Vector2f velocity;
 	Vector2f targetVelocity;
-	final float max_speed = 2f;//final for performance
-	final float max_force = 0.15f;
-	final float mass = 10;
+	final float max_speed = 4f;//final for performance
+	final float max_force = 0.3f;
+	final float mass = 5;
 	Vector4f prevPosition;
 	Vector4f target;
 	
@@ -40,9 +39,8 @@ public class Vehicle extends Dummy3DObj{
 		steering.y = 0;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
 			for (int y = gridy - 1; y < gridy+2; y++ ){
-				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
-				while(iter.hasNext()){
-					Vehicle v = iter.next();
+				Collection<GameCharacter> iter = map.getCharacters(x, y);
+				for (GameCharacter v : iter){
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
 						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*2);//all performance issues here
@@ -55,7 +53,7 @@ public class Vehicle extends Dummy3DObj{
 		
 		
 		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
-		addSteeringForce( seekTarget(new Vector4f(0.5f,0,0.5f,1), 0.3f), 3);
+		addSteeringForce( seekTarget(new Vector4f(0.5f,0,0.5f,1), 0.3f), 4);
 
 		truncate(steering, max_force);
 		steering.scale(1/mass);
