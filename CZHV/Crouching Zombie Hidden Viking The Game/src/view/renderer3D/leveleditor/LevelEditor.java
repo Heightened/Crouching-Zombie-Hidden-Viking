@@ -1,16 +1,7 @@
-package view.renderer3D.core;
+package view.renderer3D.leveleditor;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import model.Game;
-import model.character.GameCharacter;
-import model.map.Cell;
-import model.map.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -21,80 +12,50 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import simulator.tempFlocking.FlockingManager;
-import simulator.tempFlocking.Vehicle;
 import view.renderer3D.Model;
+import view.renderer3D.core.Camera;
+import view.renderer3D.core.MatrixCZHV;
+import view.renderer3D.core.ShaderObject;
+import view.renderer3D.core.TOOLBOX;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
-import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.inputoutput.FileToString;
-import controller.InputManager;
-import czhv.mainClass;
+import view.renderer3D.leveleditor.objtypes.LVLEditorLight;
+import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
 
-public class Renderer3D implements RendererInfoInterface{
+public class LevelEditor{
 	private Camera camera;
-	private VBO quadVBO;
-	private TextureObject tex;
 	private ShaderObject lightShader;
 	private ShaderObject quadShader;
 	private Matrix4f MVP;
-	private ArrayList<Vehicle> objList;
-	private DEMOselecter selecter;
 	private LightManager lightManager;
-	private ShadowManager shadowManager;
-	
-	private FlockingManager flockingManager;
-	private Vector4f flockingTarget;
-	private Model quadModel;
 	private FloatBuffer modelz;
-	private Game game;
-	private Map map;
 	private ViewGrid viewGrid;
-	private Collection<Cell> activeCells;
-	private Collection<Cell> impassibleCells;
-	public Renderer3D(Game game){
-		setupDisplay();
-		this.game = game;
-		map = game.getMap();
-		map.populate();
-
-		for (int i = 0; i < 15; i++){
-			for (int j = 0; j < 15; j++){
-				game.getFlockingMap().getActiveCells(2*i, 2*j);
-			}
+	private Model quadModel;
+	private OptionsPanel optionsPanel;
+	
+	public static void main(String[] args){
+		System.out.println("Level Editor");
+		OptionsPanel p = new OptionsPanel();
+		
+		LevelEditor e = new LevelEditor(p);
+		while(!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
+			e.update();
 		}
-		impassibleCells = map.getImpassibleCells();
-    	shadowManager = new ShadowManager(this);
-		lightManager = new LightManager(shadowManager);
+		p.close();
+	}
+	
+	public LevelEditor(OptionsPanel optionsPanel){
+		this.optionsPanel = optionsPanel;
+		this.map = new Map();
+		optionsPanel.addObjType(new LVLEditorLight());
+		setupDisplay();
+		lightManager = new LightManager(null);
 		MVP = new Matrix4f();
 		camera = new Camera(viewMatrix, viewMat);
-		quadVBO = new VBO(VBO.STATIC_DRAW);
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*6);//8 floats per vert, 6 verts
-		int scale = 1;
-		//tri 1
-		putVertex(buffer, 0, 0, 0);
-		putVertex(buffer, 1, 0, 0);
-		putVertex(buffer, 1, 1, 0);
-		//tri2
-		putVertex(buffer, 0, 0, 0);
-		putVertex(buffer, 0, 1, 0);
-		putVertex(buffer, 1, 1, 0);
-		
-		buffer.flip();
-		quadVBO.bind();
-		quadVBO.put(buffer);
-		quadVBO.unbind();
-		
-		tex = new TextureObject("tex.png");
-		tex.setup();
-		tex.setMINMAG(GL11.GL_LINEAR);
-		tex.setWRAPST(GL11.GL_REPEAT);
-		tex.mipMap();
-		tex.unbind();
 		
 		lightShader = new ShaderObject("lighting shader");
 		lightShader.addVertexSource(FileToString.read("defaultlighting/defaultlighting.vert"));
@@ -118,8 +79,6 @@ public class Renderer3D implements RendererInfoInterface{
 		quadShader.findAttributes();
 		quadShader.unbind();
 		
-		selecter = new DEMOselecter( objList);
-		
 		quadModel = new Model("quad.obj");
 		
 		viewGrid = new ViewGrid(quadModel, 2.5f, 1.4f);
@@ -129,6 +88,7 @@ public class Renderer3D implements RendererInfoInterface{
     	modelz = BufferUtils.createFloatBuffer(16);
     	MatrixCZHV.MatrixToBuffer(model, modelz);
     	
+    	System.out.println("LEVEL EDITOR INITIALIZED");
 	}
 	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
@@ -152,29 +112,12 @@ public class Renderer3D implements RendererInfoInterface{
 	private long frametime = 0;
 	private long totalframetime = 0;
 	public void update(){
-		if (Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
-			mainClass.exit();
-		}
-
-		activeCells = map.getActiveCells();
-		
-		for (Cell cell : activeCells){
-			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
-			for (GameCharacter gameChar : gameChars){
-				if (gameChar != null){
-					gameChar.update();
-				}
-			}
-		}
-		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 		
 		//selecter.update(MVP);
 		lightManager.setGridOffset(camera.getWorldPosition().x-2f,0, camera.getWorldPosition().z-3f);
 		lightManager.update();
-		
-		shadowManager.update();
 		
 		
 		long sleeptime = System.currentTimeMillis();
@@ -211,14 +154,14 @@ public class Renderer3D implements RendererInfoInterface{
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
 		//lightShader.bindTexture("texture", tex);
-		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
+		//lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
 		lightShader.putMat4("projectionMatrix", projectionMatrix);
 		
-		lightShader.putMat4("shadowProjectionMatrix", lightManager.getLight(1).getProjectionMatrix());
-		lightShader.putMat4("shadowMVP", lightManager.getLight(1).getViewMatrix());
-		lightShader.putMat4("biasMatrix", shadowManager.getBiasMatrix());
+		//lightShader.putMat4("shadowProjectionMatrix", lightManager.getLight(1).getProjectionMatrix());
+		//lightShader.putMat4("shadowMVP", lightManager.getLight(1).getViewMatrix());
+		//lightShader.putMat4("biasMatrix", shadowManager.getBiasMatrix());
 		
 		Vector3f pos = camera.getPosition();
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
@@ -232,8 +175,6 @@ public class Renderer3D implements RendererInfoInterface{
         lightShader.unbind();
         
         quadShader.bind();
-        
-        selecter.draw(quadShader, quadVBO, selectboxColor);;
 		
         quadShader.unbind();
 
@@ -242,38 +183,20 @@ public class Renderer3D implements RendererInfoInterface{
 		Display.update();
 	}
 	
+	public static Map map;
 	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
-		for (Cell cell : activeCells){
-			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
-			for (GameCharacter c : gameChars){
-				c.setPosition(c.getAbsX()*cellSize, 0, c.getAbsY()*cellSize);
-				if (c.isSelected()){
-					shader.putUnifFloat4("color", selectedColor);
-				}else if (c.isInfected()){
-					shader.putUnifFloat4("color", zombieColor);
-				}else{
-					shader.putUnifFloat4("color", vikingColor);
-				}
-		        c.draw(shader);
-			}
-			model.item.Item i = cell.getItemHolder().getItem();
-			if (i != null){
-				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
-	        	shader.putUnifFloat4("color", itemColor);
-		        i.draw(shader);
-			}
-			
+		if (map != null){
+			map.draw(shader);
 		}
-		Dummy3DObj d = new Dummy3DObj();
-		for (Cell cell : impassibleCells){
-				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
-	        	shader.putUnifFloat4("color", decorColor);
-		        d.draw(shader);
-		}
-        
+		Selection.update(camera, viewMat, projMat);
+		Selection.draw(shader);
 	}
 
+	public static void addToMap(LVLEditorObject obj){
+		map.add(obj);
+	}
+	
 	public void sleep(int time){
 		try{
 			Thread.sleep(time);
@@ -344,46 +267,4 @@ public class Renderer3D implements RendererInfoInterface{
 		TOOLBOX.checkGLERROR(true);
 	}
 
-	@Override
-	public Object click(float x, float y) {
-		//check interface, return button
-		//else return world position
-		Vector2f mouse = selecter.normalize(x, y);//selecter.getNormalizedMouse();
-		mouse.y *= -1;
-		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
-		Vector3f colPoint = ray.collideXZPlane(0);
-		int cellx = (int)(colPoint.x/cellSize);
-		int celly = (int)(colPoint.z/cellSize);
-		for (Cell c : activeCells){
-			if (c.getX() == cellx && c.getY() == celly){
-				return c;
-			}
-		}
-		System.out.println(colPoint);
-		return new Vector2f(colPoint.x/cellSize, colPoint.z/cellSize);
-	}
-	
-	@Override
-	public Collection<Cell> squareSelect(Point start, Point end){
-		Vector2f startMouse = selecter.normalize(start.x, start.y);
-		Vector2f endMouse = selecter.normalize(end.x, end.y);
-		startMouse.y *= -1;
-		endMouse.y *= -1;
-		Collection<Cell> retCollection = new ArrayList<Cell>();
-		Line3D ray1 = MatrixCZHV.getPickingRayStartDir(startMouse.x, startMouse.y, camera.getWorldPosition(), viewMat, projMat);
-		Vector3f startCol = ray1.collideXZPlane(0);
-		Line3D ray2 = MatrixCZHV.getPickingRayStartDir(endMouse.x, endMouse.y, camera.getWorldPosition(), viewMat, projMat);
-		Vector3f endCol = ray2.collideXZPlane(0);
-		float minX = Math.min(startCol.x, endCol.x);
-		float maxX = Math.max(startCol.x, endCol.x);
-		float minZ = Math.min(startCol.z, endCol.z);
-		float maxZ = Math.max(startCol.z, endCol.z);
-		for (Cell c : activeCells){
-			if (c.getX()*cellSize > minX && c.getX()*cellSize < maxX &&
-					c.getY()*cellSize > minZ && c.getY()*cellSize < maxZ){
-				retCollection.add(c);
-			}
-		}
-		return retCollection;
-	}
 }
