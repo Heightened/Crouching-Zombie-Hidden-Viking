@@ -17,7 +17,7 @@ import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
 
 public class XMLShit {
 	public static void read(File filename){
-		LevelEditor.map.objList.clear();
+		LevelEditor.map.clear();
 		FileInputStream fis = null;
 		try {
 			fis = new FileInputStream(filename);
@@ -47,6 +47,7 @@ public class XMLShit {
 	}
 
 	public static void write(File filename){
+		Selection.clearSelection();
 		int index = 0;
 		FileOutputStream fos = null;
 		try {
@@ -60,7 +61,11 @@ public class XMLShit {
 			for (LVLEditorObject obj : list){
 				writer.writeStartElement(obj.name);
 				index++;
-				obj.writeToXML(writer);
+				try{
+					obj.writeToXML(writer);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
 				writer.writeEndElement();
 			}
 

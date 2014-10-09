@@ -158,8 +158,12 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		selectedVariable = selectedVariable.substring(0, selectedVariable.indexOf(':'));
 		System.out.println("Selected " + selectedVariable);
 		if (Selection.currentSelection != null){
-			String output = Selection.currentSelection.getVariableString(selectedVariable);
-			VariableInputArea.setText(output);
+			try{
+				String output = Selection.currentSelection.getVariableString(selectedVariable);
+				VariableInputArea.setText(output);
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -185,6 +189,9 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	
 	public void textAreaChanged(){
 		String text = VariableInputArea.getText();
+		if (Selection.currentSelection == null){
+			System.out.println("CANT MODIFY WHEN NOTHING SELECTED");
+		}
 		Selection.currentSelection.parseVariableString(selectedVariable, text);
 	}
 }

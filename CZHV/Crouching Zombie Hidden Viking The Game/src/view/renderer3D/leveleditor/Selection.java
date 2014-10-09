@@ -58,7 +58,6 @@ public class Selection {
 				currentSelection.setPosition(colPoint.x, 0, colPoint.z);
 				if (clicked){
 					moving = false;
-					OptionsPanel.setSelectedObject(currentSelection);
 					clearSelection();
 					System.out.println("stopped moving");
 					return;

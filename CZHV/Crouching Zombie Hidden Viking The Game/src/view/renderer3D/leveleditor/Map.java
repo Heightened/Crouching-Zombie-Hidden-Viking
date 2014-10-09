@@ -16,6 +16,11 @@ public class Map {
 		objList.add(obj);
 	}
 	
+	public void clear(){
+		Selection.clearSelection();
+		objList.clear();
+	}
+	
 	public void remove(LVLEditorObject obj){
 		objList.remove(obj);
 	}
