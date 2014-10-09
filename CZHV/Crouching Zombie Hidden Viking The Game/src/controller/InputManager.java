@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,8 +14,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 
-import controller.actions.GroupMoveAction;
 import view.renderer3D.core.RendererInfoInterface;
+import controller.actions.GroupMoveAction;
 
 public class InputManager extends ConcreteController{
 	
@@ -87,7 +88,17 @@ public class InputManager extends ConcreteController{
 					Object obj = renderer.click(startClick.x, startClick.y);
 					if (obj != null){
 						if (obj instanceof Vector2f){
-							GroupMoveAction m = new GroupMoveAction(selected, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
+							ArrayList<GameCharacter> selectedCharacters = new ArrayList<GameCharacter>();
+							Collection<Cell> cells = getGame().getMap().getActiveCells();
+							for(Cell c: cells){
+								List<GameCharacter> temp = c.getCharacterHolder().getItem();
+								for(int i= 0 ; i<temp.size(); i++){
+									if(temp.get(i).isSelected()){
+										selectedCharacters.add(temp.get(i));
+									}
+								}
+							}
+							GroupMoveAction m = new GroupMoveAction(selectedCharacters, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
 							getGame().getActionBuffer().add(m);
 						}	
 					}

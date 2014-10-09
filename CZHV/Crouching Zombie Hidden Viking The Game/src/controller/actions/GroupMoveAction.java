@@ -62,6 +62,8 @@ public class GroupMoveAction implements Action{
 	}
 
 	private ArrayList<PathFindingMap> getPathFindingMaps() {
+		avgX = 0;
+		avgY = 0;
 		ArrayList<PathFindingMap> maps = new ArrayList<PathFindingMap>();
 		for(GameCharacter gc : characters) {
 			Cell cell = gc.getCell();
