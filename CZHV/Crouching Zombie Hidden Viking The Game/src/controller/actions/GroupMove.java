@@ -1,12 +1,12 @@
 package controller.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
-import pathfinding.Node;
-import pathfinding.PathFinder;
+import model.map.Cell;
+import pathfinding.PathFindingMap;
 
 public class GroupMove implements Action{
 	private Collection<GameCharacter> characters;
@@ -20,14 +20,24 @@ public class GroupMove implements Action{
 
 	@Override
 	public boolean perform(Game g) {
-		float avgX = 0, avgY = 0;
+		int avgX = 0, avgY = 0;
+		ArrayList<PathFindingMap> maps = new ArrayList<PathFindingMap>();
 		for(GameCharacter gc : characters) {
-			avgX += gc.getX();
-			avgY += gc.getY();
+			Cell cell = gc.getCell();
+			avgX += cell.getX();
+			avgY += cell.getY();
+			maps.add(gc.getPathFinder().makeMap(cell.getX(), cell.getY()));
 		}
+		//this might truncate but who cares
 		avgX = avgX / characters.size();
 		avgY = avgY / characters.size();
 		
+		PathFindingMap merged = PathFindingMap.mergeMap(maps);
+		//TODO: implement iterative character removal if average not in pathfindingmap
+		
+		for(GameCharacter gc : characters){
+			
+		}
 		
 		
 		return false;

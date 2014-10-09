@@ -190,6 +190,10 @@ public class GameCharacter extends Vehicle{
 		this.pathFinder = pathFinder;
 	}
 	
+	public PathFinder getPathFinder(){
+		return this.pathFinder;
+	}
+	
 	public Inventory getBag() {
 		return bag;
 	}

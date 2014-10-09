@@ -1,11 +1,12 @@
 package pathfinding;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import model.map.Cell;
 import model.character.GameCharacter;
+import model.map.Cell;
 
 public class PathFindingMap
 {
@@ -27,13 +28,18 @@ public class PathFindingMap
 		}
 	}
 	
-	public PathFindingMap mergeMap(Collection<PathFindingMap> maps){
+	/**
+	 * This will merge a list of pathfinding maps into the map at index 0 
+	 * @param maps
+	 * @return merged map
+	 */
+	public static PathFindingMap mergeMap(ArrayList<PathFindingMap> maps){
 		for(PathFindingMap map: maps){
 			for(Integer key: map.grid.keySet()){
-				grid.put(key, map.grid.get(key));
+				maps.get(0).grid.put(key, map.grid.get(key));
 			}
 		}
-		return this;
+		return maps.get(0);
 	}
 	
 	public void addCell(Cell c)
