@@ -11,11 +11,15 @@ public class PathFindingMap
 {
 	protected Map<Integer, Map<Integer, CellCapsule>> grid;
 	protected GameCharacter character;
+	protected int width;
+	protected int height;
 	
-	public PathFindingMap(Collection<Cell> cells, GameCharacter character)
+	public PathFindingMap(Collection<Cell> cells, GameCharacter character, int width, int height)
 	{
 		this.grid = new HashMap<Integer, Map<Integer, CellCapsule>>();
 		this.character = character;
+		this.width = width;
+		this.height = height;
 		
 		for(Cell c : cells)
 		{
@@ -56,6 +60,7 @@ public class PathFindingMap
 	
 	public Node getNode(int x, int y)
 	{
+		if(x >= 0 && y >=0 && x < width && y < height) {
 		if(!this.grid.containsKey(x))
 			this.grid.put(x, new HashMap<Integer, CellCapsule>());
 
@@ -66,6 +71,8 @@ public class PathFindingMap
 			this.grid.get(x).get(y).newNode(x,y,this);
 
 		return this.grid.get(x).get(y).node;
+		} 
+		return null;
 	}
 	
 	public class CellCapsule
