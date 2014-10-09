@@ -13,8 +13,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 
+import controller.actions.GroupMoveAction;
 import view.renderer3D.core.RendererInfoInterface;
-import controller.actions.MoveAction;
 
 public class InputManager extends ConcreteController{
 	
@@ -40,7 +40,10 @@ public class InputManager extends ConcreteController{
 	private Point endClick;
 	private List<GameCharacter> selected;
 	public void pollInput(){
-		while(Mouse.next()){
+		while(Mouse.next() || Keyboard.next()){
+			//read mouse and keyboard events
+			//TODO mouse keyboard combinations
+			
 			if(Mouse.getEventButton() == 0){
 				if(Mouse.getEventButtonState()){
 					startClick = new Point(Mouse.getX(), Mouse.getY());
@@ -75,23 +78,20 @@ public class InputManager extends ConcreteController{
 			//right mouse button
 			if(Mouse.getEventButton() == 1){
 				if(Mouse.getEventButtonState()){
-					//TODO: do stuff here
+					//TODO clicked empty tile while characters selected: move to
+					//TODO clicked zombie while characters selected: attack
+					//TODO click on viking while selected: open inventory
+					//TODO clicked/drag from any tile while nothing selected, selection mode
 				}else{
 					startClick = new Point(Mouse.getX(), Mouse.getY());
 					Object obj = renderer.click(startClick.x, startClick.y);
 					if (obj != null){
 						if (obj instanceof Vector2f){
-							MoveAction m = new MoveAction(selected.get(0), ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
+							GroupMoveAction m = new GroupMoveAction(selected, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
 							getGame().getActionBuffer().add(m);
 						}	
 					}
 				}
-			}
-		}
-		
-		while(Keyboard.next()){
-			if(Keyboard.getEventKeyState()){
-				//TODO: keyconfig
 			}
 		}
 	}

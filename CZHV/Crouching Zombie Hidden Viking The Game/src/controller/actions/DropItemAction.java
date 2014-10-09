@@ -6,12 +6,12 @@ import model.item.Item;
 import model.map.Cell;
 
 
-public class DropItem implements Action {
+public class DropItemAction implements Action {
 	private GameCharacter chara;
 	private Item i;
 	private Cell c;
 	
-	public DropItem(Item i, GameCharacter chara, Cell c){
+	public DropItemAction(Item i, GameCharacter chara, Cell c){
 		this.chara = chara;
 		this.i = i;
 	}

@@ -4,11 +4,11 @@ import model.Game;
 import model.character.GameCharacter;
 import model.item.Item;
 
-public class UseItem implements Action{
+public class UseItemAction implements Action{
 	private GameCharacter c;
 	private Item i;
 	
-	public UseItem(GameCharacter c, Item i){
+	public UseItemAction(GameCharacter c, Item i){
 		this.c = c;
 		this.i = i;
 	}

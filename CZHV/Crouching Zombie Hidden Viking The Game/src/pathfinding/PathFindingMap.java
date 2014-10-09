@@ -42,6 +42,10 @@ public class PathFindingMap
 		return maps.get(0);
 	}
 	
+	public Map<Integer, Map<Integer, CellCapsule>> getGrid() {
+		return grid;
+	}
+	
 	public void addCell(Cell c)
 	{
 		if(!this.grid.containsKey(c.getX()))

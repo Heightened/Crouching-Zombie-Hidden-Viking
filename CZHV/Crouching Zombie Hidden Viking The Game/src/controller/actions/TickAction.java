@@ -2,10 +2,10 @@ package controller.actions;
 
 import model.Game;
 
-public class Tick implements Action {
+public class TickAction implements Action {
 	private float dtime;
 	
-	public Tick(float dtime)
+	public TickAction(float dtime)
 	{
 		this.dtime = dtime;
 	}

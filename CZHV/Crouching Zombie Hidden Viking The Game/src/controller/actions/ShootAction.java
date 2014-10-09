@@ -5,17 +5,17 @@ import model.character.GameCharacter;
 import model.character.ItemSlot;
 import model.item.Weapon;
 
-public class Shoot implements Action {
+public class ShootAction implements Action {
 	GameCharacter c1, c2;
 	float accuracy = 1;	//accuracy
 
-	public Shoot(GameCharacter c1, GameCharacter c2) {
+	public ShootAction(GameCharacter c1, GameCharacter c2) {
 		this.c1 = c1;
 		this.c2 = c2;
 	}
 	
 
-	public Shoot(GameCharacter c1, GameCharacter c2, float accuracy){
+	public ShootAction(GameCharacter c1, GameCharacter c2, float accuracy){
 		this(c1,c2);
 		this.accuracy = accuracy;
 	}
