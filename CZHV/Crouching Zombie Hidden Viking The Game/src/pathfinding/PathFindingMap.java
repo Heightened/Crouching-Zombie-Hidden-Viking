@@ -23,6 +23,15 @@ public class PathFindingMap
 		}
 	}
 	
+	public PathFindingMap mergeMap(Collection<PathFindingMap> maps){
+		for(PathFindingMap map: maps){
+			for(Integer key: map.grid.keySet()){
+				grid.put(key, map.grid.get(key));
+			}
+		}
+		return this;
+	}
+	
 	public void addCell(Cell c)
 	{
 		if(!this.grid.containsKey(c.getX()))
