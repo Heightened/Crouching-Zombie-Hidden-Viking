@@ -18,18 +18,19 @@ import view.renderer3D.core.ShaderObject;
 public abstract class Emitter {
 	protected class Particle {
 		Matrix4f modelMatrix, translationMatrix, transformationMatrix;
-		Matrix4f translationSpeed, transformationSpeed;
-		Vector3f force;
+		Matrix4f transformationSpeed;
+		Vector3f translationSpeed, force;
 		Drawable3D type;
 		int lifespan, timeAlive;
 		
 		FloatBuffer bufferedModelMatrix;
 		
-		public Particle(Matrix4f modelMatrix, Matrix4f translationSpeed, Matrix4f transformationSpeed, Vector3f force, Drawable3D type, int lifespan) {
-			this.modelMatrix = new Matrix4f(modelMatrix);
+		public Particle(Vector3f initialLocation, Vector3f translationSpeed, Matrix4f transformationSpeed, Vector3f force, Drawable3D type, int lifespan) {
+			this.modelMatrix = new Matrix4f();
 			this.translationMatrix = new Matrix4f();
-			this.transformationMatrix = new Matrix4f(modelMatrix);
-			this.translationSpeed = translationSpeed;
+			Matrix4f.translate(initialLocation, this.translationMatrix, this.translationMatrix);
+			this.transformationMatrix = new Matrix4f();
+			this.translationSpeed = new Vector3f(translationSpeed);
 			this.transformationSpeed = transformationSpeed;
 			this.force = force;
 			this.type = type;
@@ -42,11 +43,15 @@ public abstract class Emitter {
 			return (timeAlive < lifespan);
 		}
 		
+		Matrix4f identity4f = new Matrix4f();
+		
 		public void update() {
 			//Accelerate in force direction
-			Matrix4f.translate(force, translationSpeed, translationSpeed);
+			//Matrix4f.translate(force, translationSpeed, translationSpeed);
+			Vector3f.add(force, translationSpeed, translationSpeed);
 			//Apply translation
-			Matrix4f.mul(translationSpeed, translationMatrix, translationMatrix);
+			//Matrix4f.mul(translationSpeed, translationMatrix, translationMatrix);
+			Matrix4f.translate(translationSpeed, translationMatrix, translationMatrix);
 			//Apply rotation
 			Matrix4f.mul(transformationSpeed, transformationMatrix, transformationMatrix);
 			//Calculate modelMatrix
@@ -59,8 +64,9 @@ public abstract class Emitter {
 		
 		public void draw(ShaderObject shader) {
 			shader.putMat4("modelMatrix", bufferedModelMatrix);
+			float color = 1 - (timeAlive / (float) lifespan);
+			shader.putUnifFloat4("color", new Vector4f(color + 0.1f,color / 3f,0,1));
 			type.draw(shader);
-			//System.out.println("Draw\n" + modelMatrix.toString());
 		}
 	}
 
@@ -100,7 +106,7 @@ public abstract class Emitter {
 		}
 		
 		//Loop through particles
-		shader.putUnifFloat4("color", new Vector4f(1,0.5f,0.5f,1));
+		//shader.putUnifFloat4("color", new Vector4f(1,0.5f,0.5f,1));
 		Iterator<Particle> iterator = particles.iterator();
 		Particle particle;
 		while (true) {

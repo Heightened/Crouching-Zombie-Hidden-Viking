@@ -6,14 +6,14 @@ import view.renderer3D.core.Drawable3D;
 import view.renderer3D.core.ShaderObject;
 
 public class ParticleTest {
-	Emitter particletest;
+	Emitter test;
 	
 	public ParticleTest() {
-		particletest = new DirectionalEmitter(1000, 10, 100, 100, new Drawable3D[] {new TriangleParticle(0.01f)}, new Vector3f(1,0,1), new Vector3f(0.01f,0.01f,0), new Vector3f(0,-0.00005f,0), 0.3f);
+		test = new DirectionalEmitter(1000, 10, 50, 50, new Drawable3D[] {new TriangleParticle(0.01f)}, new Vector3f(1,0.1f,1), new Vector3f(0,0.001f,0), new Vector3f(0,0.00001f,0), 0.8f, 0.05f);
 	}
 	
 	public void update(ShaderObject shader) {
-		particletest.emit();
-		particletest.updateDraw(shader);
+		test.emit();
+		test.updateDraw(shader);
 	}
 }
