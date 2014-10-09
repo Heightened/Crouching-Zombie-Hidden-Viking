@@ -9,6 +9,8 @@ import model.map.ChunkedMap;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
+import pathfinding.Node;
+
 import view.renderer3D.core.Dummy3DObj;
 import view.renderer3D.core.Renderer3D;
 
@@ -18,11 +20,11 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f velocity;
 	Vector2f targetVelocity;
 	final float max_speed = 2f;//final for performance
-	final float max_force = 0.15f;
-	final float mass = 10;
+	final float max_force = 0.50f;
+	final float mass = 2;
 	Vector4f prevPosition;
-	private Vector4f target;
-	private float targetRadius;
+	protected Vector4f target;
+	protected float targetRadius;
 	
 	int gridx = 0;
 	int gridy = 0;
@@ -32,8 +34,8 @@ public class Vehicle extends Dummy3DObj{
 		steering = new Vector2f(0,0);
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
-		this.target = prevPosition;
-		targetRadius = Renderer3D.cellSize*10;
+		this.target = position;
+		targetRadius = Renderer3D.cellSize*1;
 	}
 	
 	public void setFlockingTargetCell(Cell c){
@@ -42,6 +44,14 @@ public class Vehicle extends Dummy3DObj{
 		float tZ = ((float) c.getY() - 0.5f) * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		this.targetRadius = c.getSpaceRadius() * scaling;
+	}
+	
+	public void setFlockingTargetNode(Node n){
+		float scaling = Renderer3D.cellSize;
+		float tX = ((float) n.getX() - 0.5f) * scaling;
+		float tZ = ((float) n.getY() - 0.5f) * scaling;
+		this.target = new Vector4f(tX, 0, tZ, 1);
+		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetRadius(float r){
@@ -111,7 +121,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 	
 	public void truncate(Vector2f in, float max){
 		float len = in.length();
-        if (len > max)
+        if (len > max && len != 0)
         {
             in.normalise();
             in.scale(max);
@@ -156,13 +166,15 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 
 		float distance = targetVelocity.length();
 
-		if (distance < slowRadius){
-			targetVelocity.normalise();
-			targetVelocity.scale(max_speed);
-			targetVelocity.scale(distance/slowRadius);
-		}else{
-			targetVelocity.normalise();
-			targetVelocity.scale(max_speed);
+		if(distance != 0) {
+			if (distance < slowRadius){
+				targetVelocity.normalise();
+				targetVelocity.scale(max_speed);
+				targetVelocity.scale(distance/slowRadius);
+			}else{
+				targetVelocity.normalise();
+				targetVelocity.scale(max_speed);
+			}
 		}
 
 		tempsteering.x = targetVelocity.x - velocity.x;

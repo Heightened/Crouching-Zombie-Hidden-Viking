@@ -2,12 +2,14 @@ package model.character;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import model.item.Item;
 import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
+import pathfinding.distanceHeuristics.ApproxEuclid;
 import simulator.tempFlocking.Vehicle;
 
 public class GameCharacter extends Vehicle{
@@ -26,6 +28,8 @@ public class GameCharacter extends Vehicle{
 	
 	private Cell cell = null;
 	private PathFinder pathFinder;
+	private List<Node> path;
+	private int pathPointer;
 	
 	private boolean selected;
 	
@@ -61,6 +65,24 @@ public class GameCharacter extends Vehicle{
 			this.x = newX;
 			this.y = newY;
 		}
+		updatePathProgress();
+	}
+	
+	private void updatePathProgress()
+	{
+		if(path != null)
+		{
+			float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
+			if(distance < this.targetRadius)
+			{
+				this.setFlockingTargetNode(path.get(++pathPointer));
+				if (pathPointer >= path.size() - 1)
+				{
+					this.path = null;
+					this.pathPointer = 0;
+				}
+			}
+		}
 	}
 	
 	// only for controller
@@ -68,17 +90,21 @@ public class GameCharacter extends Vehicle{
 	{
 		assert this.cell != null;
 		
-		Collection<Node> nodes = this.pathFinder.calculatePath(
+		List<Node> nodes = this.pathFinder.calculatePath(
 				this.cell.getX(), this.cell.getY(),
 				(int)x, (int)y
 			);
 
 		if (nodes != null) {
-			for(Node n : nodes)
+			/*for(Node n : nodes)
 			{
 				System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
-			}
+			}*/
+			this.pathPointer = 0;
+			this.path = nodes;
+			this.setFlockingTargetNode(path.get(pathPointer));
+			updatePathProgress();
 		}
 	}
 	
