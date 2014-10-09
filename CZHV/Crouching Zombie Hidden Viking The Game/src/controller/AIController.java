@@ -31,4 +31,12 @@ public abstract class AIController implements Controller {
 	public void setCharacter(GameCharacter character) {
 		this.gameChar = character;
 	}
+
+	public abstract int getFollowerCount();
+
+	public abstract float getSatisfactionLevel();
+
+	public abstract float getSatisfaction();
+
+	public abstract boolean isFollower(AIController c);
 }

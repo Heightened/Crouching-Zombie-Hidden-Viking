@@ -68,11 +68,6 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		return this.map;
 	}
 	
-	public Collection<Cell> getNeighbours()
-	{
-		return new HashSet<>();
-	}
-	
 	public Container<Item> getItemHolder()
 	{
 		return this.itemHolder;

@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import controller.actions.MoveAction;
+import controller.ai.LeaderChooser;
 import util.Rand;
 import model.Game;
 import model.character.GameCharacter;
@@ -15,12 +17,18 @@ public class SimpleAIController extends AIController
 {
 	private Controller leader;
 	private Collection<SimpleAIController> followers;
+	private Map<GameCharacter, AIController> controlBinding;
+	
+	private LeaderChooser leaderChooser;
+	
 	private State currentState = State.WANDER;
 	private long time;
 	
-	public SimpleAIController(Game game, GameCharacter gameChar)
+	public SimpleAIController(Game game, GameCharacter gameChar, Map<GameCharacter, AIController> controlBinding)
 	{
 		super(game, gameChar);
+		this.controlBinding = controlBinding;
+		this.leaderChooser = new LeaderChooser(this, controlBinding);
 	}
 
 	enum State
@@ -37,7 +45,44 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
+		
+		if(!this.leaderChooser.loyal(this.followers.size(), 0, dtime))
+			this.setLeader(this.leaderChooser.chooseLeader(this.getFollowerCount(), this.getCloseAllies()));
+		
 		this.wander(dtime);
+	}
+	
+	public Collection<GameCharacter> getCloseAllies()
+	{
+		Collection<Cell> cells = this.getGame().getMap().getNearbyCells(
+				this.getCharacter().getCell().getX(),
+				this.getCharacter().getCell().getY(),
+				10);
+		
+		Collection<GameCharacter> allies = new ArrayList<>();
+		for(Cell c : cells)
+			for(GameCharacter character : c.getCharacterHolder().getItem())
+				if(character.isInfected() == this.getCharacter().isInfected())
+					allies.add(character);
+		
+		return allies;
+	}
+	
+	public boolean isFollower(AIController c)
+	{
+		if(this.followers.contains(c))
+			return true;
+		
+		for(AIController f : this.followers)
+			if(f.isFollower(c))
+				return true;
+		
+		return false;
+	}
+	
+	public void setLeader(GameCharacter leader)
+	{
+		this.leader = this.controlBinding.get(leader);
 	}
 	
 	public void wander(long dtime)
@@ -70,5 +115,30 @@ public class SimpleAIController extends AIController
 					)
 				);
 		}
+	}
+
+	@Override
+	public int getFollowerCount()
+	{
+		return this.followers.size();
+	}
+
+	@Override
+	public float getSatisfactionLevel()
+	{
+		
+		float sum = 0;
+		
+		for(AIController c : this.followers)
+		{
+			sum += c.getSatisfaction();
+		}
+		
+		return sum/this.getFollowerCount();
+	}
+	
+	public float getSatisfaction()
+	{
+		return this.leaderChooser.getSatisfaction();
 	}
 }

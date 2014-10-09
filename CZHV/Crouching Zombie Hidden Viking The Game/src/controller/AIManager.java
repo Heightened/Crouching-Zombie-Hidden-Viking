@@ -64,7 +64,7 @@ public class AIManager implements MapChangeListener {
 	private void addControlBinding(GameCharacter character) {
 		if(!controlBinding.containsKey(character)){
 			//TODO: factory for AIController
-			controlBinding.put(character,  new SimpleAIController(game, character));
+			controlBinding.put(character,  new SimpleAIController(game, character, this.controlBinding));
 		}
 	}
 	

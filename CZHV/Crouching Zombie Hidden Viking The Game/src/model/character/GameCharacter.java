@@ -52,7 +52,7 @@ public class GameCharacter extends Vehicle{
 		float newX = this.x+dtime*this.speedX;
 		float newY = this.y+dtime*this.speedY;
 		
-		if(newX <= -.5 || newX > 0.5 || newY <= -.5 || newY > 0.5)
+		if(newX < -.5 || newX >= 0.5 || newY < -.5 || newY >= 0.5)
 		{
 			this.teleportTo(newX+this.cell.getX(), newY+this.cell.getY());
 		}
@@ -94,8 +94,8 @@ public class GameCharacter extends Vehicle{
 	{
 		assert this.cell != null;
 		
-		int xi = (int)x;
-		int yi = (int)y;
+		int xi = (int)Math.round(x);
+		int yi = (int)Math.round(y);
 		model.map.Cell oldCell = this.cell;
 		model.map.Cell newCell;
 		if(this.cell.getMap().isInGrid(xi, yi))
