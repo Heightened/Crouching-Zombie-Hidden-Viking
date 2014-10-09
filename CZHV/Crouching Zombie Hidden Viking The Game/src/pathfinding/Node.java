@@ -70,20 +70,14 @@ public class Node implements Comparable<Node>
         //TODO: CHECK COLLISION
         if (!asked){
             asked = true;
-            int minI = -1;
-            int minJ = -1;
-            int maxI = 1;
-            int maxJ = 1;
-            if(this.x <= 1) minI = 0;
-            if(this.y <= 1) minJ = 0;
-            if(this.x >= 28) maxI = 0;
-            if(this.y >= 28) maxJ = 0;
-            for (int i = minI; i <= maxI; i++){
-                for (int j = minJ; j <= maxJ; j++){
+            for (int i = -1; i <= 1; i++){
+                for (int j = -1; j <= 1; j++){
                     if (!(i==0 && j==0) && !hasNeighbour(x + i, y + j)){
                         Node n = this.getMap().getNode(x + i, y + j);
-                        neighbours.add( n);
-                        n.neighbours.add(this);
+                        if (n != null) {
+                            neighbours.add( n);
+                            n.neighbours.add(this);
+                        }
                     }
                 }
             }
