@@ -1,7 +1,6 @@
 package view.renderer3D.particles;
 
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.ReadableVector4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -19,8 +18,8 @@ public class DirectionalEmitter extends Emitter {
 	Matrix4f[] transformationSpeedLookup = new Matrix4f[lookupSize];
 
 	public DirectionalEmitter(
-	int maxParticles, int emissionRate, int lifespanMinimum, int lifespanVariance, Drawable3D[] types, 
-	Vector3f location, Vector3f direction, Vector3f force, float spread, float rotation) {
+			int maxParticles, int emissionRate, int lifespanMinimum, int lifespanVariance, Drawable3D[] types, 
+			Vector3f location, Vector3f direction, Vector3f force, float spread, float rotation) {
 		super(maxParticles, emissionRate, lifespanMinimum, lifespanVariance, types);
 		
 		this.location4f = new Vector4f(location.x, location.y, location.z, 1);//location;
@@ -72,7 +71,6 @@ public class DirectionalEmitter extends Emitter {
 			
 			//generate random rotation
 			transformationSpeedLookup[i] = rotationMatrix;//new Matrix4f();
-			System.out.println(rotationMatrix);
 		}
 	}
 	
