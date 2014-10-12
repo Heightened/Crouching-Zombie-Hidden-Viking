@@ -101,9 +101,15 @@ public class GameCharacter extends Vehicle{
 	public void followPath(List<Node> nodes)
 	{
 		if (nodes != null) {
-			/*for(Node n : nodes)
+			/*if (this.path != null) {
+				for(Node n : this.path)
+				{
+					this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().removeItem();
+				}
+			}
+			for(Node n : nodes)
 			{
-				System.out.println("("+n.getX()+","+n.getY()+")");
+				//System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}*/
 			this.pathPointer = 0;
