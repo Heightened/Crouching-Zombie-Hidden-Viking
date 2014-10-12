@@ -1,11 +1,6 @@
 package view.renderer3D.leveleditor.objtypes;
 
-import java.lang.reflect.Field;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -15,19 +10,24 @@ public class LVLEditorLight extends LVLEditorObject{
 	private Vector3f color;
 	private Vector3f specularColor;
 	private Vector3f direction;
+	private Vector3f direction1;
 	
 	public LVLEditorLight(){
-		super(LVLEditorLight.class, "Light", LVLEditorObject.LIGHT);
+		super("Light");
 		color = new Vector3f(5,5,5);
 		direction = new Vector3f();
 	}
 	
-	public void putInMap(){
-		
-	}
-	
+	@Override
 	public LVLEditorObject getInstance(){
 		LVLEditorLight l = new LVLEditorLight();
+		return l;
+	}
+	
+	@Override
+	public ArrayList<String> getHiddenVariables(){
+		ArrayList<String> l = super.getHiddenVariables();
+		l.add("direction1");
 		return l;
 	}
 }

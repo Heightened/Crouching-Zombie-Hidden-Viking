@@ -67,7 +67,6 @@ public class Selection {
 			}
 		}
 		if (clicked){
-			System.out.println("CHECKING");
 			Line3D ray = getMouseRay(camera, viewMat, projMat);
 			ArrayList<LVLEditorObject> m = LevelEditor.map.objList;
 			LVLEditorObject found = null;

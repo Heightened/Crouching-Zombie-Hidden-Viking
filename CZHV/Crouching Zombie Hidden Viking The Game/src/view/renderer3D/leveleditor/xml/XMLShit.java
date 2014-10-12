@@ -1,4 +1,4 @@
-package view.renderer3D.leveleditor;
+package view.renderer3D.leveleditor.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +13,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import view.renderer3D.leveleditor.LevelEditor;
+import view.renderer3D.leveleditor.Selection;
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
 
 public class XMLShit {
@@ -34,7 +36,11 @@ public class XMLShit {
                     for(int i=0;i<attributes;++i) {
                         values.put(reader.getAttributeLocalName(i),  reader.getAttributeValue(i));
                     }
-                    LevelEditor.map.add( LVLEditorObject.parse(values));
+                    try{
+                    	LevelEditor.map.add( (LVLEditorObject)(XMLSerializeInterface.parse(values).getInstance()));
+                    }catch(Exception e){
+                    	e.printStackTrace();
+                    }
 				}
 			}
 		}
@@ -48,7 +54,6 @@ public class XMLShit {
 
 	public static void write(File filename){
 		Selection.clearSelection();
-		int index = 0;
 		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(filename);
@@ -60,7 +65,6 @@ public class XMLShit {
 			writer.writeStartElement("root");
 			for (LVLEditorObject obj : list){
 				writer.writeStartElement(obj.name);
-				index++;
 				try{
 					obj.writeToXML(writer);
 				}catch(Exception e){

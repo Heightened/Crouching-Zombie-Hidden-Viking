@@ -17,13 +17,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
+import view.renderer3D.leveleditor.xml.XMLShit;
 
 public class OptionsPanel  implements ActionListener,ListSelectionListener, DocumentListener {
 	ArrayList<LVLEditorObject> objTypes;
@@ -45,12 +48,23 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		ObjTypeBox.addItem(o.name);
 	}
 
+	static ArrayList<LVLEditorObject> objList = new ArrayList<>();
 	public static void setSelectedObject(LVLEditorObject obj){
 		if (obj != null){
-			obj.writeToInterface(VariableList);
+			objList.add(obj);
+			SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+			    	if (!objList.isEmpty()){
+			    		objList.remove(0).writeToInterface(VariableList);
+			    	}
+			    }
+			});
+			System.out.println("write");
 		}else{
 			DefaultListModel listModel = (DefaultListModel) VariableList.getModel();
 	        listModel.removeAllElements();
+	        VariableInputArea.setText("");
+			System.out.println("remove");
 		}
 	}
 	
@@ -63,7 +77,8 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	 */
 	JComboBox ObjTypeBox;
 	static JList VariableList;
-	JTextArea VariableInputArea;
+	static JTextArea VariableInputArea;
+	static DefaultListModel listmodel;
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 335, 300);
@@ -90,11 +105,14 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		panel.add(btnRemove);
 		btnRemove.addActionListener(this);
 		
-		DefaultListModel listmodel=new DefaultListModel();
+		listmodel = new DefaultListModel();
 		VariableList = new JList(listmodel);
-		VariableList.setBounds(0, 2, 126, 218);
 		VariableList.getSelectionModel().addListSelectionListener(this);
-		panel.add(VariableList);
+		JScrollPane p = new JScrollPane();
+
+		p.setViewportView(VariableList);
+		p.setBounds(0, 2, 126, 218);
+		panel.add(p);
 		
 		JButton btnLoadLevel = new JButton("Import Level");
 		btnLoadLevel.setBounds(128, 85, 188, 23);
@@ -114,11 +132,19 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		if (source.getText().equals("Create")){
 			String objName = (String)ObjTypeBox.getSelectedItem();
 			for (LVLEditorObject o : objTypes){
-				if (o.name.equals(objName)){}
+				if (o.name.equals(objName)){
 					System.out.println("Create " + o.name);
 					Selection.setSelection( o.getInstance());
 					Selection.setMoving();
 				}
+			}
+		}
+		if (source.getText().equals("Remove")){
+			LVLEditorObject obj = Selection.currentSelection;
+			if (obj != null){
+				Selection.clearSelection();
+				LevelEditor.map.objList.remove(obj);
+			}
 			
 		}
 		if (source.getText().equals("Import Level")){
@@ -159,7 +185,7 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		System.out.println("Selected " + selectedVariable);
 		if (Selection.currentSelection != null){
 			try{
-				String output = Selection.currentSelection.getVariableString(selectedVariable);
+				String output = Selection.currentSelection.varToString(Selection.currentSelection.getVarAsString(selectedVariable));
 				VariableInputArea.setText(output);
 			}catch(Exception ex){
 				ex.printStackTrace();
@@ -170,7 +196,7 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
 		// TODO Auto-generated method stub
-		 textAreaChanged();
+		// textAreaChanged();
 	}
 
 	@Override
@@ -183,7 +209,7 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	@Override
 	public void removeUpdate(DocumentEvent arg0) {
 		// TODO Auto-generated method stub
-		 textAreaChanged();
+		// textAreaChanged();
 		
 	}
 	
@@ -192,6 +218,6 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		if (Selection.currentSelection == null){
 			System.out.println("CANT MODIFY WHEN NOTHING SELECTED");
 		}
-		Selection.currentSelection.parseVariableString(selectedVariable, text);
+		Selection.currentSelection.setVarWithString(selectedVariable, text);
 	}
 }

@@ -27,7 +27,7 @@ public class Map {
 	
 	public void draw(ShaderObject shader){
 		for (LVLEditorObject obj:  objList){
-			if (obj.type == LVLEditorObject.LIGHT){
+			if (obj.name.equals("Light")){
 				shader.putUnifFloat4("color", 0.5f, 0.5f, 1f, 1f);
 				obj.update();
 				obj.draw(shader);
