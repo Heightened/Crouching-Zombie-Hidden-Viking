@@ -3,6 +3,7 @@ package controller.ai;
 import java.util.Collection;
 import java.util.Map;
 
+import util.Rand;
 import controller.AIController;
 import model.Game;
 import model.character.GameCharacter;
@@ -10,12 +11,12 @@ import model.character.GameCharacter;
 public class LeaderChooser
 {
 	private float satisfaction = 0.5f;
-	private float groupSize = 100f;
+	private float idealGroupSize = 2f;
 	private Map<GameCharacter, AIController> controlBinding;
 	private AIController controller;
 	private float timeSinceLastLoyaltyCheck = 0;
 	
-	private static final float TIME_BETWEEN_LOYALTY_CHECKS = 3000;
+	private static final int TIME_BETWEEN_LOYALTY_CHECKS = 10000;
 	
 	public LeaderChooser(AIController controller, Map<GameCharacter, AIController> controlBinding)
 	{
@@ -23,15 +24,24 @@ public class LeaderChooser
 		this.controller     = controller;
 	}
 	
-	public boolean loyal(int followerCount, float satisfaction, float dtime)
+	public boolean loyal(float satisfaction, long dtime)
 	{
-		if(this.timeSinceLastLoyaltyCheck > TIME_BETWEEN_LOYALTY_CHECKS)
+		this.timeSinceLastLoyaltyCheck -= dtime;
+		
+		if(this.timeSinceLastLoyaltyCheck < 0)
 		{
-			this.satisfaction += satisfaction;
+			this.timeSinceLastLoyaltyCheck = TIME_BETWEEN_LOYALTY_CHECKS;
 			
-			if(this.satisfaction < followerCount/groupSize)
+			float d = Math.min(this.satisfaction, 1-this.satisfaction);
+			if(d < 0.01)
+				d = 0.01f;
+			
+			//this.satisfaction += satisfaction/d;
+			
+			if(this.loyaltyCheck())
 			{
 				this.satisfaction = 0.5f;
+				System.out.println("Ima go follow someone else");
 				return false;
 			}
 		}
@@ -39,25 +49,39 @@ public class LeaderChooser
 		return true;
 	}
 	
-	public GameCharacter chooseLeader(int followerCount, Collection<GameCharacter> options)
+	public GameCharacter chooseLeader(Collection<GameCharacter> options)
 	{
+		int followerCount = this.controller.getFollowerCount();
 		GameCharacter leader = null;
 		float bestLeaderRate = 0;
 		
-		if(followerCount > groupSize)
+		if(followerCount > this.idealGroupSize)
+		{
+			System.out.println("Ima be a leaderrr!");
 			return null;
+		}
 		
 		for(GameCharacter c : options)
 		{
 			float tempRate = this.rateLeader(followerCount, c);
-			if(bestLeaderRate < tempRate)
+			if(bestLeaderRate <= tempRate)
 			{
 				leader = c;
 				bestLeaderRate = tempRate;
 			}
 		}
 		
+		System.out.println("Ima follow "+leader);
+		
 		return leader;
+	}
+	
+	private boolean loyaltyCheck()
+	{
+		int followerCount = this.controller.getFollowerCount();
+		int groupSize     = this.controller.getGroupSize();
+		
+		return followerCount - idealGroupSize <= this.satisfaction * groupSize;
 	}
 	
 	private float rateLeader(int followerCount, GameCharacter character)

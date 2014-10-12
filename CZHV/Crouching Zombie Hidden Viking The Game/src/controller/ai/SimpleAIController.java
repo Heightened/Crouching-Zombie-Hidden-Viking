@@ -1,4 +1,4 @@
-package controller;
+package controller.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,8 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import controller.AIController;
+import controller.Controller;
 import controller.actions.MoveAction;
-import controller.ai.LeaderChooser;
+import controller.ai.strategy.CommandSet;
+import controller.ai.strategy.Strategy;
 import util.Rand;
 import model.Game;
 import model.character.GameCharacter;
@@ -16,13 +19,15 @@ import model.map.Cell;
 
 public class SimpleAIController extends AIController
 {
-	private Controller leader;
-	private Collection<SimpleAIController> followers;
+	private AIController leader;
+	private Collection<AIController> followers;
 	private Map<GameCharacter, AIController> controlBinding;
 	
 	private LeaderChooser leaderChooser;
+	private StrategyChooser strategyChooser;
 	
-	private State currentState = State.WANDER;
+	private CommandSet commands;
+	
 	private long time;
 	
 	public SimpleAIController(Game game, GameCharacter gameChar, Map<GameCharacter, AIController> controlBinding)
@@ -31,14 +36,7 @@ public class SimpleAIController extends AIController
 		this.controlBinding = controlBinding;
 		this.followers = new HashSet<>();
 		this.leaderChooser = new LeaderChooser(this, controlBinding);
-	}
-
-	enum State
-	{
-		WANDER,
-		ATTACK,
-		FOLLOW,
-		FLEE;
+		this.strategyChooser = new StupidStrategyChooser();
 	}
 
 	@Override
@@ -47,11 +45,20 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
+		if(!this.leaderChooser.loyal(0, dtime))
+			this.setLeader(this.leaderChooser.chooseLeader(this.getCloseAllies()));
 		
-		if(!this.leaderChooser.loyal(this.followers.size(), 0, dtime))
-			this.setLeader(this.leaderChooser.chooseLeader(this.getFollowerCount(), this.getCloseAllies()));
+		Strategy strategy = null;
 		
-		this.wander(dtime);
+		if(this.leader != null)
+			strategy = this.leader.getOrders(this);
+		if(strategy == null)
+			strategy = this.strategyChooser.choose(this.leader, dtime);
+		
+		this.commands = strategy.getCommandSet(this, dtime);
+		
+		if(this.commands.getAction() != null)
+			this.getGame().getActionBuffer().add(this.commands.getAction());
 	}
 	
 	public Collection<GameCharacter> getCloseAllies()
@@ -72,6 +79,9 @@ public class SimpleAIController extends AIController
 	
 	public boolean isFollower(AIController c)
 	{
+		if(c == this)
+			return true;
+		
 		if(this.followers.contains(c))
 			return true;
 		
@@ -86,49 +96,31 @@ public class SimpleAIController extends AIController
 	{
 		this.leader = this.controlBinding.get(leader);
 	}
-	
-	public void wander(long dtime)
-	{
-		if(Rand.randInt(0, 3000) < dtime) // roughly every 3 seconds
-		{
-			Collection<Cell> cells = this.getGame().getMap().getNearbyCells(
-					this.getCharacter().getCell().getX(),
-					this.getCharacter().getCell().getY(),
-					10
-				);
-			
-			List<Cell> possibleTargets = new ArrayList<>();
-			
-			for(Cell c : cells)
-			{
-				if(c.isFree(this.getCharacter()))
-				{
-					possibleTargets.add(c);
-				}
-			}
-			
-			Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
-			
-			this.getGame().getActionBuffer().add(
-					new MoveAction(
-						this.getCharacter(),
-						target.getX()+Rand.randInt(-50, +49)/100f,
-						target.getY()+Rand.randInt(-50, +49)/100f
-					)
-				);
-		}
-	}
 
 	@Override
 	public int getFollowerCount()
 	{
-		return this.followers.size();
+		int count = 0;
+		for(AIController c : this.followers)
+		{
+			count += c.getFollowerCount()+1;
+		}
+		
+		return count;
+	}
+	
+	@Override
+	public int getGroupSize()
+	{
+		if(this.leader == null)
+			return this.getFollowerCount();
+		else
+			return this.leader.getFollowerCount();
 	}
 
 	@Override
 	public float getSatisfactionLevel()
 	{
-		
 		float sum = 0;
 		
 		for(AIController c : this.followers)
@@ -136,11 +128,23 @@ public class SimpleAIController extends AIController
 			sum += c.getSatisfaction();
 		}
 		
-		return sum/this.getFollowerCount();
+		if(this.getFollowerCount() == 0)
+			return 0;
+		else
+			return sum/this.getFollowerCount();
 	}
 	
 	public float getSatisfaction()
 	{
 		return this.leaderChooser.getSatisfaction();
+	}
+
+	@Override
+	public Strategy getOrders(AIController c)
+	{
+		if(this.commands == null)
+			return null;
+		else
+			return this.commands.getStrategy(c);
 	}
 }

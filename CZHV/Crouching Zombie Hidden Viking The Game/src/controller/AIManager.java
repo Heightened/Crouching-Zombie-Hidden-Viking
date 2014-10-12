@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import controller.ai.SimpleAIController;
 import model.Game;
 import model.character.GameCharacter;
 import model.map.MapChangeListener;

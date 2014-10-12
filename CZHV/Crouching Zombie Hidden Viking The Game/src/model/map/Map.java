@@ -60,7 +60,7 @@ public class Map implements ChangeListener<Cell>
 			}
 		}
 		
-		int nZombies = 50; //this.randInt(size/600, size/300);
+		int nZombies = 20; //this.randInt(size/600, size/300);
 		
 		for(int i=0; i<nZombies; i++)
 		{

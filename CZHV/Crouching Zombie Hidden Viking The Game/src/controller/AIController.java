@@ -1,5 +1,6 @@
 package controller;
 
+import controller.ai.strategy.Strategy;
 import model.Game;
 import model.character.GameCharacter;
 
@@ -33,10 +34,14 @@ public abstract class AIController implements Controller {
 	}
 
 	public abstract int getFollowerCount();
+	
+	public abstract int getGroupSize();
 
 	public abstract float getSatisfactionLevel();
 
 	public abstract float getSatisfaction();
 
 	public abstract boolean isFollower(AIController c);
+	
+	public abstract Strategy getOrders(AIController c);
 }
