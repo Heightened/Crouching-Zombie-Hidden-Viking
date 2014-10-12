@@ -35,21 +35,21 @@ public class Vehicle extends Dummy3DObj{
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
 		this.target = position;
-		targetRadius = Renderer3D.cellSize*1;
+		targetRadius = Renderer3D.cellSize*2f;
 	}
 	
 	public void setFlockingTargetCell(Cell c){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) c.getX() - 0.5f) * scaling;
-		float tZ = ((float) c.getY() - 0.5f) * scaling;
+		float tX = ((float) c.getX() + 0.5f) * scaling;
+		float tZ = ((float) c.getY() + 0.5f) * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetNode(Node n){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) n.getX() - 0.5f) * scaling;
-		float tZ = ((float) n.getY() - 0.5f) * scaling;
+		float tX = ((float) n.getX() + 0.5f) * scaling;
+		float tZ = ((float) n.getY() + 0.5f) * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
@@ -63,6 +63,7 @@ public class Vehicle extends Dummy3DObj{
 
 		steering.x = 0;
 		steering.y = 0;
+		float scaling = Renderer3D.cellSize;
 		for (int x = gridx - 1; x < gridx+2; x++ ){
 			for (int y = gridy - 1; y < gridy+2; y++ ){
 				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
@@ -82,9 +83,16 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 						steering.y += vec.y*2f;
 					}
 				}
+				Iterator<Cell> iterC = map.getImpassibleCells(x, y).iterator();
+				while(iterC.hasNext()){
+					Cell c = iterC.next();
+					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
+							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1);
+					steering.x += vec.x*2f;
+					steering.y += vec.y*2f;
+				}
 			}
 		}
-		
 		
 		//addSteeringForce( fleeTarget(new Vector4f(1,0,1,1), 0.3f), 5);
 		addSteeringForce( seekTarget(this.target, targetRadius), 3);
