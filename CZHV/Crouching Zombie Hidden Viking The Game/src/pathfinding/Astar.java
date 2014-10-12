@@ -22,7 +22,7 @@ public class Astar extends PathFinder
 		return this.calculatePath(this.currentMap.getNode(x1, y1), this.currentMap.getNode(x2, y2));
 	}
 	
-	private List<Node> calculatePath(Node start, Node goal)
+	public List<Node> calculatePath(Node start, Node goal)
 	{
 		if(start == goal) return null;
 		

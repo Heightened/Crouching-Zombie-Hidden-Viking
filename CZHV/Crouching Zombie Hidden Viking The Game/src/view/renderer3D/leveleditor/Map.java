@@ -16,13 +16,18 @@ public class Map {
 		objList.add(obj);
 	}
 	
+	public void clear(){
+		Selection.clearSelection();
+		objList.clear();
+	}
+	
 	public void remove(LVLEditorObject obj){
 		objList.remove(obj);
 	}
 	
 	public void draw(ShaderObject shader){
 		for (LVLEditorObject obj:  objList){
-			if (obj.type == LVLEditorObject.LIGHT){
+			if (obj.name.equals("Light")){
 				shader.putUnifFloat4("color", 0.5f, 0.5f, 1f, 1f);
 				obj.update();
 				obj.draw(shader);

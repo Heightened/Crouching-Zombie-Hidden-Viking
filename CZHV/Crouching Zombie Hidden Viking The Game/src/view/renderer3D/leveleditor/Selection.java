@@ -22,12 +22,17 @@ public class Selection {
 		if (currentSelection != null){
 			LevelEditor.addToMap(currentSelection);
 		}
+		LevelEditor.map.remove(obj);
 		currentSelection = obj;
 		OptionsPanel.setSelectedObject(obj);
 	}
 	
 	public static void clearSelection(){
+		if (currentSelection != null){
+			LevelEditor.addToMap(currentSelection);
+		}
 		currentSelection = null;
+		OptionsPanel.setSelectedObject(null);
 	}
 	
 	public static void setMoving(){
@@ -53,9 +58,7 @@ public class Selection {
 				currentSelection.setPosition(colPoint.x, 0, colPoint.z);
 				if (clicked){
 					moving = false;
-					OptionsPanel.setSelectedObject(currentSelection);
-					LevelEditor.addToMap(currentSelection);
-					currentSelection = null;
+					clearSelection();
 					System.out.println("stopped moving");
 					return;
 				}
@@ -64,7 +67,6 @@ public class Selection {
 			}
 		}
 		if (clicked){
-			System.out.println("CHECKING");
 			Line3D ray = getMouseRay(camera, viewMat, projMat);
 			ArrayList<LVLEditorObject> m = LevelEditor.map.objList;
 			LVLEditorObject found = null;
@@ -75,8 +77,9 @@ public class Selection {
 				}
 			}
 			if (found != null){
-				LevelEditor.map.remove(found);
 				setSelection(found);
+			}else{
+				clearSelection();
 			}
 		}
 		

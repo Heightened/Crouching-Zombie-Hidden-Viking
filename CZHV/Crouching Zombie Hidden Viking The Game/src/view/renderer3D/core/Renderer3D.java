@@ -32,6 +32,7 @@ import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.inputoutput.FileToString;
+import view.renderer3D.particles.ParticleTest;
 import controller.InputManager;
 import czhv.mainClass;
 
@@ -129,7 +130,10 @@ public class Renderer3D implements RendererInfoInterface{
     	modelz = BufferUtils.createFloatBuffer(16);
     	MatrixCZHV.MatrixToBuffer(model, modelz);
     	
+    	fireTest = new ParticleTest();
 	}
+	
+	ParticleTest fireTest;
 	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
 		buffer.put(x).put(y).put(z);
@@ -227,6 +231,7 @@ public class Renderer3D implements RendererInfoInterface{
 		
 		bufferGeo(lightShader);
     	
+		fireTest.update(lightShader);
 		
         lightManager.unbind();
         lightShader.unbind();

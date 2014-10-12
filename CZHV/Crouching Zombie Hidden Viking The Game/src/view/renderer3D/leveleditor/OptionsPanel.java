@@ -6,22 +6,27 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
+import view.renderer3D.leveleditor.xml.XMLShit;
 
 public class OptionsPanel  implements ActionListener,ListSelectionListener, DocumentListener {
 	ArrayList<LVLEditorObject> objTypes;
@@ -43,8 +48,24 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		ObjTypeBox.addItem(o.name);
 	}
 
+	static ArrayList<LVLEditorObject> objList = new ArrayList<>();
 	public static void setSelectedObject(LVLEditorObject obj){
-		obj.writeToInterface(VariableList);
+		if (obj != null){
+			objList.add(obj);
+			SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+			    	if (!objList.isEmpty()){
+			    		objList.remove(0).writeToInterface(VariableList);
+			    	}
+			    }
+			});
+			System.out.println("write");
+		}else{
+			DefaultListModel listModel = (DefaultListModel) VariableList.getModel();
+	        listModel.removeAllElements();
+	        VariableInputArea.setText("");
+			System.out.println("remove");
+		}
 	}
 	
 	public void close(){
@@ -56,7 +77,8 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	 */
 	JComboBox ObjTypeBox;
 	static JList VariableList;
-	JTextArea VariableInputArea;
+	static JTextArea VariableInputArea;
+	static DefaultListModel listmodel;
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 335, 300);
@@ -83,19 +105,24 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		panel.add(btnRemove);
 		btnRemove.addActionListener(this);
 		
-		DefaultListModel listmodel=new DefaultListModel();
+		listmodel = new DefaultListModel();
 		VariableList = new JList(listmodel);
-		VariableList.setBounds(0, 2, 126, 218);
 		VariableList.getSelectionModel().addListSelectionListener(this);
-		panel.add(VariableList);
+		JScrollPane p = new JScrollPane();
+
+		p.setViewportView(VariableList);
+		p.setBounds(0, 2, 126, 218);
+		panel.add(p);
 		
 		JButton btnLoadLevel = new JButton("Import Level");
 		btnLoadLevel.setBounds(128, 85, 188, 23);
 		panel.add(btnLoadLevel);
+		btnLoadLevel.addActionListener(this);
 		
 		JButton btnExportLevel = new JButton("Export Level");
 		btnExportLevel.setBounds(128, 119, 188, 23);
 		panel.add(btnExportLevel);
+		btnExportLevel.addActionListener(this);
 	}
 
 	@Override
@@ -105,12 +132,40 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		if (source.getText().equals("Create")){
 			String objName = (String)ObjTypeBox.getSelectedItem();
 			for (LVLEditorObject o : objTypes){
-				if (o.name.equals(objName)){}
+				if (o.name.equals(objName)){
 					System.out.println("Create " + o.name);
 					Selection.setSelection( o.getInstance());
 					Selection.setMoving();
 				}
+			}
+		}
+		if (source.getText().equals("Remove")){
+			LVLEditorObject obj = Selection.currentSelection;
+			if (obj != null){
+				Selection.clearSelection();
+				LevelEditor.map.objList.remove(obj);
+			}
 			
+		}
+		if (source.getText().equals("Import Level")){
+			System.out.println("Importing...");
+			JFileChooser c = new JFileChooser();
+			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			int returnVal = c.showOpenDialog(this.frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		        XMLShit.read(c.getSelectedFile());
+				System.out.println("Imported");
+		    }
+		}
+		if (source.getText().equals("Export Level")){
+			System.out.println("Exporting...");
+			JFileChooser c = new JFileChooser();
+			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			int returnVal = c.showOpenDialog(this.frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		        XMLShit.write(c.getSelectedFile());
+				System.out.println("Exported");
+		    }
 		}
 	}
 
@@ -129,15 +184,19 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		selectedVariable = selectedVariable.substring(0, selectedVariable.indexOf(':'));
 		System.out.println("Selected " + selectedVariable);
 		if (Selection.currentSelection != null){
-			String output = Selection.currentSelection.getVariableString(selectedVariable);
-			VariableInputArea.setText(output);
+			try{
+				String output = Selection.currentSelection.varToString(Selection.currentSelection.getVarAsString(selectedVariable));
+				VariableInputArea.setText(output);
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
 		// TODO Auto-generated method stub
-		 textAreaChanged();
+		// textAreaChanged();
 	}
 
 	@Override
@@ -150,12 +209,15 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	@Override
 	public void removeUpdate(DocumentEvent arg0) {
 		// TODO Auto-generated method stub
-		 textAreaChanged();
+		// textAreaChanged();
 		
 	}
 	
 	public void textAreaChanged(){
 		String text = VariableInputArea.getText();
-		Selection.currentSelection.parseVariableString(selectedVariable, text);
+		if (Selection.currentSelection == null){
+			System.out.println("CANT MODIFY WHEN NOTHING SELECTED");
+		}
+		Selection.currentSelection.setVarWithString(selectedVariable, text);
 	}
 }

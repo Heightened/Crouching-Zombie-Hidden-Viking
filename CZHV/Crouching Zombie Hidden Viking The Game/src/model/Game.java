@@ -19,7 +19,6 @@ public class Game {
 		createMap();
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
-		
 	}
 
 	private void createMap() {

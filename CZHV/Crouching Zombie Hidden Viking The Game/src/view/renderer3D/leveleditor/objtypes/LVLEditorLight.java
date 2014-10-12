@@ -1,22 +1,33 @@
 package view.renderer3D.leveleditor.objtypes;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
+import java.util.ArrayList;
+
+import org.lwjgl.util.vector.Vector3f;
 
 public class LVLEditorLight extends LVLEditorObject{
+	private float radius;
+	private float cutoff;
+	private Vector3f color;
+	private Vector3f specularColor;
+	private Vector3f direction;
+	private Vector3f direction1;
 	
 	public LVLEditorLight(){
-		super("Light", LVLEditorObject.LIGHT);
-	}
-	
-	@Override
-	public void writeToInterface(JList list){
-		super.writeToInterface(list);
-		DefaultListModel listModel = (DefaultListModel) list.getModel();
+		super("Light");
+		color = new Vector3f(5,5,5);
+		direction = new Vector3f();
 	}
 	
 	@Override
 	public LVLEditorObject getInstance(){
-		return new LVLEditorLight();
+		LVLEditorLight l = new LVLEditorLight();
+		return l;
+	}
+	
+	@Override
+	public ArrayList<String> getHiddenVariables(){
+		ArrayList<String> l = super.getHiddenVariables();
+		l.add("direction1");
+		return l;
 	}
 }

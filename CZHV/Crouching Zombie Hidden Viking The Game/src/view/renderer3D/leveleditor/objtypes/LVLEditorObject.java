@@ -1,70 +1,79 @@
 package view.renderer3D.leveleditor.objtypes;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Dummy3DObj;
+import view.renderer3D.leveleditor.xml.FakeClass;
+import view.renderer3D.leveleditor.xml.XMLSerializeInterface;
 
-public class LVLEditorObject extends Dummy3DObj{
+public class LVLEditorObject extends Dummy3DObj implements XMLSerializeInterface{
 	public String name;
-	public int type = -1;
 	
-	public static final int LIGHT = 0;
-	
-	public LVLEditorObject(String name, int type){
+
+	public LVLEditorObject(String name){
+		addImplementor(Dummy3DObj.class, this);
 		this.name = name;
-		this.type = type;
 	}
-	
+
 	public void writeToInterface(JList variableList){
 		DefaultListModel listModel = (DefaultListModel) variableList.getModel();
-        listModel.removeAllElements();
-		listModel.addElement("Name: " + name);
-		listModel.addElement("P: " + getPosition());
-		listModel.addElement("R: " + getRotation());
+		listModel.removeAllElements();
+		HashMap<String, Field> fields = getAllFields();
+		try{
+			for (String s : fields.keySet()){
+				Field field = fields.get(s);
+				Object value = field.get(this);
+				listModel.addElement(s + ":" + varToString(value));
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
-	
-	public void putInMap(){
-		
-	}
-	
+
 	public LVLEditorObject getInstance(){
 		return null;
 	}
 	
-	public String getVariableString(String name){
-		if (name.equals("Name")){
-			return name;
+	ArrayList<String> hiddenVariables;
+	@Override
+	public ArrayList<String> getHiddenVariables(){
+		if (hiddenVariables == null){
+			hiddenVariables = new ArrayList<>();
+			hiddenVariables.add("implementors");
+			hiddenVariables.add("hiddenVariables");
+			hiddenVariables.add("additionalVariables");
 		}
-		if (name.equals("P")){
-			return getPosition().x + " " + getPosition().y + " " + getPosition().z;
-		}
-		if (name.equals("R")){
-			return getRotation().x + " " + getRotation().y + " " + getRotation().z;
-		}
-		return "not found";
+		return hiddenVariables;
 	}
 	
-	public void parseVariableString(String variable, String input){
-		try{
-			if (variable.equals("Name")){
-				//ignore name changes
-				return;
-			}
-			if (variable.equals("P")){
-				String[] split = input.split(" ");
-				setPosition(Float.parseFloat(split[0]),Float.parseFloat(split[1]), Float.parseFloat(split[2]));
-				return;
-			}
-			if (variable.equals("R")){
-				String[] split = input.split(" ");
-				setRotation(Float.parseFloat(split[0]),Float.parseFloat(split[1]), Float.parseFloat(split[2]));
-				return;
-			}
-			throw new Exception("UNKNOWN VARIABLE " + variable);
-		}catch(Exception e){
-			System.out.println("FOR THE LOVE OF GOD, FORMAT YOUR INPUT PROPERLY: " + e.getMessage());
+	ArrayList<String> additionalVariables;
+	@Override
+	public ArrayList<String> getAdditionalVariables(){
+		if (additionalVariables == null){
+			additionalVariables = new ArrayList<>();
+			additionalVariables.add("position");
+			additionalVariables.add("rotation");
 		}
+		return additionalVariables;
 	}
+
 	
+	private ArrayList<FakeClass> implementors = new ArrayList<>();
+	@Override
+	public ArrayList<FakeClass> getImplementors() {
+		return implementors;
+	}
+
+	
+
 }

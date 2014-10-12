@@ -92,7 +92,7 @@ public class GameCharacter extends Vehicle{
 		
 		List<Node> nodes = this.pathFinder.calculatePath(
 				this.cell.getX(), this.cell.getY(),
-				(int)x, (int)y
+				(int)(x+0.5f), (int)(y+0.5f)
 			);
 
 		followPath(nodes);
@@ -188,6 +188,10 @@ public class GameCharacter extends Vehicle{
 	public void setPathFinder(PathFinder pathFinder)
 	{
 		this.pathFinder = pathFinder;
+	}
+	
+	public PathFinder getPathFinder(){
+		return this.pathFinder;
 	}
 	
 	public Inventory getBag() {

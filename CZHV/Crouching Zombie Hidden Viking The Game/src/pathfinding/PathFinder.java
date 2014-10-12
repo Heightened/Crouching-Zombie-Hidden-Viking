@@ -19,7 +19,7 @@ public abstract class PathFinder
 		this.character = character;
 	}
 	
-	protected PathFindingMap makeMap(int x, int y)
+	public PathFindingMap makeMap(int x, int y)
 	{
 		return new PathFindingMap(this.map.getNearbyCells(x, y, this.radius), this.character, 
 				this.map.getWidth(), this.map.getHeight());
