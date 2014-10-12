@@ -26,7 +26,7 @@ public class Astar extends PathFinder
 	{
 		if(start == goal) return null;
 		
-		System.out.println("START PATHFINDING");
+		//System.out.println("START PATHFINDING");
 		SortedList<Node> closedset = new SortedList<>();
 		SortedList<Node> openset = new SortedList<>();
 		
@@ -54,7 +54,7 @@ public class Astar extends PathFinder
 			//System.out.println("it current:" + current.x + " " + current.y);
 			
 			if (current.equals(goal)){
-				System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
+				//System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
 				return reconstructPath( goal, start);
 			}
 			
@@ -62,7 +62,7 @@ public class Astar extends PathFinder
 			closedset.add(current);
 			for (Node n : current.getNeighbours()){
 				//System.out.println(n.x + " " + n.y);
-				if (n.isSolid()){System.out.println("SOLID");}
+				//if (n.isSolid()){System.out.println("SOLID");}
 				if(n.isSolid()) continue;//non-passable terrain, ignore
 				
 				//System.out.println("Neighbour:" + n.x + " " + n.y);
@@ -86,7 +86,7 @@ public class Astar extends PathFinder
 			}
 		}
 		//System.out.println("NO PATH");
-		System.out.println("NO PATH FOUND");
+		//System.out.println("NO PATH FOUND");
 		return null;
 	}
 	

@@ -2,6 +2,7 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class SimpleAIController extends AIController
 	{
 		super(game, gameChar);
 		this.controlBinding = controlBinding;
+		this.followers = new HashSet<>();
 		this.leaderChooser = new LeaderChooser(this, controlBinding);
 	}
 
