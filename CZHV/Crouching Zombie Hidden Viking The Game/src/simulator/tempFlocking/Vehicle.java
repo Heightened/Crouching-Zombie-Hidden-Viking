@@ -21,7 +21,7 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f targetVelocity;
 	final float max_speed = 2f;//final for performance
 	final float max_force = 0.50f;
-	final float mass = 2;
+	final float mass = 5;
 	Vector4f prevPosition;
 	protected Vector4f target;
 	protected float targetRadius;
@@ -71,7 +71,7 @@ public class Vehicle extends Dummy3DObj{
 					Vehicle v = iter.next();
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
-						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*2);//all performance issues here
+						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*1);//all performance issues here
 						/*
 Ik heb in simulator speed x10 gedaan (door ms te delen too 100 ipv 1000), en toen kreeg ik dit:
 Exception in thread "Thread-11" java.lang.NullPointerException
@@ -79,15 +79,15 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 	at simulator.tempFlocking.FlockingManager.loop(FlockingManager.java:36)
 	at simulator.Simulator.run(Simulator.java:49)
 						 */
-						steering.x += vec.x*2f;
-						steering.y += vec.y*2f;
+						steering.x += vec.x*1f;
+						steering.y += vec.y*1f;
 					}
 				}
 				Iterator<Cell> iterC = map.getImpassibleCells(x, y).iterator();
 				while(iterC.hasNext()){
 					Cell c = iterC.next();
 					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
-							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1);
+							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.5f);
 					steering.x += vec.x*2f;
 					steering.y += vec.y*2f;
 				}
