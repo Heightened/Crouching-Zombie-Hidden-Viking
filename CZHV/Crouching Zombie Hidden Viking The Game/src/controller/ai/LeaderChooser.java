@@ -28,7 +28,7 @@ public class LeaderChooser
 	{
 		this.timeSinceLastLoyaltyCheck -= dtime;
 		
-		if(this.timeSinceLastLoyaltyCheck < 0)
+		if(Rand.randInt(0, TIME_BETWEEN_LOYALTY_CHECKS) < dtime) //this.timeSinceLastLoyaltyCheck < 0)
 		{
 			this.timeSinceLastLoyaltyCheck = TIME_BETWEEN_LOYALTY_CHECKS;
 			
@@ -36,9 +36,9 @@ public class LeaderChooser
 			if(d < 0.01)
 				d = 0.01f;
 			
-			//this.satisfaction += satisfaction/d;
+			this.satisfaction += satisfaction/d;
 			
-			if(this.loyaltyCheck())
+			if(!this.loyaltyCheck())
 			{
 				this.satisfaction = 0.5f;
 				System.out.println("Ima go follow someone else");
@@ -81,12 +81,14 @@ public class LeaderChooser
 		int followerCount = this.controller.getFollowerCount();
 		int groupSize     = this.controller.getGroupSize();
 		
-		return followerCount - idealGroupSize <= this.satisfaction * groupSize;
+		return followerCount/this.idealGroupSize >= this.satisfaction * groupSize/this.idealGroupSize;
 	}
 	
 	private float rateLeader(int followerCount, GameCharacter character)
 	{
 		AIController controller = this.controlBinding.get(character);
+		if(controller == null)
+			return -2;
 		
 		if(this.controller.isFollower(controller))
 			return -1;

@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.Collection;
+
 import controller.ai.strategy.Strategy;
 import model.Game;
 import model.character.GameCharacter;
@@ -43,5 +45,11 @@ public abstract class AIController implements Controller {
 
 	public abstract boolean isFollower(AIController c);
 	
+	public abstract void register(AIController c);
+	
+	public abstract void unregister(AIController c);
+	
 	public abstract Strategy getOrders(AIController c);
+
+	public abstract Collection<AIController> getFollowers();
 }

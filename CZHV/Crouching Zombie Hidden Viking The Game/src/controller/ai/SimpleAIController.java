@@ -94,7 +94,17 @@ public class SimpleAIController extends AIController
 	
 	public void setLeader(GameCharacter leader)
 	{
+		if(this.leader != null)
+			this.leader.unregister(this);
 		this.leader = this.controlBinding.get(leader);
+		if(this.leader != null)
+			this.leader.register(this);
+	}
+	
+	@Override
+	public Collection<AIController> getFollowers()
+	{
+		return this.followers;
 	}
 
 	@Override
@@ -113,9 +123,9 @@ public class SimpleAIController extends AIController
 	public int getGroupSize()
 	{
 		if(this.leader == null)
-			return this.getFollowerCount();
+			return this.getFollowerCount()+1;
 		else
-			return this.leader.getFollowerCount();
+			return this.leader.getGroupSize();
 	}
 
 	@Override
@@ -146,5 +156,17 @@ public class SimpleAIController extends AIController
 			return null;
 		else
 			return this.commands.getStrategy(c);
+	}
+
+	@Override
+	public void register(AIController c)
+	{
+		this.followers.add(c);
+	}
+
+	@Override
+	public void unregister(AIController c)
+	{
+		this.followers.remove(c);
 	}
 }

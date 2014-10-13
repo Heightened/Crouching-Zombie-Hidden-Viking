@@ -2,6 +2,7 @@ package controller.ai.strategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import util.Rand;
@@ -35,15 +36,22 @@ public class Wander extends Strategy
 			}
 			
 			Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
+			float x = target.getX()+Rand.randInt(-50, +49)/100f;
+			float y = target.getY()+Rand.randInt(-50, +49)/100f;
 			
-			return new CommandSet(
+			CommandSet commands = new CommandSet(
 					new MoveAction(
 							commander.getCharacter(),
-							target.getX()+Rand.randInt(-50, +49)/100f,
-							target.getY()+Rand.randInt(-50, +49)/100f
+							x, y
 						),
-					null
+					new HashMap<AIController, Strategy>()
 				);
+
+			
+			for(AIController f : commander.getFollowers())
+				commands.setStrategy(f, new GoTo(x, y));
+			
+			return commands;
 		}
 		else
 			return new CommandSet(null, null);
