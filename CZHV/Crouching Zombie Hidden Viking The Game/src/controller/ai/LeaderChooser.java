@@ -41,7 +41,6 @@ public class LeaderChooser
 			if(!this.loyaltyCheck())
 			{
 				this.satisfaction = 0.5f;
-				System.out.println("Ima go follow someone else");
 				return false;
 			}
 		}
@@ -57,7 +56,6 @@ public class LeaderChooser
 		
 		if(followerCount > this.idealGroupSize)
 		{
-			System.out.println("Ima be a leaderrr!");
 			return null;
 		}
 		
@@ -70,8 +68,6 @@ public class LeaderChooser
 				bestLeaderRate = tempRate;
 			}
 		}
-		
-		System.out.println("Ima follow "+leader);
 		
 		return leader;
 	}
