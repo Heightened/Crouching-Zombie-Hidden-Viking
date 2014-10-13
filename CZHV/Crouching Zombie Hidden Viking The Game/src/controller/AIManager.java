@@ -17,6 +17,8 @@ public class AIManager implements MapChangeListener {
 	private HashMap<GameCharacter, AIController> controlBinding;
 	private Game game;
 	
+	private long time = System.currentTimeMillis();
+	
 	public AIManager(Game game) {
 		this.game = game;
 		activeControllers = new LinkedBlockingQueue<AIController>();
@@ -77,6 +79,7 @@ public class AIManager implements MapChangeListener {
 	
 	class ManagerThread extends Thread{
 		private boolean running;
+		private int count = 0;
 		
 		public void quit(){
 			running = false;
@@ -86,10 +89,19 @@ public class AIManager implements MapChangeListener {
 		public void run(){
 			running = true;
 			while(running){
+				if(System.currentTimeMillis() - time > 5000)
+				{
+					time = System.currentTimeMillis();
+					
+					System.out.println("Handled "+count+" AI ticks in 5 seconds.");
+					
+					count= 0;
+				}
 				try {
 					AIController temp = activeControllers.poll();
 					if(temp != null){
 						temp.update();
+						count++;
 						activeControllers.put(temp);
 					}
 					try{

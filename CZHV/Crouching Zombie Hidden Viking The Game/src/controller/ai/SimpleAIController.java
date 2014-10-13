@@ -82,12 +82,15 @@ public class SimpleAIController extends AIController
 		if(c == this)
 			return true;
 		
-		if(this.followers.contains(c))
-			return true;
-		
-		for(AIController f : this.followers)
-			if(f.isFollower(c))
+		synchronized(this.followers)
+		{
+			if(this.followers.contains(c))
 				return true;
+			
+			for(AIController f : this.followers)
+				if(f.isFollower(c))
+					return true;
+		}
 		
 		return false;
 	}
@@ -111,9 +114,13 @@ public class SimpleAIController extends AIController
 	public int getFollowerCount()
 	{
 		int count = 0;
-		for(AIController c : this.followers)
+		
+		synchronized(this.followers)
 		{
-			count += c.getFollowerCount()+1;
+			for(AIController c : this.followers)
+			{
+				count += c.getFollowerCount()+1;
+			}
 		}
 		
 		return count;
@@ -133,9 +140,12 @@ public class SimpleAIController extends AIController
 	{
 		float sum = 0;
 		
-		for(AIController c : this.followers)
+		synchronized(this.followers)
 		{
-			sum += c.getSatisfaction();
+			for(AIController c : this.followers)
+			{
+				sum += c.getSatisfaction();
+			}
 		}
 		
 		if(this.getFollowerCount() == 0)
@@ -161,12 +171,18 @@ public class SimpleAIController extends AIController
 	@Override
 	public void register(AIController c)
 	{
-		this.followers.add(c);
+		synchronized(this.followers)
+		{
+			this.followers.add(c);
+		}
 	}
 
 	@Override
 	public void unregister(AIController c)
 	{
-		this.followers.remove(c);
+		synchronized(this.followers)
+		{
+			this.followers.remove(c);
+		}
 	}
 }
