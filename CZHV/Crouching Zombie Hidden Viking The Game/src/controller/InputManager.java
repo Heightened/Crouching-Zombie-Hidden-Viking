@@ -98,8 +98,10 @@ public class InputManager extends ConcreteController{
 									}
 								}
 							}
-							GroupMoveAction m = new GroupMoveAction(selectedCharacters, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
-							getGame().getActionBuffer().add(m);
+							if(selectedCharacters.size() > 0){
+								GroupMoveAction m = new GroupMoveAction(selectedCharacters, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
+								getGame().getActionBuffer().add(m);
+							}
 						}	
 					}
 				}
