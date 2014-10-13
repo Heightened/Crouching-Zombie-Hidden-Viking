@@ -27,7 +27,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
-import view.renderer3D.leveleditor.xml.XMLShit;
+import view.renderer3D.leveleditor.xml.XMLFeces;
 
 public class OptionsPanel  implements ActionListener,ListSelectionListener, DocumentListener {
 	ArrayList<LVLEditorObject> objTypes;
@@ -163,17 +163,19 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			int returnVal = c.showOpenDialog(this.frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		        XMLShit.read(c.getSelectedFile());
+				LevelEditor.map.clear();
+		        LevelEditor.map.objList.addAll(XMLFeces.read(c.getSelectedFile()));
 				System.out.println("Imported");
 		    }
 		}
 		if (source.getText().equals("Export Level")){
 			System.out.println("Exporting...");
+			Selection.clearSelection();
 			JFileChooser c = new JFileChooser();
 			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			int returnVal = c.showOpenDialog(this.frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		        XMLShit.write(c.getSelectedFile());
+		        XMLFeces.write(c.getSelectedFile(), LevelEditor.map.objList);
 				System.out.println("Exported");
 		    }
 		}

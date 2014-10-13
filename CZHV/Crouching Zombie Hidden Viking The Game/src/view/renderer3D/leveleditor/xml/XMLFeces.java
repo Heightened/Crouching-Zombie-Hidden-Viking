@@ -13,14 +13,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import view.renderer3D.leveleditor.LevelEditor;
-import view.renderer3D.leveleditor.Selection;
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
 
-public class XMLShit {
-	public static void read(File filename){
-		LevelEditor.map.clear();
+public class XMLFeces {
+	public static ArrayList<LVLEditorObject> read(File filename){
 		FileInputStream fis = null;
+		ArrayList<LVLEditorObject> map = new ArrayList<>();
 		try {
 			fis = new FileInputStream(filename);
 			XMLInputFactory xmlInFact = XMLInputFactory.newInstance();
@@ -37,7 +35,7 @@ public class XMLShit {
                         values.put(reader.getAttributeLocalName(i),  reader.getAttributeValue(i));
                     }
                     try{
-                    	LevelEditor.map.add( (LVLEditorObject)(XMLSerializeInterface.parse(values).getInstance()));
+                    	map.add( (LVLEditorObject)(XMLSerializeInterface.parse(values).getInstance()));
                     }catch(Exception e){
                     	e.printStackTrace();
                     }
@@ -50,10 +48,10 @@ public class XMLShit {
 		catch(XMLStreamException exc) {
 			exc.printStackTrace();
 		}
+		return map;
 	}
 
-	public static void write(File filename){
-		Selection.clearSelection();
+	public static void write(File filename, ArrayList<LVLEditorObject> map){
 		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(filename);
@@ -61,9 +59,8 @@ public class XMLShit {
 			XMLStreamWriter writer = xmlOutFact.createXMLStreamWriter(fos);
 			writer.writeStartDocument();
 			
-			ArrayList<LVLEditorObject> list = LevelEditor.map.objList;
 			writer.writeStartElement("root");
-			for (LVLEditorObject obj : list){
+			for (LVLEditorObject obj : map){
 				writer.writeStartElement(obj.name);
 				try{
 					obj.writeToXML(writer);
