@@ -10,19 +10,22 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Dummy3DObj;
 import view.renderer3D.leveleditor.xml.FakeClass;
+import view.renderer3D.leveleditor.xml.GenericSerializeInterface;
 import view.renderer3D.leveleditor.xml.XMLSerializeInterface;
 
 public class LVLEditorObject extends Dummy3DObj implements XMLSerializeInterface{
 	public String name;
 	
+	private XMLSerializeInterface xmlInterface;
 
-	public LVLEditorObject(String name){
-		addImplementor(Dummy3DObj.class, this);
+	public LVLEditorObject(String name, Vector3f editorColor){
 		this.name = name;
+		this.editorColor = editorColor;
+		xmlInterface = new GenericSerializeInterface();//if only we had java 1.8 QQQQQQQQQ moltipol inharitince bleeeeez
+		xmlInterface.addImplementor(Dummy3DObj.class, this);
 	}
 
 	public void writeToInterface(JList variableList){
@@ -52,8 +55,15 @@ public class LVLEditorObject extends Dummy3DObj implements XMLSerializeInterface
 			hiddenVariables.add("implementors");
 			hiddenVariables.add("hiddenVariables");
 			hiddenVariables.add("additionalVariables");
+			hiddenVariables.add("xmlInterface");
+			hiddenVariables.add("editorColor");
 		}
 		return hiddenVariables;
+	}
+	
+	private Vector3f editorColor;
+	public Vector3f getEditorColor(){
+		return editorColor;
 	}
 	
 	ArrayList<String> additionalVariables;
@@ -72,6 +82,40 @@ public class LVLEditorObject extends Dummy3DObj implements XMLSerializeInterface
 	@Override
 	public ArrayList<FakeClass> getImplementors() {
 		return implementors;
+	}
+
+	@Override
+	public void addImplementor(Class endClass, XMLSerializeInterface implementor) {
+		xmlInterface.addImplementor(endClass, implementor);
+	}
+
+	@Override
+	public void writeToXML(XMLStreamWriter writer) throws XMLStreamException,
+			IllegalArgumentException, IllegalAccessException {
+		xmlInterface.writeToXML(writer);
+		
+	}
+
+	@Override
+	public String getVarAsString(String varname) {
+		return xmlInterface.getVarAsString(varname);
+
+	}
+
+	@Override
+	public void setVarWithString(String var, String input) {
+		xmlInterface.setVarWithString(var, input);
+		
+	}
+
+	@Override
+	public HashMap<String, Field> getAllFields() {
+		return xmlInterface.getAllFields();
+	}
+
+	@Override
+	public String varToString(Object o) {
+		return xmlInterface.varToString(o);
 	}
 
 	

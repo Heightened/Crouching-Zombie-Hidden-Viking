@@ -13,7 +13,7 @@ public class LVLEditorLight extends LVLEditorObject{
 	private Vector3f direction1;
 	
 	public LVLEditorLight(){
-		super("Light");
+		super("Light", new Vector3f(1,0.9f,0.2f));
 		color = new Vector3f(5,5,5);
 		direction = new Vector3f();
 	}
