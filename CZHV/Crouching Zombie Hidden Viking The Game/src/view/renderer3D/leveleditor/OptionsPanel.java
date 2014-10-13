@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -26,7 +27,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
-import view.renderer3D.leveleditor.xml.XMLShit;
+import view.renderer3D.leveleditor.xml.XMLFeces;
 
 public class OptionsPanel  implements ActionListener,ListSelectionListener, DocumentListener {
 	ArrayList<LVLEditorObject> objTypes;
@@ -79,6 +80,7 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 	static JList VariableList;
 	static JTextArea VariableInputArea;
 	static DefaultListModel listmodel;
+	static JCheckBox check;
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 335, 300);
@@ -123,8 +125,16 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 		btnExportLevel.setBounds(128, 119, 188, 23);
 		panel.add(btnExportLevel);
 		btnExportLevel.addActionListener(this);
+		
+		check = new JCheckBox("Snap To Grid");
+		check.setBounds(128, 150, 200, 20);
+		panel.add(check);
 	}
 
+	public static boolean snapToGrid(){
+		return check.isSelected();
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -153,17 +163,19 @@ public class OptionsPanel  implements ActionListener,ListSelectionListener, Docu
 			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			int returnVal = c.showOpenDialog(this.frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		        XMLShit.read(c.getSelectedFile());
+				LevelEditor.map.clear();
+		        LevelEditor.map.objList.addAll(XMLFeces.read(c.getSelectedFile()));
 				System.out.println("Imported");
 		    }
 		}
 		if (source.getText().equals("Export Level")){
 			System.out.println("Exporting...");
+			Selection.clearSelection();
 			JFileChooser c = new JFileChooser();
 			c.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			int returnVal = c.showOpenDialog(this.frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		        XMLShit.write(c.getSelectedFile());
+		        XMLFeces.write(c.getSelectedFile(), LevelEditor.map.objList);
 				System.out.println("Exported");
 		    }
 		}

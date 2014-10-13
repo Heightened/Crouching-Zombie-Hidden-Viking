@@ -55,7 +55,11 @@ public class Selection {
 			if (moving){
 				Line3D ray = getMouseRay(camera, viewMat, projMat);
 				Vector3f colPoint = ray.collideXZPlane(0);
-				currentSelection.setPosition(colPoint.x, 0, colPoint.z);
+				if (OptionsPanel.snapToGrid()){
+					currentSelection.setPosition(colPoint.x - colPoint.x%Renderer3D.cellSize, 0, colPoint.z - colPoint.z%Renderer3D.cellSize);
+				}else{
+					currentSelection.setPosition(colPoint.x, 0, colPoint.z);
+				}
 				if (clicked){
 					moving = false;
 					clearSelection();

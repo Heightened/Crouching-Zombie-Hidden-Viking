@@ -23,8 +23,11 @@ import view.renderer3D.core.TOOLBOX;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.inputoutput.FileToString;
+import view.renderer3D.leveleditor.objtypes.Fire;
 import view.renderer3D.leveleditor.objtypes.LVLEditorLight;
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
+import view.renderer3D.leveleditor.objtypes.VikingSpawnPoint;
+import view.renderer3D.leveleditor.objtypes.ZombieSpawnPoint;
 
 public class LevelEditor{
 	private Camera camera;
@@ -52,6 +55,9 @@ public class LevelEditor{
 		this.optionsPanel = optionsPanel;
 		this.map = new Map();
 		optionsPanel.addObjType(new LVLEditorLight());
+		optionsPanel.addObjType(new Fire());
+		optionsPanel.addObjType(new VikingSpawnPoint());
+		optionsPanel.addObjType(new ZombieSpawnPoint());
 		setupDisplay();
 		lightManager = new LightManager(null);
 		MVP = new Matrix4f();

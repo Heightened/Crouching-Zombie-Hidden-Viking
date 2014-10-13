@@ -2,6 +2,8 @@ package view.renderer3D.leveleditor;
 
 import java.util.ArrayList;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import view.renderer3D.core.ShaderObject;
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
 
@@ -27,11 +29,10 @@ public class Map {
 	
 	public void draw(ShaderObject shader){
 		for (LVLEditorObject obj:  objList){
-			if (obj.name.equals("Light")){
-				shader.putUnifFloat4("color", 0.5f, 0.5f, 1f, 1f);
-				obj.update();
-				obj.draw(shader);
-			}
+			Vector3f color = obj.getEditorColor();
+			shader.putUnifFloat4("color", color.x, color.y, color.z, 1);
+			obj.update();
+			obj.draw(shader);
 		}
 	}
 	
