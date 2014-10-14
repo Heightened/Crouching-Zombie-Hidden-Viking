@@ -13,18 +13,23 @@ public class Game {
 	private ChunkedMap flockingMap;
 	private LinkedBlockingQueue<Action> controlBuffer;
 	private LinkedBlockingQueue<Action> actionBuffer;
-	
+	private ArrayList<GameCharacter> controlledCharacters;
+	private ArrayList<GameCharacter> aiCharacters;
+
 	public Game() {
 		//TODO: fill in stuff
-		createMap();
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
+		aiCharacters = new ArrayList<GameCharacter>();
+		controlledCharacters = new ArrayList<GameCharacter>();
+		createMap();
 	}
 
 	private void createMap() {
 		//TODO do map creation
 		map = new Map(30,30);
 		flockingMap = new ChunkedMap(map, 2, 225);
+		//TODO add characters to map
 	}	
 	
 	public void update(){
@@ -59,6 +64,10 @@ public class Game {
 		return flockingMap;
 	}
 	
+	public ArrayList<GameCharacter> getControlledCharacters() {
+		return controlledCharacters;
+	}
+	
 	public Map getMap() {
 		return map;
 	}
@@ -69,5 +78,9 @@ public class Game {
 	
 	public LinkedBlockingQueue<Action> getActionBuffer() {
 		return actionBuffer;
+	}
+
+	public ArrayList<GameCharacter> getAiCharacters() {
+		return aiCharacters;
 	}
 }

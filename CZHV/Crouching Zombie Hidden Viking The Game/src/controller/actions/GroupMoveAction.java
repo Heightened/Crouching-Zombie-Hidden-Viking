@@ -15,7 +15,10 @@ public class GroupMoveAction implements Action{
 	private int x,y;
 	private int avgX = 0, avgY = 0;
 	
-	public GroupMoveAction(List<GameCharacter> characters, float x, float y){
+	public GroupMoveAction(List<GameCharacter> characters, float x, float y) throws Exception{
+		if(characters.isEmpty()){
+			throw new Exception("no characters selected for group move");
+		}
 		this.characters = characters;
 		this.x = (int)(x+0.5);
 		this.y = (int)(y+0.5);

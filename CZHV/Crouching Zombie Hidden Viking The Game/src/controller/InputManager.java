@@ -20,6 +20,7 @@ import controller.actions.GroupMoveAction;
 public class InputManager extends ConcreteController{
 	
 	private RendererInfoInterface renderer;
+	
 	public InputManager(Game game, RendererInfoInterface renderer){
 		super(game);
 		this.renderer = renderer;
@@ -78,8 +79,7 @@ public class InputManager extends ConcreteController{
 			}
 			//right mouse button
 			if(Mouse.getEventButton() == 1){
-				if(Mouse.getEventButtonState()){
-					//TODO clicked empty tile while characters selected: move to
+				if(Mouse.getEventButtonState()) {
 					//TODO clicked zombie while characters selected: attack
 					//TODO click on viking while selected: open inventory
 					//TODO clicked/drag from any tile while nothing selected, selection mode
@@ -93,14 +93,16 @@ public class InputManager extends ConcreteController{
 							for(Cell c: cells){
 								List<GameCharacter> temp = c.getCharacterHolder().getItem();
 								for(int i= 0 ; i<temp.size(); i++){
-									if(temp.get(i).isSelected()){
+									if(temp.get(i).isSelected() && getGame().getControlledCharacters().contains(temp.get(i))){
 										selectedCharacters.add(temp.get(i));
 									}
 								}
-							}
-							if(selectedCharacters.size() > 0){
+							}	
+							try {
 								GroupMoveAction m = new GroupMoveAction(selectedCharacters, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
 								getGame().getActionBuffer().add(m);
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
 						}	
 					}
