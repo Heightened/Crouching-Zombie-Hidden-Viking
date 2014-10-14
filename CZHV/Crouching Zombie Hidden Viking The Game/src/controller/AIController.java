@@ -35,9 +35,9 @@ public abstract class AIController implements Controller {
 		this.gameChar = character;
 	}
 
-	public abstract int getFollowerCount();
+	public abstract int getFollowerCount(AIController source);
 	
-	public abstract int getGroupSize();
+	public abstract int getGroupSize(AIController source);
 
 	public abstract float getSatisfactionLevel();
 

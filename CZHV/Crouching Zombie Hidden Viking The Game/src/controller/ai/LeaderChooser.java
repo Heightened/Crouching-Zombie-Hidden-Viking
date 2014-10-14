@@ -50,7 +50,7 @@ public class LeaderChooser
 	
 	public GameCharacter chooseLeader(Collection<GameCharacter> options)
 	{
-		int followerCount = this.controller.getFollowerCount();
+		int followerCount = this.controller.getFollowerCount(null);
 		GameCharacter leader = null;
 		float bestLeaderRate = 0;
 		
@@ -74,8 +74,8 @@ public class LeaderChooser
 	
 	private boolean loyaltyCheck(GameCharacter leader)
 	{
-		int followerCount = this.controller.getFollowerCount();
-		int groupSize     = this.controller.getGroupSize();
+		int followerCount = this.controller.getFollowerCount(null);
+		int groupSize     = this.controller.getGroupSize(null);
 		float DTL;
 		if(leader == null)
 			DTL = 0;
@@ -94,7 +94,7 @@ public class LeaderChooser
 		if(this.controller.isFollower(controller))
 			return -1;
 		
-		return controller.getFollowerCount() * controller.getSatisfactionLevel() + followerCount;
+		return controller.getFollowerCount(null) * controller.getSatisfactionLevel() + followerCount;
 	}
 	
 	public float getSatisfaction()

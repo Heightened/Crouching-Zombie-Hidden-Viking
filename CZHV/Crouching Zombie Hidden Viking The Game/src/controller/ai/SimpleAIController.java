@@ -52,20 +52,25 @@ public class SimpleAIController extends AIController
 		this.time  = System.currentTimeMillis();
 		
 		GameCharacter leader;
+		boolean justChoseLeader = false;
+		
 		if(this.leader != null)
 			leader = this.leader.getCharacter();
 		else
 			leader = null;
 		
 		if(!this.leaderChooser.loyal(leader, 0, dtime))
+		{
 			this.setLeader(this.leaderChooser.chooseLeader(this.getCloseAllies()));
+			justChoseLeader = true;
+		}
 		
 		Strategy strategy = null;
 		
 		if(this.leader != null)
 			strategy = this.leader.getOrders(this);
 		if(strategy == null)
-			strategy = this.strategyChooser.choose(this.leader, dtime);
+			strategy = this.strategyChooser.choose(this.leader, dtime, justChoseLeader);
 		
 		this.commands = strategy.getCommandSet(this, dtime);
 		
@@ -123,15 +128,20 @@ public class SimpleAIController extends AIController
 	}
 
 	@Override
-	public int getFollowerCount()
+	public int getFollowerCount(AIController source)
 	{
+		if(source == this)
+			return 0;
+		if(source == null)
+			source = this;
+		
 		int count = 0;
 		
 		synchronized(this.followers)
 		{
 			for(AIController c : this.followers)
 			{
-				count += c.getFollowerCount()+1;
+				count += c.getFollowerCount(source)+1;
 			}
 		}
 		
@@ -139,12 +149,17 @@ public class SimpleAIController extends AIController
 	}
 	
 	@Override
-	public int getGroupSize()
+	public int getGroupSize(AIController source)
 	{
+		if(source == this)
+			return 0;
+		if(source == null)
+			source = this;
+		
 		if(this.leader == null)
-			return this.getFollowerCount()+1;
+			return this.getFollowerCount(null)+1;
 		else
-			return this.leader.getGroupSize();
+			return this.leader.getGroupSize(source);
 	}
 
 	@Override
@@ -160,10 +175,10 @@ public class SimpleAIController extends AIController
 			}
 		}
 		
-		if(this.getFollowerCount() == 0)
+		if(this.getFollowerCount(null) == 0)
 			return 0;
 		else
-			return sum/this.getFollowerCount();
+			return sum/this.getFollowerCount(null);
 	}
 	
 	public float getSatisfaction()

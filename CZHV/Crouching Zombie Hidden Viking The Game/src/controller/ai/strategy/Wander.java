@@ -7,12 +7,14 @@ import java.util.List;
 
 import util.Rand;
 import controller.AIController;
+import controller.actions.Action;
 import controller.actions.MoveAction;
 import model.map.Cell;
 
 public class Wander extends Strategy
 {
 	public static final int WANDER_DISTANCE = 10;
+	private int x=0,y=0;
 
 	@Override
 	public CommandSet getCommandSet(AIController commander, long dtime)
@@ -20,8 +22,8 @@ public class Wander extends Strategy
 		if(Rand.randInt(0, 3000) < dtime) // roughly every 3 seconds
 		{
 			Collection<Cell> cells = commander.getGame().getMap().getNearbyCells(
-					commander.getCharacter().getCell().getX(),
-					commander.getCharacter().getCell().getY(),
+					commander.getCharacter().getCell().getX()+x,
+					commander.getCharacter().getCell().getY()+y,
 					Wander.WANDER_DISTANCE
 				);
 			
@@ -35,15 +37,24 @@ public class Wander extends Strategy
 				}
 			}
 			
-			Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
-			float x = target.getX()+Rand.randInt(-50, +49)/100f;
-			float y = target.getY()+Rand.randInt(-50, +49)/100f;
+			Action action = null;
+			
+			if(possibleTargets.size() != 0)
+			{
+				Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
+				float x = target.getX()+Rand.randInt(-50, +49)/100f;
+				float y = target.getY()+Rand.randInt(-50, +49)/100f;
+				this.x = (int)Math.min(x, Wander.WANDER_DISTANCE);
+				this.y = (int)Math.min(y, Wander.WANDER_DISTANCE);
+				
+				action = new MoveAction(
+						commander.getCharacter(),
+						x, y
+					);
+			}
 			
 			CommandSet commands = new CommandSet(
-					new MoveAction(
-							commander.getCharacter(),
-							x, y
-						),
+					action,
 					new HashMap<AIController, Strategy>()
 				);
 
@@ -53,7 +64,7 @@ public class Wander extends Strategy
 			{
 				for(AIController f : followers)
 				{
-					if(commander.getCharacter().distanceTo(f.getCharacter()) > 4)
+					if(commander.getCharacter().distanceTo(f.getCharacter()) > 3)
 						commands.setStrategy(f, new Follow(commander.getCharacter()));
 					else
 						commands.setStrategy(f, new GoTo(x, y));

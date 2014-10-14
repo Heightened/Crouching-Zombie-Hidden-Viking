@@ -6,4 +6,6 @@ import controller.ai.strategy.Strategy;
 public interface StrategyChooser
 {
 	public Strategy choose(AIController leader, long dtime);
+
+	Strategy choose(AIController leader, long dtime, boolean justFollowed);
 }
