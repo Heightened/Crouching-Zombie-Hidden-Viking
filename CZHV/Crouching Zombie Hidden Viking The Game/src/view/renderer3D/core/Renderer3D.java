@@ -38,9 +38,11 @@ import czhv.mainClass;
 public class Renderer3D implements RendererInfoInterface{
 	private Camera camera;
 	private VBO quadVBO;
+	private VBO lineVBO;
 	private TextureObject tex;
 	private ShaderObject lightShader;
 	private ShaderObject quadShader;
+	private ShaderObject lineShader;
 	private Matrix4f MVP;
 	private ArrayList<Vehicle> objList;
 	private DEMOselecter selecter;
@@ -89,6 +91,17 @@ public class Renderer3D implements RendererInfoInterface{
 		quadVBO.put(buffer);
 		quadVBO.unbind();
 		
+		lineVBO = new VBO(VBO.STATIC_DRAW);
+		buffer = BufferUtils.createFloatBuffer(8*2);//8 floats per vert, 2 verts
+		//line
+		putVertex(buffer, 1, 0, 0);
+		putVertex(buffer, 0, 1, 0);
+		
+		buffer.flip();
+		lineVBO.bind();
+		lineVBO.put(buffer);
+		lineVBO.unbind();
+		
 		tex = new TextureObject("tex.png");
 		tex.setup();
 		tex.setMINMAG(GL11.GL_LINEAR);
@@ -106,6 +119,17 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.findUniforms();
 		lightShader.findAttributes();
 		lightShader.unbind();
+		
+		lineShader = new ShaderObject("line shader");
+		lineShader.addVertexSource(FileToString.read("lineshader.vert"));
+		lineShader.addFragmentSource(FileToString.read("lineshader.frag"));
+		lineShader.compileVertex();
+		lineShader.compileFragment();
+		lineShader.link();
+		lineShader.bind();
+		lineShader.findUniforms();
+		lineShader.findAttributes();
+		lineShader.unbind();
 		
 		quadShader = new ShaderObject("fullscreen quad shader");
 		quadShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
@@ -241,9 +265,40 @@ public class Renderer3D implements RendererInfoInterface{
 		
         quadShader.unbind();
 
+        drawLines();
+        
 		TOOLBOX.checkGLERROR(true);
 
 		Display.update();
+	}
+	
+	public Vector3f lineColor = new Vector3f(1,0,0);
+	public void drawLines(){
+		lineShader.bind();
+		lineShader.putMat4("viewMatrix", viewMatrix);
+		lineShader.putMat4("projectionMatrix", projectionMatrix);
+		
+		for (Cell cell : activeCells){
+			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter gameChar : gameChars){
+				for (GameCharacter follower : gameChar.getFollowers()){
+						drawLine(new Vector3f(gameChar.getAbsX()*cellSize,0.05f,gameChar.getAbsY()*cellSize), new Vector3f(follower.getAbsX()*cellSize,0.05f,follower.getAbsY()*cellSize), lineColor);
+				}
+			}
+		}
+		
+		lineShader.unbind();
+	}
+	
+	public void drawLine(Vector3f start, Vector3f end, Vector3f color){
+		lineShader.putUnifFloat4("startPos", start.x, start.y, start.z, 1);
+		lineShader.putUnifFloat4("endPos", end.x, end.y, end.z, 1);
+		lineShader.putUnifFloat4("color", color.x, color.y, color.z, 1);
+		
+		lineVBO.bind();
+		lineVBO.prepareForDraw(lineShader);
+		lineVBO.drawLines();
+		lineVBO.unbind();
 	}
 	
 	public static final float cellSize = 0.1f;

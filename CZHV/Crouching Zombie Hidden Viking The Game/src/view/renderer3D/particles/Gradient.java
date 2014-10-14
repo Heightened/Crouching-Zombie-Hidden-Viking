@@ -39,7 +39,7 @@ public class Gradient {
 		
 		for (int i = 0; i < colorLookup.length; i++) {
 			colorLookup[i] = getColor(i / (float) approximationPrecision);
-			System.out.println(i + ": " + colorLookup[i]);
+			//System.out.println(i + ": " + colorLookup[i]);
 		}
 	}
 	
@@ -63,7 +63,7 @@ public class Gradient {
 			}
 		}
 		
-		System.out.println("+++\n" + a.t + ": " + a + "\n" + b.t + ": " + b);
+		//System.out.println("+++\n" + a.t + ": " + a + "\n" + b.t + ": " + b);
 		
 		return mix((t - a.t) / (b.t - a.t), a, b);
 	}

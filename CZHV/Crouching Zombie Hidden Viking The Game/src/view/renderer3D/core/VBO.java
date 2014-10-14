@@ -116,6 +116,11 @@ public class VBO {
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertCount);
 	}
 	
+	public void drawLines(){
+		classInv();
+        GL11.glDrawArrays(GL11.GL_LINES, 0, vertCount);
+	}
+	
 	public void deAllocate(){
 		ARBBufferObject.glDeleteBuffersARB(index);
 	}

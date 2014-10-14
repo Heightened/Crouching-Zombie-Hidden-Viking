@@ -20,6 +20,9 @@ public class Selection {
 	
 	public static void setSelection(LVLEditorObject obj){
 		if (currentSelection != null){
+			if (currentSelection.equals(obj)){
+				return;
+			}
 			LevelEditor.addToMap(currentSelection);
 		}
 		LevelEditor.map.remove(obj);
