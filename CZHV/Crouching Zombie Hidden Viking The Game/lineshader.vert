@@ -14,7 +14,7 @@ uniform vec4 endPos;
 
 uniform vec4 color;
 
-varying vec4 gradientColor;
+out vec4 gradientColor;
 
 void main()
 {
