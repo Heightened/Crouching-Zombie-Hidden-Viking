@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,11 @@ public class SimpleAIController extends AIController
 		this.followers = new HashSet<>();
 		this.leaderChooser = new LeaderChooser(this, controlBinding);
 		this.strategyChooser = new StupidStrategyChooser();
+		
+		if(Game.AI_DRAW_HIERARCHY)
+		{
+			this.getCharacter().setFollowers(this.getFollowers());
+		}
 	}
 
 	@Override

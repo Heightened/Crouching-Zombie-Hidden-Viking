@@ -2,9 +2,11 @@ package model.character;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import controller.AIController;
 import model.item.Item;
 import model.map.Cell;
 import pathfinding.Node;
@@ -191,6 +193,16 @@ public class GameCharacter extends Vehicle{
 		return this.y + this.cell.getY();
 	}
 	
+	public float distanceTo(GameCharacter c)
+	{
+		return this.distanceTo(c.getAbsX(), c.getAbsY());
+	}
+	
+	public float distanceTo(float x, float y)
+	{
+		return (float)Math.sqrt(Math.pow(x-this.getAbsX(), 2) + Math.pow(y-this.getAbsY(), 2));
+	}
+	
 	public void setPathFinder(PathFinder pathFinder)
 	{
 		this.pathFinder = pathFinder;
@@ -290,5 +302,23 @@ public class GameCharacter extends Vehicle{
 
 	public void setInfected(boolean infected) {
 		this.infected = infected;
+	}
+
+	// ---vvv--- DEBUG CODE ---vvv---
+	private Collection<AIController> followers;
+	public void setFollowers(Collection<AIController> followers)
+	{
+		this.followers = followers;
+	}
+	public Collection<GameCharacter> getFollowers()
+	{
+		Collection<GameCharacter> f = new LinkedList<>();
+		synchronized(this.followers)
+		{
+			for(AIController aic : this.followers)
+				f.add(aic.getCharacter());
+		}
+			
+		return f;
 	}
 }

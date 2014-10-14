@@ -49,7 +49,13 @@ public class Wander extends Strategy
 
 			
 			for(AIController f : commander.getFollowers())
-				commands.setStrategy(f, new GoTo(x, y));
+			{
+				if(commander.getCharacter().distanceTo(f.getCharacter()) > 4)
+					commands.setStrategy(f, new Follow(commander.getCharacter()));
+				else
+					commands.setStrategy(f, new GoTo(x, y));
+				
+			}
 			
 			return commands;
 		}

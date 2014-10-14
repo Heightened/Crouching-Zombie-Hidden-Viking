@@ -9,6 +9,7 @@ import model.map.Map;
 import controller.actions.Action;
 
 public class Game {
+	public static final boolean AI_DRAW_HIERARCHY = true;
 	private Map map;
 	private ChunkedMap flockingMap;
 	private LinkedBlockingQueue<Action> controlBuffer;

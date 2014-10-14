@@ -47,7 +47,7 @@ public class Astar extends PathFinder
 			if (counter > 100){
 				//visited too much nodes, destination unreachable or too far away
 				//bail
-				System.out.println("PATH NOT FOUND/TOO FAR AWAY");
+				//System.out.println("PATH NOT FOUND/TOO FAR AWAY");
 				break;
 			}
 			Node current = openset.getFirst();
