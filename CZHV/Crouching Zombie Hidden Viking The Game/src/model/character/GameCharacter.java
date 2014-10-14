@@ -74,12 +74,12 @@ public class GameCharacter extends Vehicle{
 	{
 		if(path != null)
 		{
-			float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
-			if(distance < this.targetRadius)
+			if(this.isAtTarget())
 			{
 				this.setFlockingTargetNode(path.get(++pathPointer));
 				if (pathPointer >= path.size() - 1)
 				{
+					this.setFlockingTargetRadius(0.5f);
 					this.path = null;
 					this.pathPointer = 0;
 				}
@@ -114,6 +114,7 @@ public class GameCharacter extends Vehicle{
 				//System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}*/
+			this.setFlockingTargetRadius(2.0f);
 			this.pathPointer = 0;
 			this.path = nodes;
 			this.setFlockingTargetNode(path.get(pathPointer));
