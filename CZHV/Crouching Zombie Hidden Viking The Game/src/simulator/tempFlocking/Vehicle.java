@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 import pathfinding.Node;
+import pathfinding.distanceHeuristics.ApproxEuclid;
 
 import view.renderer3D.core.Dummy3DObj;
 import view.renderer3D.core.Renderer3D;
@@ -20,7 +21,7 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f velocity;
 	Vector2f targetVelocity;
 	final float max_speed = 2f;//final for performance
-	final float max_force = 0.50f;
+	final float max_force = 0.20f;
 	final float mass = 5;
 	Vector4f prevPosition;
 	protected Vector4f target;
@@ -35,7 +36,7 @@ public class Vehicle extends Dummy3DObj{
 		targetVelocity = new Vector2f(0,0);
 		velocity = new Vector2f(0,0);
 		this.target = position;
-		targetRadius = Renderer3D.cellSize*2f;
+		targetRadius = Renderer3D.cellSize*1f;
 	}
 	
 	public void setFlockingTargetCell(Cell c){
@@ -88,8 +89,15 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 					Cell c = iterC.next();
 					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
 							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.5f);
-					steering.x += vec.x*2f;
-					steering.y += vec.y*2f;
+					if(vec.x > vec.y) {
+						steering.x += (vec.x + vec.y)*2f;
+						steering.y += vec.y*2f;
+					} else {
+						steering.y += (vec.x + vec.y)*2f;
+						steering.x += vec.x*2f;
+					}
+					//steering.x += vec.x*2f;
+					//steering.y += vec.y*2f;
 				}
 			}
 		}
@@ -232,5 +240,10 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		tempsteering.x = targetvx - velocity.x;
 		tempsteering.y = targetvy - velocity.y;
 		return tempsteering;
+	}
+	
+	public boolean isAtTarget() {
+		float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
+		return distance < this.targetRadius;
 	}
 }
