@@ -74,7 +74,7 @@ public class Vehicle extends Dummy3DObj{
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
 						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*1);//all performance issues here
 						/*
-Ik heb in simulator speed x10 gedaan (door ms te delen too 100 ipv 1000), en toen kreeg ik dit:
+TODO: exception
 Exception in thread "Thread-11" java.lang.NullPointerException
 	at simulator.tempFlocking.Vehicle.update(Vehicle.java:48)
 	at simulator.tempFlocking.FlockingManager.loop(FlockingManager.java:36)

@@ -16,7 +16,7 @@ public class LeaderChooser
 	private AIController controller;
 	private float timeSinceLastLoyaltyCheck = 0;
 	
-	private static final int TIME_BETWEEN_LOYALTY_CHECKS = 10000;
+	private static final int TIME_BETWEEN_LOYALTY_CHECKS = 1000;
 	
 	public LeaderChooser(AIController controller, Map<GameCharacter, AIController> controlBinding)
 	{
@@ -82,7 +82,7 @@ public class LeaderChooser
 		else
 			DTL = this.controller.getCharacter().distanceTo(leader);
 		
-		return followerCount/this.idealGroupSize >= this.satisfaction * groupSize/this.idealGroupSize;
+		return DTL < 5 && followerCount/this.idealGroupSize >= this.satisfaction * groupSize/this.idealGroupSize;
 	}
 	
 	private float rateLeader(int followerCount, GameCharacter character)

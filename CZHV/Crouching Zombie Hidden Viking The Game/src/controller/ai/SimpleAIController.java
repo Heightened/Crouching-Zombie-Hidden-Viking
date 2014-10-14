@@ -78,7 +78,7 @@ public class SimpleAIController extends AIController
 		Collection<Cell> cells = this.getGame().getMap().getNearbyCells(
 				this.getCharacter().getCell().getX(),
 				this.getCharacter().getCell().getY(),
-				10);
+				5);
 		
 		Collection<GameCharacter> allies = new ArrayList<>();
 		for(Cell c : cells)
