@@ -15,6 +15,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 
+import pathfinding.Node;
 import view.renderer3D.core.RendererInfoInterface;
 import controller.actions.GroupMoveAction;
 
@@ -76,16 +77,18 @@ public class InputManager extends ConcreteController{
 					//TODO clicked zombie while characters selected: attack
 					//TODO click on viking while selected: open inventory
 					//TODO clicked/drag from any tile while nothing selected, selection mode
-					
-				}else{
 					startClick = new Point(Mouse.getX(), Mouse.getY());
-					Object obj = renderer.click(startClick.x, startClick.y);
-					if (obj != null){
-						if (obj instanceof Vector2f){
-							doGroupMoveAction((Vector2f)obj);
-						}	
-						if (obj instanceof Cell){
-							doPickupItem((Cell)obj);
+				}else{
+					if(startClick!=null){
+						Object obj = renderer.click(startClick.x, startClick.y);
+						if (obj != null){
+							if (obj instanceof Vector2f){
+								doGroupMoveAction((Vector2f)obj);
+							}	
+							if (obj instanceof Cell){
+								doAttack((Cell)obj);
+								doPickupItem((Cell)obj);
+							}
 						}
 					}
 				}
@@ -93,17 +96,43 @@ public class InputManager extends ConcreteController{
 		}
 	}
 
+	ActionThread attack = new ActionThread(){
+		@Override
+		public void run(){
+			while(running){
+				
+			}
+		}
+	};
+	private void doAttack(Cell cell) {
+		List<GameCharacter> characters = cell.getCharacterHolder().getItem();
+		for(GameCharacter c: characters){
+			if(c.isInfected()){
+				//only one attack thread may spawn
+				if(attack.isAlive()){
+					attack.cancel();
+				}
+			}
+		}
+	}
+	
+	ActionThread pickUp = new ActionThread(){
+		@Override
+		public void run(){
+			while(running){
+				
+			}
+		}
+	};
 	private void doPickupItem(Cell c) {
 		Item i = c.getItemHolder().getItem();
 		Vector2f vec = new Vector2f(c.getX(), c.getY());
 		doGroupMoveAction(vec);
-		new Thread(){
-			
-			@Override
-			public void run(){
-				
-			}
-		}.start();
+		//only one pickup thread may spawn
+		if( pickUp.isAlive()){
+			pickUp.cancel();
+		
+		}
 	}
 
 	private void doGroupMoveAction(Vector2f vec) {
@@ -150,5 +179,21 @@ public class InputManager extends ConcreteController{
 			} 
 		}
 		return null;
+	}
+	
+	class ActionThread extends Thread{
+		protected boolean running;
+		
+		public void cancel(){
+			running = false;
+		}
+		
+		public boolean atDestination(GameCharacter c){
+			return c.isAtTarget() && c.getPath() == null;		
+		}
+		
+		public boolean nearDestination(GameCharacter c, GameCharacter c2, int radius){
+			return c.distanceTo(c2)<radius;
+		}
 	}
 }

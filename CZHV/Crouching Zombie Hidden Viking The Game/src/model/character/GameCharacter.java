@@ -265,6 +265,10 @@ public class GameCharacter extends Vehicle{
 		return currentHp;
 	}
 
+	public List<Node> getPath(){
+		return path;
+	}
+
 	public void applyDamage(int Damage) {
 		currentHp = currentHp-Damage;
 		if(isDead()){
