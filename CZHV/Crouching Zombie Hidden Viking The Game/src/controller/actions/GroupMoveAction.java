@@ -9,6 +9,7 @@ import model.map.Cell;
 import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFindingMap;
+import pathfinding.PathFindingMap.CellType;
 
 public class GroupMoveAction implements Action{
 	private List<GameCharacter> characters;
@@ -81,6 +82,6 @@ public class GroupMoveAction implements Action{
 	}
 	
 	private boolean isInMap(int X, int Y, PathFindingMap map){
-		return map.getGrid().containsKey(X) && map.getGrid().get(X).containsKey(Y);
+		return map.getGrid().containsKey(X) && map.getGrid().get(X).containsKey(Y) && map.getGrid().get(X).get(Y).celltype.equals(CellType.PASSIBLE);
 	}
 }

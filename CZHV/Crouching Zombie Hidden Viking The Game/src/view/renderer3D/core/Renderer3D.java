@@ -9,6 +9,7 @@ import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
+import model.item.Item;
 import model.map.Cell;
 import model.map.Map;
 
