@@ -51,7 +51,13 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
-		if(!this.leaderChooser.loyal(0, dtime))
+		GameCharacter leader;
+		if(this.leader != null)
+			leader = this.leader.getCharacter();
+		else
+			leader = null;
+		
+		if(!this.leaderChooser.loyal(leader, 0, dtime))
 			this.setLeader(this.leaderChooser.chooseLeader(this.getCloseAllies()));
 		
 		Strategy strategy = null;

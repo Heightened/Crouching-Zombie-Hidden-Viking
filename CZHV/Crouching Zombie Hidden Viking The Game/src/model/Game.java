@@ -15,13 +15,11 @@ public class Game {
 	private LinkedBlockingQueue<Action> controlBuffer;
 	private LinkedBlockingQueue<Action> actionBuffer;
 	private ArrayList<GameCharacter> controlledCharacters;
-	private ArrayList<GameCharacter> aiCharacters;
 
 	public Game() {
 		//TODO: fill in stuff
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
-		aiCharacters = new ArrayList<GameCharacter>();
 		controlledCharacters = new ArrayList<GameCharacter>();
 		createMap();
 	}
@@ -81,7 +79,7 @@ public class Game {
 		return actionBuffer;
 	}
 
-	public ArrayList<GameCharacter> getAiCharacters() {
-		return aiCharacters;
+	public boolean isAIControlled(GameCharacter character) {
+		return character.isInfected() && !this.controlledCharacters.contains(character);
 	}
 }

@@ -312,6 +312,9 @@ public class GameCharacter extends Vehicle{
 	}
 	public Collection<GameCharacter> getFollowers()
 	{
+		if(this.followers == null)
+			return new LinkedList<>();
+		
 		Collection<GameCharacter> f = new LinkedList<>();
 		synchronized(this.followers)
 		{

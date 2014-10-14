@@ -24,7 +24,7 @@ public class LeaderChooser
 		this.controller     = controller;
 	}
 	
-	public boolean loyal(float satisfaction, long dtime)
+	public boolean loyal(GameCharacter leader, float satisfaction, long dtime)
 	{
 		this.timeSinceLastLoyaltyCheck -= dtime;
 		
@@ -38,7 +38,7 @@ public class LeaderChooser
 			
 			this.satisfaction += satisfaction/d;
 			
-			if(!this.loyaltyCheck())
+			if(!this.loyaltyCheck(leader))
 			{
 				this.satisfaction = 0.5f;
 				return false;
@@ -72,10 +72,15 @@ public class LeaderChooser
 		return leader;
 	}
 	
-	private boolean loyaltyCheck()
+	private boolean loyaltyCheck(GameCharacter leader)
 	{
 		int followerCount = this.controller.getFollowerCount();
 		int groupSize     = this.controller.getGroupSize();
+		float DTL;
+		if(leader == null)
+			DTL = 0;
+		else
+			DTL = this.controller.getCharacter().distanceTo(leader);
 		
 		return followerCount/this.idealGroupSize >= this.satisfaction * groupSize/this.idealGroupSize;
 	}
