@@ -7,6 +7,7 @@ import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
+import model.item.Item;
 import model.map.Cell;
 
 import org.lwjgl.LWJGLException;
@@ -81,23 +82,37 @@ public class InputManager extends ConcreteController{
 					Object obj = renderer.click(startClick.x, startClick.y);
 					if (obj != null){
 						if (obj instanceof Vector2f){
-							ArrayList<GameCharacter> controllable = getControllableCharacters();
-							try {
-								GroupMoveAction m = new GroupMoveAction(controllable, ((Vector2f) obj).getX(), ((Vector2f) obj).getY());
-								getGame().getActionBuffer().add(m);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+							doGroupMoveAction((Vector2f)obj);
 						}	
+						if (obj instanceof Cell){
+							doPickupItem((Cell)obj);
+						}
 					}
 				}
 			}
-			
-			if(Keyboard.getEventKey() == Keyboard.KEY_DELETE){
-				if(!Keyboard.getEventKeyState()){
+		}
+	}
 
-				}
+	private void doPickupItem(Cell c) {
+		Item i = c.getItemHolder().getItem();
+		Vector2f vec = new Vector2f(c.getX(), c.getY());
+		doGroupMoveAction(vec);
+		new Thread(){
+			
+			@Override
+			public void run(){
+				
 			}
+		}.start();
+	}
+
+	private void doGroupMoveAction(Vector2f vec) {
+		ArrayList<GameCharacter> controllable = getControllableCharacters();
+		try {
+			GroupMoveAction m = new GroupMoveAction(controllable,  vec.getX(), vec.getY());
+			getGame().getActionBuffer().add(m);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
