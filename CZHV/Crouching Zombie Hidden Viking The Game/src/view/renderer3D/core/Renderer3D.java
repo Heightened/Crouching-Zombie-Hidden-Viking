@@ -33,7 +33,6 @@ import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.inputoutput.FileToString;
 import view.renderer3D.particles.ParticleTest;
-import controller.InputManager;
 import czhv.mainClass;
 
 public class Renderer3D implements RendererInfoInterface{
@@ -352,10 +351,19 @@ public class Renderer3D implements RendererInfoInterface{
 	@Override
 	public Object click(float x, float y) {
 		//check interface, return button
-		//else return world position
 		Vector2f mouse = selecter.normalize(x, y);//selecter.getNormalizedMouse();
 		mouse.y *= -1;
 		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
+		//else check characters
+		for (Cell c : activeCells){
+			List<GameCharacter> gameChars = c.getCharacterHolder().getItem();
+			for (GameCharacter gameChar : gameChars){
+				if (gameChar.checkAABB(ray)){
+					return c;
+				}
+			}
+		}
+		//else return world position
 		Vector3f colPoint = ray.collideXZPlane(0);
 		int cellx = (int)(colPoint.x/cellSize);
 		int celly = (int)(colPoint.z/cellSize);
