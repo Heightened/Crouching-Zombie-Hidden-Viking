@@ -1,10 +1,10 @@
 #version 330
 
-uniform vec4 color;
+varying vec4 gradientColor;
 
 out vec4 texelColor;
 
 void main()
 {
-    texelColor = color;
+    texelColor = gradientColor;
 }
