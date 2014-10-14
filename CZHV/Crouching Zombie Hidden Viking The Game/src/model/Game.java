@@ -22,13 +22,14 @@ public class Game {
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
 		aiCharacters = new ArrayList<GameCharacter>();
-		controlledCharacters = new ArrayList<GameCharacter>();
 		createMap();
+		controlledCharacters = map.getControlledCharacters();
 	}
 
 	private void createMap() {
 		//TODO do map creation
 		map = new Map(30,30);
+		map.populate();
 		flockingMap = new ChunkedMap(map, 2, 225);
 		//TODO add characters to map
 	}	
