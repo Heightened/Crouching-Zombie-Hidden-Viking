@@ -226,8 +226,12 @@ public class InputManager extends ConcreteController{
 	}
 	
 	private void doPickupItem(Cell c) {
-		Item i = c.getItemHolder().getItem();
+		stopThreads(attack);
+		pickUp = af.attackThread();
+		
 		doGroupMoveAction(cellToVector2f(c));
+		
+		pickUp.start();
 		//TODO stuff here
 	}
 	
