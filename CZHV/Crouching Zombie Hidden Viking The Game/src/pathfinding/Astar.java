@@ -10,6 +10,8 @@ import util.SortedList;
 public class Astar extends PathFinder
 {
 	private PathFindingMap currentMap;
+	final float unknownCellWeight = 1.2f;
+	final float impassibleWeight = 3f;
 	
 	public Astar(Map map, int radius, GameCharacter character)
 	{
@@ -63,10 +65,15 @@ public class Astar extends PathFinder
 			for (Node n : current.getNeighbours()){
 				//System.out.println(n.x + " " + n.y);
 				//if (n.isSolid()){System.out.println("SOLID");}
-				if(n.isSolid()) continue;//non-passable terrain, ignore
+				if(n.isSolid() || currentMap.getNode(current.getX(), n.getY()).isSolid() ||
+						currentMap.getNode(n.getX(), current.getY()).isSolid()) continue;//non-passable terrain, ignore
 				
 				//System.out.println("Neighbour:" + n.x + " " + n.y);
-				float tentative_g_score = current.path_length + Node.distance(n, current);
+				float weight = 1;
+				if(n.type == PathFindingMap.CellType.UNKNOWN) weight *= unknownCellWeight;
+				if(!this.map.getCell(n.getX(), n.getY()).isFree(null)) weight *= impassibleWeight;
+				
+				float tentative_g_score = current.path_length + weight * Node.distance(n, current);
 				float tentative_f_score = tentative_g_score + Node.distance(n, goal);
 				
 				//System.out.println("fscore " + tentative_f_score +" neighbourscore = " + n.getScore());

@@ -88,13 +88,13 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 				while(iterC.hasNext()){
 					Cell c = iterC.next();
 					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
-							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.5f);
+							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.0f);
 					if(vec.x > vec.y) {
 						steering.x += (vec.x + vec.y)*2f;
-						steering.y += vec.y*2f;
+						steering.y += vec.y*1f;
 					} else {
 						steering.y += (vec.x + vec.y)*2f;
-						steering.x += vec.x*2f;
+						steering.x += vec.x*1f;
 					}
 					//steering.x += vec.x*2f;
 					//steering.y += vec.y*2f;
