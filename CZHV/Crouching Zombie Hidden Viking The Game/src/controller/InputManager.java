@@ -23,6 +23,7 @@ import view.renderer3D.core.RendererInfoInterface;
 import controller.actions.GroupMoveAction;
 import controller.actions.PickupAction;
 import controller.actions.ShootAction;
+import controller.actions.StopMovingAction;
 
 public class InputManager extends ConcreteController{
 	
@@ -50,7 +51,6 @@ public class InputManager extends ConcreteController{
 	
 	private Point startClick;
 	private Point endClick;
-	private boolean attackEnabled;
 	
 	public void pollInput(){
 		while(Mouse.next() || Keyboard.next()){
@@ -85,30 +85,47 @@ public class InputManager extends ConcreteController{
 					//TODO click on viking while selected: open inventory
 					//TODO clicked/drag from any tile while nothing selected, selection mode
 					startClick = new Point(Mouse.getX(), Mouse.getY());
-				}else{
+				} else {
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
 						if (obj != null){
 							if (obj instanceof Vector2f){
+								stopAttack();
 								doGroupMoveAction((Vector2f)obj);
 							}	
 							if (obj instanceof Cell){
-								if(attackEnabled){
-									doAttack((Cell)obj);
-								}
 								doPickupItem((Cell)obj);
 							}
+							stopAttack();
+							if(Keyboard.getEventKey() == Keyboard.KEY_A){
+								//if mouse clicked and A pressed
+								if(Keyboard.getEventKeyState()){
+									if (obj instanceof Vector2f){
+										doAttack(null);
+									}	
+									if (obj instanceof Cell){
+										doAttack((Cell) obj);
+									}
+								}
+							}
 						}
+						startClick = null;
 					}
 				}
 			}			
-			if(Keyboard.getEventKey() == Keyboard.KEY_A){
-				if(!Keyboard.getEventKeyState()){
-					attackEnabled = !attackEnabled;
-					if(attackEnabled){
-						doAttack(null);// 
-					} else {
-						stopThreads(attack);
+
+			if(Keyboard.getEventKey() == Keyboard.KEY_S){
+				boolean startPress = false;
+				if(Keyboard.getEventKeyState()){
+					startPress = true;
+				} else {
+					if(startPress){
+						startPress = false;
+						for(GameCharacter g: selectedCharacters){
+							if(getGame().getControlledCharacters().contains(g)){
+								getGame().getActionBuffer().add(new StopMovingAction(g));
+							}
+						}
 					}
 				}
 			}
@@ -127,20 +144,25 @@ public class InputManager extends ConcreteController{
 				if(c.isInfected()){				
 					doGroupMoveAction(cellToVector2f(c.getCell()));
 					//only one attack thread may spawn
+					attack.addAttackers(getControllableCharacters());
 					attack.setTarget(c);
 				}
 			}
 		} else {
-			//if no target specified everything is a target and all controlled characters become the source
+			attack.addAttackers(getControllableCharacters());
 			attack.setTargets(getGame().getUndead());
 		}
+	}
+	
+	private void stopAttack(){
+		attack.removeAttackers(getControllableCharacters());
 	}
 	
 	private void stopThreads(ActionThread at) {
 		if(at.isAlive()){				
 			try {
 				at.cancel();
-				at.join();
+				at.join(0);
 			} catch (InterruptedException e) {
 				// nothing to do here
 			}
@@ -172,7 +194,7 @@ public class InputManager extends ConcreteController{
 		}
 	}
 
-	private ArrayList<GameCharacter> getControllableCharacters() {
+	protected ArrayList<GameCharacter> getControllableCharacters() {
 		ArrayList<GameCharacter> controllable = new ArrayList<GameCharacter>();
 		for(GameCharacter c: selectedCharacters){
 			if(getGame().getControlledCharacters().contains(c)){
@@ -213,6 +235,7 @@ public class InputManager extends ConcreteController{
 	class ActionThread extends Thread{
 		protected boolean running;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
+		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
 		private Item i;
 		
@@ -226,6 +249,22 @@ public class InputManager extends ConcreteController{
 		
 		public boolean nearby(GameCharacter c, GameCharacter c2, float radius){
 			return c.distanceTo(c2)<radius;
+		}
+		
+		public void addAttackers(ArrayList<GameCharacter> attackers){
+			for(GameCharacter gc: attackers){
+				if(!this.attacker.contains(gc)){
+					this.attacker.add(gc);
+				}
+			}
+		}
+		
+		public void removeAttackers(ArrayList<GameCharacter> attackers){
+			for(GameCharacter gc: attackers){
+				if(this.attacker.contains(gc)){
+					this.attacker.remove(gc);
+				}
+			}
 		}
 		
 		//puts the target at the head of the list
@@ -248,51 +287,56 @@ public class InputManager extends ConcreteController{
 				@Override
 				public void run(){
 					while(running){
-						if(focusedTarget != null){
-							for (GameCharacter c : getGame().getControlledCharacters()) {
-								ItemSlot[] inventory = c.getBag().getInventory();
-								Weapon v = getWeapon(inventory);
-								if (nearby(c, focusedTarget, v.getRange())) {
-									getGame().getActionBuffer().add(new ShootAction(v, c, focusedTarget));
-									if (focusedTarget.isDead()) {
-										focusedTarget = null;
+						int numChars = getGame().getControlledCharacters().size();
+						GameCharacter[] lockedTargets = new GameCharacter[numChars];
+						ArrayList<GameCharacter> characters = getGame().getControlledCharacters();
+						for(int i = 0; i<characters.size(); i++) {
+							if(focusedTarget!=null){
+								if(focusedTarget.isDead()){
+									focusedTarget = null;
+								}
+								if(getControllableCharacters().contains(characters.get(i))){
+									lockedTargets[i] = focusedTarget;
+								}
+							}
+							Iterator<GameCharacter> iter = targets.iterator();
+							GameCharacter gc = characters.get(i);
+							ItemSlot[] inventory = gc.getBag().getInventory();
+							Weapon v = getWeapon(inventory);
+							int range = 1;
+							if(v != null){
+								range = v.getRange();
+							}
+							while(lockedTargets[i] == null && iter.hasNext()){
+								GameCharacter enemy = iter.next();
+								if(!enemy.isDead()){									
+									if(nearby(gc, enemy, v.getRange())){
+										lockedTargets[i] = enemy;
 									}
+								} else {
+									iter.remove();
 								}
 								
+							} 
+							if(lockedTargets[i].isDead()){
+								lockedTargets[i] = null;
 							}
-						} else {
-							int numChars = getGame().getControlledCharacters().size();
-							GameCharacter[] lockedTargets = new GameCharacter[numChars];
-							for(int i = 0; i<getGame().getControlledCharacters().size(); i++) {
-								Iterator<GameCharacter> iter = targets.iterator();
-								GameCharacter gc = getGame().getControlledCharacters().get(i);
-								ItemSlot[] inventory = gc.getBag().getInventory();
-								Weapon v = getWeapon(inventory);
-								while(lockedTargets[i] == null && iter.hasNext()){
-									GameCharacter enemy = iter.next();
-									if(!enemy.isDead()){
-										if(nearby(gc, enemy, v.getRange())){
-											lockedTargets[i] = enemy;
-										}
-									} else {
-										iter.remove();
-									}
-									
-								} 
-								if(lockedTargets[i].isDead()){
+							if(lockedTargets[i]!=null){
+								if(nearby(gc, lockedTargets[i], v.getRange())){
+									getGame().getActionBuffer().add(new StopMovingAction(gc));
+									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
+								} else {
 									lockedTargets[i] = null;
-								}
-								if(lockedTargets[i]!=null){
-									if(nearby(gc, lockedTargets[i], v.getRange())){
-										getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
-									} else {
-										lockedTargets[i] = null;
-									}
 								}
 							}
 						}
-					}
-					
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}		
 				}
 				
 				private Weapon getWeapon(ItemSlot[] inventory) {
@@ -316,6 +360,12 @@ public class InputManager extends ConcreteController{
 							if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
 								getGame().getActionBuffer().add(new PickupAction(gc));
 							}
+						}
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}
