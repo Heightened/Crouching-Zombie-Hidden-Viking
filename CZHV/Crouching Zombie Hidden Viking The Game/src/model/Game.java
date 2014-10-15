@@ -1,9 +1,11 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import model.character.GameCharacter;
+import model.map.Cell;
 import model.map.ChunkedMap;
 import model.map.Map;
 import controller.actions.Action;
@@ -82,5 +84,18 @@ public class Game {
 
 	public boolean isAIControlled(GameCharacter character) {
 		return character.isInfected() && !this.controlledCharacters.contains(character);
+	}
+	
+	public ArrayList<GameCharacter> getUndead(){
+		ArrayList<GameCharacter> undead = new ArrayList<GameCharacter>();
+		Collection<Cell> all = map.getActiveCells();
+		for(Cell c: all){
+			for(GameCharacter gc: c.getCharacterHolder().getItem()){
+				if(gc.isInfected()){
+					undead.add(gc);
+				}
+			}
+		}
+		return undead;
 	}
 }

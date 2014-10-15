@@ -32,7 +32,7 @@ public class GameCharacter extends Vehicle{
 	private PathFinder pathFinder;
 	private List<Node> path;
 	private int pathPointer;
-	
+	private int accuracy;
 	private boolean selected;
 	
 	public GameCharacter(){
@@ -213,8 +213,21 @@ public class GameCharacter extends Vehicle{
 		return this.pathFinder;
 	}
 	
+	public void stopMovement(){
+		path = null;
+		pathPointer = 0;
+	}
+	
 	public Inventory getBag() {
 		return bag;
+	}
+
+	public int getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(int accuracy) {
+		this.accuracy = accuracy;
 	}
 
 	public void setBag(Inventory bag) {
@@ -311,6 +324,7 @@ public class GameCharacter extends Vehicle{
 
 	// ---vvv--- DEBUG CODE ---vvv---
 	private Collection<AIController> followers;
+
 	public void setFollowers(Collection<AIController> followers)
 	{
 		this.followers = followers;
