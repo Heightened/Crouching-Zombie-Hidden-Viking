@@ -41,16 +41,16 @@ public class Vehicle extends Dummy3DObj{
 	
 	public void setFlockingTargetCell(Cell c){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) c.getX() + 0.5f) * scaling;
-		float tZ = ((float) c.getY() + 0.5f) * scaling;
+		float tX = c.getX() * scaling;
+		float tZ = c.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetNode(Node n){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) n.getX() + 0.5f) * scaling;
-		float tZ = ((float) n.getY() + 0.5f) * scaling;
+		float tX = n.getX() * scaling;
+		float tZ = n.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
@@ -87,8 +87,8 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 				Iterator<Cell> iterC = map.getImpassibleCells(x, y).iterator();
 				while(iterC.hasNext()){
 					Cell c = iterC.next();
-					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
-							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.0f);
+					Vector2f vec = fleeTarget(new Vector4f(c.getX() * scaling, 0, 
+							c.getY() * scaling, 1), Renderer3D.cellSize*1.0f);
 					if(vec.x > vec.y) {
 						steering.x += (vec.x + vec.y)*2f;
 						steering.y += vec.y*1f;
