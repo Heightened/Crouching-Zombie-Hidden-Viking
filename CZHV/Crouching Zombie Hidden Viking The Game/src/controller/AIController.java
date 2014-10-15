@@ -54,4 +54,6 @@ public abstract class AIController implements Controller {
 	public abstract Collection<AIController> getFollowers();
 
 	public abstract void removeLeader();
+
+	public abstract boolean isAlive();
 }

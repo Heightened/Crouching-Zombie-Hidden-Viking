@@ -107,7 +107,8 @@ public class AIManager implements MapChangeListener {
 					if(temp != null){
 						temp.update();
 						count++;
-						activeControllers.put(temp);
+						if(!temp.isAlive())
+							activeControllers.put(temp);
 					}
 					try{
 						//sleep for one millisecond

@@ -86,7 +86,9 @@ public class SimpleAIController extends AIController
 		if(!this.getCharacter().isDead())
 			return false;
 		
-		this.leader.unregister(this);
+		if(this.leader!=null)
+			this.leader.unregister(this);
+		
 		synchronized(this.followers)
 		{
 			for(AIController aic : this.followers)
@@ -237,5 +239,11 @@ public class SimpleAIController extends AIController
 	public void removeLeader()
 	{
 		this.leader = null;
+	}
+
+	@Override
+	public boolean isAlive()
+	{
+		return this.getCharacter() != null && !this.getCharacter().isDead();
 	}
 }
