@@ -37,7 +37,7 @@ public abstract class AIController implements Controller {
 
 	public abstract int getFollowerCount(AIController source);
 	
-	public abstract int getGroupSize(AIController source);
+	public abstract int getGroupSize(int depth);
 
 	public abstract float getSatisfactionLevel();
 

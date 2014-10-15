@@ -30,11 +30,11 @@ public class Map implements ChangeListener<Cell>
 	public void populate()
 	{
 		int size = this.grid.length * this.grid[0].length;
-		int n = Rand.randInt(size/120, size/100);
+		int n = Rand.randInt(size/300, size/200);
 		
 		for(int i=0; i<n; i++)
 		{
-			int l = Rand.randInt(10, 20);
+			int l = Rand.randInt(30, 100);
 			
 			int x = Rand.randInt(0, this.grid.length);
 			int y = Rand.randInt(0, this.grid[0].length);

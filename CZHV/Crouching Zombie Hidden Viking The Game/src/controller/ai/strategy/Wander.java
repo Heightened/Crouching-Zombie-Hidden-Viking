@@ -44,14 +44,16 @@ public class Wander extends Strategy
 				Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
 				float x = target.getX()+Rand.randInt(-50, +49)/100f;
 				float y = target.getY()+Rand.randInt(-50, +49)/100f;
-				this.x = (int)Math.min(x, Wander.WANDER_DISTANCE);
-				this.y = (int)Math.min(y, Wander.WANDER_DISTANCE);
+				this.x = (int)Math.min(x, 0.7 * Wander.WANDER_DISTANCE);
+				this.y = (int)Math.min(y, 0.7 * Wander.WANDER_DISTANCE);
 				
 				action = new MoveAction(
 						commander.getCharacter(),
 						x, y
 					);
 			}
+			else
+				System.out.println("No cells to wander to.. at ("+(commander.getCharacter().getCell().getX()+x)+", "+(commander.getCharacter().getCell().getY()+y)+")");
 			
 			CommandSet commands = new CommandSet(
 					action,

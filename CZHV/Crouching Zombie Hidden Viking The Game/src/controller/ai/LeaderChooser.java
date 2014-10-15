@@ -75,7 +75,7 @@ public class LeaderChooser
 	private boolean loyaltyCheck(GameCharacter leader)
 	{
 		int followerCount = this.controller.getFollowerCount(null);
-		int groupSize     = this.controller.getGroupSize(null);
+		int groupSize     = this.controller.getGroupSize(10);
 		float DTL;
 		if(leader == null)
 			DTL = 0;
@@ -89,7 +89,10 @@ public class LeaderChooser
 	{
 		AIController controller = this.controlBinding.get(character);
 		if(controller == null)
+		{
+			System.out.println("Zombie without controller");
 			return -2;
+		}
 		
 		if(this.controller.isFollower(controller))
 			return -1;

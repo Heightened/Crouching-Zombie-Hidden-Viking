@@ -51,15 +51,15 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
-		GameCharacter leader;
+		GameCharacter leaderCharacter;
 		boolean justChoseLeader = false;
 		
 		if(this.leader != null)
-			leader = this.leader.getCharacter();
+			leaderCharacter = this.leader.getCharacter();
 		else
-			leader = null;
+			leaderCharacter = null;
 		
-		if(!this.leaderChooser.loyal(leader, 0, dtime))
+		if(!this.leaderChooser.loyal(leaderCharacter, 0, dtime))
 		{
 			this.setLeader(this.leaderChooser.chooseLeader(this.getCloseAllies()));
 			justChoseLeader = true;
@@ -149,17 +149,12 @@ public class SimpleAIController extends AIController
 	}
 	
 	@Override
-	public int getGroupSize(AIController source)
+	public int getGroupSize(int depth)
 	{
-		if(source == this)
-			return 0;
-		if(source == null)
-			source = this;
-		
-		if(this.leader == null)
+		if(depth <= 0 || this.leader == null)
 			return this.getFollowerCount(null)+1;
 		else
-			return this.leader.getGroupSize(source);
+			return this.leader.getGroupSize(depth-1);
 	}
 
 	@Override
