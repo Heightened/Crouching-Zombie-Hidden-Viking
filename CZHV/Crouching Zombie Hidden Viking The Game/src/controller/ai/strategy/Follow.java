@@ -10,6 +10,8 @@ public class Follow extends Strategy
 	
 	public Follow(GameCharacter followee)
 	{
+		assert followee != null;
+		
 		this.followee = followee;
 	}
 	
@@ -24,7 +26,7 @@ public class Follow extends Strategy
 	{
 		timeSinceLastFollow += dtime;
 		
-		if(timeSinceLastFollow > 1000)
+		if(timeSinceLastFollow > 1000 && this.followee != null)
 		{
 			timeSinceLastFollow = 0;
 			

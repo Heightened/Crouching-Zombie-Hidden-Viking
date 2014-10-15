@@ -90,6 +90,9 @@ public class Chunk implements ChangeListener<Cell>
 	@Override
 	public void characterMoved(GameCharacter character, Cell cell)
 	{
+		if(character == null)
+			(new Exception("Character cannot be null")).printStackTrace();
+		
 		if(this.contains(character.getCell()) && !this.chars.contains(character))
 		{
 			this.chars.add(character);
