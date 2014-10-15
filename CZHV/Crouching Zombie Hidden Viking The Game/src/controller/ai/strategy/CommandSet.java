@@ -19,11 +19,16 @@ public class CommandSet
 	
 	public Action getAction()
 	{
+		return null;
+		/*
 		return this.myAction;
+		//*/
 	}
 	
 	public Strategy getStrategy(AIController follower)
 	{
+		return null;
+		/*
 		if(this.commands == null)
 			return null;
 		
@@ -31,6 +36,7 @@ public class CommandSet
 			return this.commands.get(follower);
 		else
 			return null;
+		//*/
 	}
 	
 	protected void setAction(Action action)

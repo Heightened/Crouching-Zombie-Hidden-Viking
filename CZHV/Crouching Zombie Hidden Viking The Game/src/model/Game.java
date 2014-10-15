@@ -28,9 +28,9 @@ public class Game {
 
 	private void createMap() {
 		//TODO do map creation
-		map = new Map(100,100);
+		map = new Map(30,30);
 		map.populate();
-		flockingMap = new ChunkedMap(map, 2, 2500);
+		flockingMap = new ChunkedMap(map, 2, 225);
 		//TODO add characters to map
 	}	
 	
