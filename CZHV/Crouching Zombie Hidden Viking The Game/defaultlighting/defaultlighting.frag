@@ -121,8 +121,8 @@ void main(void)
 	vec4 textureColor = texture2D(texture,vec2(texture_coordinate.x, 1-texture_coordinate.y));
 	
 	//texelColor = vec4(texture_coordinate,1,1);
-    //texelColor = vec4(final_color.rgb*color.rgb*textureColor,1);
-    texelColor = vec4(color.rgb*textureColor,1);
+    //texelColor = vec4(final_color.rgb*color.rgb*textureColor.rgb,1);
+    texelColor = vec4(color.rgb*textureColor.rgb,1);
     
     //texelColor = vec4(shadow, shadow, shadow,1);
     //texelColor = vec4(final_color.rgb,1);
