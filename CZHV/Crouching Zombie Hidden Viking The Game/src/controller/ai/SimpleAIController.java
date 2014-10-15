@@ -51,21 +51,29 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
-		GameCharacter leader;
-		if(this.leader != null)
-			leader = this.leader.getCharacter();
-		else
-			leader = null;
+		if(this.destructIfDead())
+			return;
 		
-		if(!this.leaderChooser.loyal(leader, 0, dtime))
+		GameCharacter leaderCharacter;
+		boolean justChoseLeader = false;
+		
+		if(this.leader != null)
+			leaderCharacter = this.leader.getCharacter();
+		else
+			leaderCharacter = null;
+		
+		if(!this.leaderChooser.loyal(leaderCharacter, 0, dtime))
+		{
 			this.setLeader(this.leaderChooser.chooseLeader(this.getCloseAllies()));
+			justChoseLeader = true;
+		}
 		
 		Strategy strategy = null;
 		
 		if(this.leader != null)
 			strategy = this.leader.getOrders(this);
 		if(strategy == null)
-			strategy = this.strategyChooser.choose(this.leader, dtime);
+			strategy = this.strategyChooser.choose(this.leader, dtime, justChoseLeader);
 		
 		this.commands = strategy.getCommandSet(this, dtime);
 		
@@ -73,12 +81,36 @@ public class SimpleAIController extends AIController
 			this.getGame().getActionBuffer().add(this.commands.getAction());
 	}
 	
+	public boolean destructIfDead()
+	{
+		if(!this.getCharacter().isDead())
+			return false;
+		
+		if(this.leader!=null)
+			this.leader.unregister(this);
+		
+		synchronized(this.followers)
+		{
+			for(AIController aic : this.followers)
+			{
+				aic.removeLeader();
+			}
+		}
+		this.commands = null;
+		this.leaderChooser = null;
+		this.leader = null;
+		this.strategyChooser = null;
+		this.setCharacter(null);
+		
+		return true;
+	}
+	
 	public Collection<GameCharacter> getCloseAllies()
 	{
 		Collection<Cell> cells = this.getGame().getMap().getNearbyCells(
 				this.getCharacter().getCell().getX(),
 				this.getCharacter().getCell().getY(),
-				10);
+				5);
 		
 		Collection<GameCharacter> allies = new ArrayList<>();
 		for(Cell c : cells)
@@ -123,15 +155,20 @@ public class SimpleAIController extends AIController
 	}
 
 	@Override
-	public int getFollowerCount()
+	public int getFollowerCount(AIController source)
 	{
+		if(source == this)
+			return 0;
+		if(source == null)
+			source = this;
+		
 		int count = 0;
 		
 		synchronized(this.followers)
 		{
 			for(AIController c : this.followers)
 			{
-				count += c.getFollowerCount()+1;
+				count += c.getFollowerCount(source)+1;
 			}
 		}
 		
@@ -139,12 +176,12 @@ public class SimpleAIController extends AIController
 	}
 	
 	@Override
-	public int getGroupSize()
+	public int getGroupSize(int depth)
 	{
-		if(this.leader == null)
-			return this.getFollowerCount()+1;
+		if(depth <= 0 || this.leader == null)
+			return this.getFollowerCount(null)+1;
 		else
-			return this.leader.getGroupSize();
+			return this.leader.getGroupSize(depth-1);
 	}
 
 	@Override
@@ -160,10 +197,10 @@ public class SimpleAIController extends AIController
 			}
 		}
 		
-		if(this.getFollowerCount() == 0)
+		if(this.getFollowerCount(null) == 0)
 			return 0;
 		else
-			return sum/this.getFollowerCount();
+			return sum/this.getFollowerCount(null);
 	}
 	
 	public float getSatisfaction()
@@ -196,5 +233,17 @@ public class SimpleAIController extends AIController
 		{
 			this.followers.remove(c);
 		}
+	}
+
+	@Override
+	public void removeLeader()
+	{
+		this.leader = null;
+	}
+
+	@Override
+	public boolean isAlive()
+	{
+		return this.getCharacter() != null && !this.getCharacter().isDead();
 	}
 }

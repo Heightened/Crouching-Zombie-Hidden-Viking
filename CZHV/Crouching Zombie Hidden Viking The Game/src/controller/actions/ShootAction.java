@@ -43,7 +43,7 @@ public class ShootAction implements Action {
 		return false;
 	}
 
-	private boolean hitSuccess(int accuracy){
+	private boolean hitSuccess(float accuracy){
 		return Math.random() < accuracy;
 	}
 

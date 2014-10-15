@@ -9,7 +9,7 @@ public abstract class PathFinder
 {
 	
 	private int radius;
-	private Map map;
+	protected Map map;
 	private GameCharacter character;
 	
 	public PathFinder(Map map, int radius, GameCharacter character)
@@ -23,6 +23,11 @@ public abstract class PathFinder
 	{
 		return new PathFindingMap(this.map.getNearbyCells(x, y, this.radius), this.character, 
 				this.map.getWidth(), this.map.getHeight());
+	}
+	
+	public GameCharacter getCharacter()
+	{
+		return this.character;
 	}
 	
 	// returns a path from (x1,y1) to (x2,y2)

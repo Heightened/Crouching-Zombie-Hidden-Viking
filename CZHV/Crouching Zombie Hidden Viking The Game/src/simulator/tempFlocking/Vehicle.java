@@ -22,7 +22,7 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f targetVelocity;
 	final float max_speed = 2f;//final for performance
 	final float max_force = 0.20f;
-	final float mass = 5;
+	final float mass = 1;
 	Vector4f prevPosition;
 	protected Vector4f target;
 	protected float targetRadius;
@@ -41,16 +41,16 @@ public class Vehicle extends Dummy3DObj{
 	
 	public void setFlockingTargetCell(Cell c){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) c.getX() + 0.5f) * scaling;
-		float tZ = ((float) c.getY() + 0.5f) * scaling;
+		float tX = c.getX() * scaling;
+		float tZ = c.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetNode(Node n){
 		float scaling = Renderer3D.cellSize;
-		float tX = ((float) n.getX() + 0.5f) * scaling;
-		float tZ = ((float) n.getY() + 0.5f) * scaling;
+		float tX = n.getX() * scaling;
+		float tZ = n.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
 		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
@@ -74,7 +74,7 @@ public class Vehicle extends Dummy3DObj{
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
 						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*1);//all performance issues here
 						/*
-Ik heb in simulator speed x10 gedaan (door ms te delen too 100 ipv 1000), en toen kreeg ik dit:
+TODO: exception
 Exception in thread "Thread-11" java.lang.NullPointerException
 	at simulator.tempFlocking.Vehicle.update(Vehicle.java:48)
 	at simulator.tempFlocking.FlockingManager.loop(FlockingManager.java:36)
@@ -87,14 +87,14 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 				Iterator<Cell> iterC = map.getImpassibleCells(x, y).iterator();
 				while(iterC.hasNext()){
 					Cell c = iterC.next();
-					Vector2f vec = fleeTarget(new Vector4f(((float) c.getX() + 0.5f) * scaling, 0, 
-							((float) c.getY() + 0.5f) * scaling, 1), Renderer3D.cellSize*1.5f);
+					Vector2f vec = fleeTarget(new Vector4f(c.getX() * scaling, 0, 
+							c.getY() * scaling, 1), Renderer3D.cellSize*1.0f);
 					if(vec.x > vec.y) {
 						steering.x += (vec.x + vec.y)*2f;
-						steering.y += vec.y*2f;
+						steering.y += vec.y*1f;
 					} else {
 						steering.y += (vec.x + vec.y)*2f;
-						steering.x += vec.x*2f;
+						steering.x += vec.x*1f;
 					}
 					//steering.x += vec.x*2f;
 					//steering.y += vec.y*2f;

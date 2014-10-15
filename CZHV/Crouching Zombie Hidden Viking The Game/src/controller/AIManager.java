@@ -94,11 +94,11 @@ public class AIManager implements MapChangeListener {
 		public void run(){
 			running = true;
 			while(running){
-				if(System.currentTimeMillis() - time > 5000)
+				if(System.currentTimeMillis() - time > 1000)
 				{
 					time = System.currentTimeMillis();
 					
-					System.out.println("Handled "+count+" AI ticks in 5 seconds.");
+					System.out.println("Handled "+count+" AI ticks in 1 seconds. Current Queue size: "+activeControllers.size());
 					
 					count= 0;
 				}
@@ -107,7 +107,8 @@ public class AIManager implements MapChangeListener {
 					if(temp != null){
 						temp.update();
 						count++;
-						activeControllers.put(temp);
+						if(temp.isAlive())
+							activeControllers.put(temp);
 					}
 					try{
 						//sleep for one millisecond

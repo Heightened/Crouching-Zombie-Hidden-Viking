@@ -10,6 +10,8 @@ import util.SortedList;
 public class Astar extends PathFinder
 {
 	private PathFindingMap currentMap;
+	final float unknownCellWeight = 1.2f;
+	final float impassibleWeight = 3f;
 	
 	public Astar(Map map, int radius, GameCharacter character)
 	{
@@ -24,16 +26,28 @@ public class Astar extends PathFinder
 	
 	public List<Node> calculatePath(Node start, Node goal)
 	{
-		if(start == goal || goal == null || start == null) return null;
+		if(start == goal || goal == null || start == null)
+		{
+			return null;
+		}
 		
 		//System.out.println("START PATHFINDING");
 		SortedList<Node> closedset = new SortedList<>();
 		SortedList<Node> openset = new SortedList<>();
 		
-		if (goal.isSolid()){
+		if (goal.isSolid())
+		{
 			return null;
 		}
-		if (start.isSolid()){
+		if (start.isSolid())
+		{
+			if(!this.getCharacter().isInfected())
+			{
+				System.out.println("regel 49");
+				System.out.println("position of character: ("+getCharacter().getAbsX()+", "+getCharacter().getAbsY()+")");
+				for(Node n : start.getNeighbours())
+					System.out.println("("+n.getX()+", "+n.getY()+")");
+			}
 			return null;
 		}
 		openset.add(start);
@@ -44,17 +58,18 @@ public class Astar extends PathFinder
 		int counter = 0;//counts number of nodes processed
 		while (!openset.isEmpty()){
 			counter++;
-			if (counter > 100){
+			//if (counter > 100){
 				//visited too much nodes, destination unreachable or too far away
 				//bail
 				//System.out.println("PATH NOT FOUND/TOO FAR AWAY");
-				break;
-			}
+				//break;
+			//}
 			Node current = openset.getFirst();
 			//System.out.println("it current:" + current.x + " " + current.y);
 			
 			if (current.equals(goal)){
-				//System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
+				if(!this.getCharacter().isInfected())
+					System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
 				return reconstructPath( goal, start);
 			}
 			
@@ -63,10 +78,15 @@ public class Astar extends PathFinder
 			for (Node n : current.getNeighbours()){
 				//System.out.println(n.x + " " + n.y);
 				//if (n.isSolid()){System.out.println("SOLID");}
-				if(n.isSolid()) continue;//non-passable terrain, ignore
+				if(n.isSolid() || currentMap.getNode(current.getX(), n.getY()).isSolid() ||
+						currentMap.getNode(n.getX(), current.getY()).isSolid()) continue;//non-passable terrain, ignore
 				
 				//System.out.println("Neighbour:" + n.x + " " + n.y);
-				float tentative_g_score = current.path_length + Node.distance(n, current);
+				float weight = 1;
+				if(n.type == PathFindingMap.CellType.UNKNOWN) weight *= unknownCellWeight;
+				if(!this.map.getCell(n.getX(), n.getY()).isFree(null)) weight *= impassibleWeight;
+				
+				float tentative_g_score = current.path_length + weight * Node.distance(n, current);
 				float tentative_f_score = tentative_g_score + Node.distance(n, goal);
 				
 				//System.out.println("fscore " + tentative_f_score +" neighbourscore = " + n.getScore());
@@ -86,7 +106,9 @@ public class Astar extends PathFinder
 			}
 		}
 		//System.out.println("NO PATH");
-		//System.out.println("NO PATH FOUND");
+		if(!this.getCharacter().isInfected())
+			System.out.println("NO PATH FOUND");
+		
 		return null;
 	}
 	

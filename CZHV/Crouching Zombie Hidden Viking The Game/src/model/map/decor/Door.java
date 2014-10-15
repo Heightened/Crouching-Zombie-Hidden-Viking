@@ -22,6 +22,6 @@ public class Door extends Decor
 	
 	public boolean isPassible(GameCharacter c)
 	{
-		return c.hasSkill(GameCharacter.Skill.OPEN_DOOR);
+		return c==null || c.hasSkill(GameCharacter.Skill.OPEN_DOOR);
 	}
 }

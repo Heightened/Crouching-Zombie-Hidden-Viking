@@ -23,12 +23,15 @@ import view.renderer3D.core.RendererInfoInterface;
 import controller.actions.GroupMoveAction;
 import controller.actions.PickupAction;
 import controller.actions.ShootAction;
+import controller.actions.StopMovingAction;
 
 public class InputManager extends ConcreteController{
 	
 	private RendererInfoInterface renderer;
 	private ArrayList<GameCharacter> selectedCharacters;
 	private ActionThreadFactory af= new ActionThreadFactory();
+	ActionThread attack = af.attackThread();
+	ActionThread pickUp = af.pickUpItemThread();
 	
 	public InputManager(Game game, RendererInfoInterface renderer){
 		super(game);
@@ -43,41 +46,74 @@ public class InputManager extends ConcreteController{
 	}
 	
 	public void stopManager(){
+		stopThreads(pickUp);
+		stopThreads(attack);
 		Keyboard.destroy();
-		Mouse.destroy();
+		Mouse.destroy();		
 	}
 	
 	
 	private Point startClick;
 	private Point endClick;
-	private boolean attackEnabled;
 	
 	public void pollInput(){
 		while(Mouse.next() || Keyboard.next()){
 			//if left mouse button was pressed
 			if(Mouse.getEventButton() == 0){
-				//select cells
-				Collection<Cell> selected = selector();
-				if(selected != null){
-					for(Cell c: selected){
-						//get the characters
-						List<GameCharacter> characters = c.getCharacterHolder().getItem();
-						//if characters were selected add them to the selection
-						for(GameCharacter character: characters){
-							if(!character.isSelected()){
-								character.setSelected(true);
-								selectedCharacters.add(character);
+				
+				if(Mouse.getEventButtonState()){
+					startClick = new Point(Mouse.getX(), Mouse.getY());
+				} else {
+					Collection<Cell> selected = selector();
+					if (startClick != null) {
+						// select cells
+						ArrayList<GameCharacter> temp = new ArrayList<GameCharacter>();
+						temp.addAll(selectedCharacters);
+						if (selected != null) {
+							for (GameCharacter gc : selectedCharacters) {
+								gc.setSelected(false);
 							}
+							selectedCharacters.clear();
+							for (Cell c : selected) {
+								// get the characters
+								List<GameCharacter> characters = c
+										.getCharacterHolder().getItem();
+								// if characters were selected add them to the
+								// selection
+								if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT
+										|| Keyboard.getEventKey() == Keyboard.KEY_RSHIFT) {
+									if (Keyboard.getEventKeyState()) {
+										for (GameCharacter character : characters) {
+
+											temp.add(character);
+											selectedCharacters = temp;
+										}
+										for (GameCharacter character : selectedCharacters) {
+											character.setSelected(true);
+										}
+									}
+								} else {
+
+									for (GameCharacter character : characters) {
+										if (!character.isSelected()) {
+											character.setSelected(true);
+											selectedCharacters.add(character);
+										}
+									}
+								}
+							}
+						} else {
+							// if no characters were selected deselect all
+							// characters
+							for (GameCharacter character : selectedCharacters) {
+								character.setSelected(false);
+							}
+							selectedCharacters.clear();
 						}
 					}
-				} else {
-					//if no characters were selected deselect all characters
-					for(GameCharacter character: selectedCharacters){
-						character.setSelected(false);
-					}
-					selectedCharacters.clear();
+					startClick = null;
 				}
-			}
+			} 
 			//right mouse button
 			if(Mouse.getEventButton() == 1){				
 				if(Mouse.getEventButtonState()) {
@@ -85,75 +121,108 @@ public class InputManager extends ConcreteController{
 					//TODO click on viking while selected: open inventory
 					//TODO clicked/drag from any tile while nothing selected, selection mode
 					startClick = new Point(Mouse.getX(), Mouse.getY());
-				}else{
+				} else {
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
 						if (obj != null){
+							if(Keyboard.getEventKey() == Keyboard.KEY_A){
+								//if mouse clicked and A pressed
+								if(Keyboard.getEventKeyState()){
+									if (obj instanceof Vector2f){
+										doAttack(null);
+									}	
+									if (obj instanceof Cell){
+										doAttack((Cell) obj);
+									}
+								} 
+							}
 							if (obj instanceof Vector2f){
 								doGroupMoveAction((Vector2f)obj);
 							}	
 							if (obj instanceof Cell){
-								if(attackEnabled){
-									doAttack((Cell)obj);
-								}
 								doPickupItem((Cell)obj);
 							}
 						}
 					}
+					startClick = null;
 				}
 			}			
-			if(Keyboard.getEventKey() == Keyboard.KEY_A){
-				if(!Keyboard.getEventKeyState()){
-					attackEnabled = !attackEnabled;
-					if(attackEnabled){
-						doAttack(null);// 
-					} else {
-						stopThreads(attack);
+
+			if(Keyboard.getEventKey() == Keyboard.KEY_S){
+				boolean startPress = false;
+				if(Keyboard.getEventKeyState()){
+					startPress = true;
+				} else {
+					if(startPress){
+						startPress = false;
+						for(GameCharacter g: selectedCharacters){
+							if(getGame().getControlledCharacters().contains(g)){
+								getGame().getActionBuffer().add(new StopMovingAction(g));
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+	
+	private Collection<Cell> selector(){
+		Collection<Cell> selection;
+		if (startClick != null){
+			endClick = new Point(Mouse.getX(), Mouse.getY());
+			double distance = Math.abs(endClick.x - startClick.x) + Math.abs(endClick.y - startClick.y);
+			//distance determines whether we select with selectbox or a single point
+			if (distance > 10){
+				return renderer.squareSelect(startClick, endClick);
+			} else {
+				Object obj = renderer.click(startClick.x, startClick.y);
+				if (obj != null){
+					if (obj instanceof Cell){
+						selection = new ArrayList<Cell>();
+						selection.add((Cell)obj);
+						return selection;
+					}
+				}
+			}
+		} 
+		return null;
+	}
 
-	ActionThread attack = af.attackThread();
 	private void doAttack(Cell cell) {
-		stopThreads(attack); //halt the previous attack command
+		stopThreads(attack);
 		attack = af.attackThread();
-		attack.start();
 		//if a target cell was specified we target it with the selected characters
 		if(cell != null){
 			List<GameCharacter> characters = cell.getCharacterHolder().getItem();
 			for(GameCharacter c: characters){
 				if(c.isInfected()){				
-					doGroupMoveAction(cellToVector2f(c.getCell()));
 					//only one attack thread may spawn
+					attack.addAttackers(getControllableCharacters());
 					attack.setTarget(c);
 				}
 			}
 		} else {
-			//if no target specified everything is a target and all controlled characters become the source
+			attack.addAttackers(getControllableCharacters());
 			attack.setTargets(getGame().getUndead());
 		}
+		attack.start();
 	}
 	
 	private void stopThreads(ActionThread at) {
 		if(at.isAlive()){				
 			try {
 				at.cancel();
-				at.join();
+				at.join(0);
 			} catch (InterruptedException e) {
 				// nothing to do here
 			}
 		}
 	}
 	
-	ActionThread pickUp = af.pickUpItemThread();
 	private void doPickupItem(Cell c) {
-		Item i = c.getItemHolder().getItem();
-		doGroupMoveAction(cellToVector2f(c));
-		//only one pickup thread may spawn
 		stopThreads(pickUp);
-		pickUp = af.pickUpItemThread();
+		pickUp = af.pickUpItemThread();		
+		doGroupMoveAction(cellToVector2f(c));
 		pickUp.start();
 		//TODO stuff here
 	}
@@ -168,11 +237,11 @@ public class InputManager extends ConcreteController{
 			GroupMoveAction m = new GroupMoveAction(controllable,  vec.getX(), vec.getY());
 			getGame().getActionBuffer().add(m);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//Nothing has to be done
 		}
 	}
 
-	private ArrayList<GameCharacter> getControllableCharacters() {
+	protected ArrayList<GameCharacter> getControllableCharacters() {
 		ArrayList<GameCharacter> controllable = new ArrayList<GameCharacter>();
 		for(GameCharacter c: selectedCharacters){
 			if(getGame().getControlledCharacters().contains(c)){
@@ -181,41 +250,12 @@ public class InputManager extends ConcreteController{
 		}
 		return controllable;
 	}
-	
-	private Collection<Cell> selector(){
-		Collection<Cell> selection;
-		if(Mouse.getEventButtonState()){
-			startClick = new Point(Mouse.getX(), Mouse.getY());
-		} else {
-			if (startClick != null){
-				endClick = new Point(Mouse.getX(), Mouse.getY());
-				double distance = Math.abs(endClick.x - startClick.x) + Math.abs(endClick.y - startClick.y);
-				//distance determines whether we select with selectbox or a single point
-				if (false || distance > 10){
-					return renderer.squareSelect(startClick, endClick);
-				} else {
-					Object obj = renderer.click(startClick.x, startClick.y);
-					if (obj != null){
-						if (obj instanceof Cell){
-							selection = new ArrayList<Cell>();
-							selection.add((Cell)obj);
-							return selection;
-						}
-					}
-				}
-			} 
-			startClick = null;
-		}
-		return null;
-	}
-	
-
-	
+		
 	class ActionThread extends Thread{
-		protected boolean running;
+		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
+		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
-		private Item i;
 		
 		public void cancel(){
 			running = false;
@@ -225,8 +265,24 @@ public class InputManager extends ConcreteController{
 			return c.isAtTarget() && c.getPath() == null;		
 		}
 		
-		public boolean nearby(GameCharacter c, GameCharacter c2, int radius){
+		public boolean nearby(GameCharacter c, GameCharacter c2, float radius){
 			return c.distanceTo(c2)<radius;
+		}
+		
+		public void addAttackers(ArrayList<GameCharacter> attackers){
+			for(GameCharacter gc: attackers){
+				if(!this.attacker.contains(gc)){
+					this.attacker.add(gc);
+				}
+			}
+		}
+		
+		public void removeAttackers(ArrayList<GameCharacter> attackers){
+			for(GameCharacter gc: attackers){
+				if(this.attacker.contains(gc)){
+					this.attacker.remove(gc);
+				}
+			}
 		}
 		
 		//puts the target at the head of the list
@@ -249,51 +305,58 @@ public class InputManager extends ConcreteController{
 				@Override
 				public void run(){
 					while(running){
-						if(focusedTarget != null){
-							for (GameCharacter c : getGame().getControlledCharacters()) {
-								ItemSlot[] inventory = c.getBag().getInventory();
-								Weapon v = getWeapon(inventory);
-								if (nearby(c, focusedTarget, v.getRange())) {
-									getGame().getActionBuffer().add(new ShootAction(v, c, focusedTarget));
-									if (focusedTarget.isDead()) {
-										focusedTarget = null;
+						int numChars = getControllableCharacters().size();
+						GameCharacter[] lockedTargets = new GameCharacter[numChars];
+						ArrayList<GameCharacter> characters = getControllableCharacters();
+						for(int i = 0; i<characters.size(); i++) {
+							if(focusedTarget!=null){
+								if(focusedTarget.isDead()){
+									focusedTarget = null;
+								} else {
+									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()));
+								}
+								if(getControllableCharacters().contains(characters.get(i))){
+									lockedTargets[i] = focusedTarget;
+								}
+							}
+							Iterator<GameCharacter> iter = targets.iterator();
+							GameCharacter gc = characters.get(i);
+							ItemSlot[] inventory = gc.getBag().getInventory();
+							Weapon v = getWeapon(inventory);
+							float range = 1;
+							if(v != null){
+								range = v.getRange();
+							}
+							while(lockedTargets[i] == null && iter.hasNext()){
+								GameCharacter enemy = iter.next();
+								if(!enemy.isDead()){									
+									if(nearby(gc, enemy, range)){
+										lockedTargets[i] = enemy;
 									}
+								} else {
+									iter.remove();
 								}
 								
-							}
-						} else {
-							int numChars = getGame().getControlledCharacters().size();
-							GameCharacter[] lockedTargets = new GameCharacter[numChars];
-							for(int i = 0; i<getGame().getControlledCharacters().size(); i++) {
-								Iterator<GameCharacter> iter = targets.iterator();
-								GameCharacter gc = getGame().getControlledCharacters().get(i);
-								ItemSlot[] inventory = gc.getBag().getInventory();
-								Weapon v = getWeapon(inventory);
-								while(lockedTargets[i] == null && iter.hasNext()){
-									GameCharacter enemy = iter.next();
-									if(!enemy.isDead()){
-										if(nearby(gc, enemy, v.getRange())){
-											lockedTargets[i] = enemy;
-										}
-									} else {
-										iter.remove();
-									}
-									
-								} 
+							} 
+							if(lockedTargets[i]!=null){
 								if(lockedTargets[i].isDead()){
 									lockedTargets[i] = null;
 								}
-								if(lockedTargets[i]!=null){
-									if(nearby(gc, lockedTargets[i], v.getRange())){
-										getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
-									} else {
-										lockedTargets[i] = null;
-									}
+								if(nearby(gc, lockedTargets[i], v.getRange())){
+									getGame().getActionBuffer().add(new StopMovingAction(gc));
+									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
+								} else {
+									lockedTargets[i] = null;
 								}
 							}
 						}
-					}
-					
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}		
 				}
 				
 				private Weapon getWeapon(ItemSlot[] inventory) {
@@ -316,7 +379,14 @@ public class InputManager extends ConcreteController{
 						for(GameCharacter gc: selectedCharacters){
 							if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
 								getGame().getActionBuffer().add(new PickupAction(gc));
+								cancel();
 							}
+						}
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}

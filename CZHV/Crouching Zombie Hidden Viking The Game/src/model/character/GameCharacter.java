@@ -23,7 +23,7 @@ public class GameCharacter extends Vehicle{
 	private int strength = 0;
 	private float maxSpeed = 0;
 	private float speedX = 0, speedY = 0;
-	private float x=0.5f,y=0.5f; // in-cell position 0<=x<1 and 0<=y<1
+	private float x=0.0f,y=0.0f; // in-cell position 0<=x<1 and 0<=y<1
 	
 	private Map<Skill, Boolean> skills = new HashMap<>();
 	private boolean infected;
@@ -32,7 +32,7 @@ public class GameCharacter extends Vehicle{
 	private PathFinder pathFinder;
 	private List<Node> path;
 	private int pathPointer;
-	private int accuracy;
+	private float accuracy = 1;
 	private boolean selected;
 	
 	public GameCharacter(){
@@ -80,8 +80,7 @@ public class GameCharacter extends Vehicle{
 				if (pathPointer >= path.size() - 1)
 				{
 					this.setFlockingTargetRadius(0.5f);
-					this.path = null;
-					this.pathPointer = 0;
+					stopMovement();
 				}
 			}
 		}
@@ -114,7 +113,7 @@ public class GameCharacter extends Vehicle{
 				//System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}*/
-			this.setFlockingTargetRadius(2.0f);
+			this.setFlockingTargetRadius(1.0f);
 			this.pathPointer = 0;
 			this.path = nodes;
 			this.setFlockingTargetNode(path.get(pathPointer));
@@ -222,11 +221,11 @@ public class GameCharacter extends Vehicle{
 		return bag;
 	}
 
-	public int getAccuracy() {
+	public float getAccuracy() {
 		return accuracy;
 	}
 
-	public void setAccuracy(int accuracy) {
+	public void setAccuracy(float accuracy) {
 		this.accuracy = accuracy;
 	}
 

@@ -10,6 +10,7 @@ import pathfinding.Astar;
 import util.Rand;
 import model.character.GameCharacter;
 import model.item.Item;
+import model.item.Weapon;
 
 
 public class Map implements ChangeListener<Cell>
@@ -30,11 +31,11 @@ public class Map implements ChangeListener<Cell>
 	public void populate()
 	{
 		int size = this.grid.length * this.grid[0].length;
-		int n = Rand.randInt(size/60, size/30);
+		int n = Rand.randInt(size/300, size/200);
 		
 		for(int i=0; i<n; i++)
 		{
-			int l = Rand.randInt(10, 20);
+			int l = Rand.randInt(30, 100);
 			
 			int x = Rand.randInt(0, this.grid.length);
 			int y = Rand.randInt(0, this.grid[0].length);
@@ -62,7 +63,7 @@ public class Map implements ChangeListener<Cell>
 			}
 		}
 		
-		int nZombies = 30; //this.randInt(size/600, size/300);
+		int nZombies = 60; //this.randInt(size/600, size/300);
 		
 		for(int i=0; i<nZombies; i++)
 		{
@@ -93,6 +94,7 @@ public class Map implements ChangeListener<Cell>
 			int x,y;
 			GameCharacter c = new GameCharacter(128,16,16,2,false);
 			c.setPathFinder(new Astar(this,100,c));
+			c.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 2, 0.7f));
 			
 			do
 			{
@@ -108,6 +110,25 @@ public class Map implements ChangeListener<Cell>
 				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
 			}
 			controlled.add(c);
+			
+		}
+		
+		
+		int nItems = 10; //Rand.randInt(size/600, size/300);
+		
+		for(int i=0; i<nItems; i++)
+		{
+			int x,y;
+			Item item = new Item();
+			
+			do
+			{
+				x = Rand.randInt(0, this.getWidth() - 1);
+				y = Rand.randInt(0, this.getHeight() - 1);
+			}
+			while(!this.getCell(x, y).isFree(null));
+			
+			this.getCell(x,y).getItemHolder().setItem(item);
 			
 		}
 		//*/

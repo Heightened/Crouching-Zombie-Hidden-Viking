@@ -35,9 +35,9 @@ public abstract class AIController implements Controller {
 		this.gameChar = character;
 	}
 
-	public abstract int getFollowerCount();
+	public abstract int getFollowerCount(AIController source);
 	
-	public abstract int getGroupSize();
+	public abstract int getGroupSize(int depth);
 
 	public abstract float getSatisfactionLevel();
 
@@ -52,4 +52,8 @@ public abstract class AIController implements Controller {
 	public abstract Strategy getOrders(AIController c);
 
 	public abstract Collection<AIController> getFollowers();
+
+	public abstract void removeLeader();
+
+	public abstract boolean isAlive();
 }

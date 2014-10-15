@@ -2,7 +2,7 @@ package controller.actions;
 
 import model.Game;
 import model.character.GameCharacter;
-import model.character.Inventory;
+import model.item.Item;
 
 
 public class PickupAction implements Action{
@@ -14,9 +14,12 @@ public class PickupAction implements Action{
 	
 	@Override
 	public boolean perform(Game g){
-		if(chara.getBag().addItem(chara.getCell().getItemHolder().getItem())){
-			chara.getCell().getItemHolder().removeItem();
-			return true;
+		Item item = chara.getCell().getItemHolder().getItem();
+		if(item != null){
+			if(chara.getBag().addItem(item)){
+				chara.getCell().getItemHolder().removeItem();
+				return true;
+			}
 		}
 		return false;
 	}

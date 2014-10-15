@@ -14,6 +14,15 @@ public class StupidStrategyChooser implements StrategyChooser
 	@Override
 	public Strategy choose(AIController leader, long dtime)
 	{
+		return this.choose(leader, dtime, false);
+	}
+	
+	@Override
+	public Strategy choose(AIController leader, long dtime, boolean justFollowed)
+	{
+		if(leader != null && justFollowed)
+			this.currentStrategy = new Follow(leader.getCharacter());
+		
 		if(this.currentStrategy == null)
 			if(leader ==  null)
 				this.currentStrategy = new Wander();

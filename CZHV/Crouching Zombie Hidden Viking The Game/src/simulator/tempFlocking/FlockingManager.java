@@ -27,6 +27,9 @@ public class FlockingManager {
 
 	public void loop(ChunkedMap flockingMap){
 		for (GameCharacter v : vlist){
+			if(v == null)
+				System.out.println("------------------ v == null");
+			
 			v.setPosition(v.getAbsX()*Renderer3D.cellSize, 0, v.getAbsY()*Renderer3D.cellSize);
 		}
 		for (GameCharacter v : vlist){

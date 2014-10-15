@@ -90,11 +90,11 @@ public class Dummy3DObj {
 	
 	public void update() {
 		if (mesh == null){
-			mesh = new Animation(120, "Animation/Cube/cube");
+			//mesh = new Animation(120, "Animation/Cube/cube");
 		}
 		animationTime += 0.005f ;
 		animationTime %= 1.0f;
-		mesh.setTime(animationTime);
+		//mesh.setTime(animationTime);
 	}
 	
 	private float scalex = scale;
@@ -162,9 +162,9 @@ public class Dummy3DObj {
 		calcModelMatrix();
 		shader.putMat4("modelMatrix", modelMatrix);
 		
-		//shader.bindTexture("texture", Resource.vikingTexture);
-		//Resource.viking.draw(shader);
-		mesh.draw(shader);
+		shader.bindTexture("texture", Resource.vikingTexture);
+		Resource.viking.draw(shader);
+		//mesh.draw(shader);
 		/*
         mesh.bind();
         mesh.prepareForDraw(shader);

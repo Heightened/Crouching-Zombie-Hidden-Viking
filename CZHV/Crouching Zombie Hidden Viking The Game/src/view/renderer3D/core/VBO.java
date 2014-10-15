@@ -98,7 +98,7 @@ public class VBO {
 		setAttrPointer(shader,"in_position", 3, GL11.GL_FLOAT, false, 32, 0);
 		setAttrPointer(shader,"in_normal", 3, GL11.GL_SHORT, true, 32, 12);
 		setAttrPointer(shader,"in_tangent", 3, GL11.GL_SHORT, true, 32, 18);
-		setAttrPointer(shader,"in_texcoord", 2, GL11.GL_SHORT, false, 32, 24);
+		setAttrPointer(shader,"in_texcoord", 2, GL11.GL_SHORT, true, 32, 24);
 		ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 	}
 	
