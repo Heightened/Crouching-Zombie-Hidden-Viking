@@ -38,11 +38,8 @@ public class GroupMoveAction implements Action{
 			merged = PathFindingMap.mergeMap(maps);
 		}
 		
-		Node startNode = merged.getNode(avgX, avgY);
-		Node goalNode = merged.getNode(x, y);
-		
 		Astar pathfinder = (Astar) characters.get(0).getPathFinder();
-		List<Node> path = pathfinder.calculatePath(startNode, goalNode);
+		List<Node> path = pathfinder.calculatePath(avgX, avgY, x, y);
 		
 		for(GameCharacter gc: characters){
 			//TODO use smarter follow path
