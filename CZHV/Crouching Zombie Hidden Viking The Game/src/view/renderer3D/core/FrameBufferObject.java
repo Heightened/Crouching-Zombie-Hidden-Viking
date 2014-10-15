@@ -71,6 +71,7 @@ public class FrameBufferObject {
         }
         checkOK();
         unBind();
+        TOOLBOX.checkGLERROR(true);
     }
     
     public void bind(){
@@ -96,7 +97,7 @@ public class FrameBufferObject {
             attachments.add(attachment);
         }
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,GL_TEXTURE_2D, t.getTextureID(), 0);
-        TOOLBOX.checkGLERROR();
+        TOOLBOX.checkGLERROR(true);
     }
     
     public void drawBufferNone(){
@@ -110,6 +111,7 @@ public class FrameBufferObject {
             TOOLBOX.printStackTraceFromHere();
             System.exit(0);
         }
+        TOOLBOX.checkGLERROR(true);
     }
     
     private void classInv(){

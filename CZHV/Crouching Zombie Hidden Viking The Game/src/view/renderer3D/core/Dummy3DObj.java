@@ -1,6 +1,7 @@
 package view.renderer3D.core;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
@@ -9,8 +10,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.resources.Animation;
-import view.renderer3D.core.resources.Model;
-import view.renderer3D.core.resources.Resource;
 
 public class Dummy3DObj {
 	private static Animation mesh;
@@ -98,26 +97,61 @@ public class Dummy3DObj {
 		mesh.setTime(animationTime);
 	}
 	
+	private float scalex = scale;
+	private float scaley = scale*4;
+	private float scalez = scale;
+	
+	public ArrayList<Vector3f> drawBoundingBox(){
+		ArrayList<Vector3f> bb = new ArrayList<>();
+		//top
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z - scalez));
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z - scalez));
+
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z - scalez));
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z + scalez));
+
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z + scalez));
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z - scalez));
+
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z + scalez));
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z + scalez));
+		
+		//bottom
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z - scalez));
+		bb.add(new Vector3f(position.x - scalex,position.y,position.z - scalez));
+
+		bb.add(new Vector3f(position.x - scalex,position.y + scaley,position.z + scalez));
+		bb.add(new Vector3f(position.x - scalex,position.y,position.z + scalez));
+
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z - scalez));
+		bb.add(new Vector3f(position.x + scalex,position.y,position.z - scalez));
+
+		bb.add(new Vector3f(position.x + scalex,position.y + scaley,position.z + scalez));
+		bb.add(new Vector3f(position.x + scalex,position.y,position.z + scalez));
+		
+		return bb;
+	}
+	
 	public boolean checkAABB(Line3D ray){
-		Vector3f top = ray.collideXZPlane(this.position.y-scale);
-		Vector3f bottom = ray.collideXZPlane(this.position.y+scale);
-		Vector3f front = ray.collideYZPlane(this.position.x-scale);
-		Vector3f back = ray.collideYZPlane(this.position.x+scale);
-		Vector3f left = ray.collideXYPlane(this.position.z-scale);
-		Vector3f right = ray.collideXYPlane(this.position.z+scale);
-		if (top != null && inBetween(top.x, this.position.x) && inBetween(top.z, this.position.z)) return true;
-		if (bottom != null && inBetween(bottom.x, this.position.x) && inBetween(bottom.z, this.position.z)) return true;
+		Vector3f top = ray.collideXZPlane(this.position.y-scaley);
+		Vector3f bottom = ray.collideXZPlane(this.position.y+scaley);
+		Vector3f front = ray.collideYZPlane(this.position.x-scalex);
+		Vector3f back = ray.collideYZPlane(this.position.x+scalex);
+		Vector3f left = ray.collideXYPlane(this.position.z-scalez);
+		Vector3f right = ray.collideXYPlane(this.position.z+scalez);
+		if (top != null && inBetween(top.x, this.position.x, scalex) && inBetween(top.z, this.position.z, scalez)) return true;
+		if (bottom != null && inBetween(bottom.x, this.position.x, scalex) && inBetween(bottom.z, this.position.z, scalez)) return true;
 
-		if (front != null && inBetween(front.y, this.position.y) && inBetween(front.z, this.position.z)) return true;
-		if (back != null && inBetween(back.y, this.position.y) && inBetween(back.z, this.position.z)) return true;
+		if (front != null && inBetween(front.y, this.position.y, scaley) && inBetween(front.z, this.position.z, scalez)) return true;
+		if (back != null && inBetween(back.y, this.position.y, scaley) && inBetween(back.z, this.position.z, scalez)) return true;
 
-		if (left != null && inBetween(left.x, this.position.x) && inBetween(left.y, this.position.y)) return true;
-		if (right != null && inBetween(right.x, this.position.x) && inBetween(right.y, this.position.y)) return true;
+		if (left != null && inBetween(left.x, this.position.x, scalex) && inBetween(left.y, this.position.y, scaley)) return true;
+		if (right != null && inBetween(right.x, this.position.x, scalex) && inBetween(right.y, this.position.y, scaley)) return true;
 		
 		return false;
 	}
 	
-	public boolean inBetween(float source, float pos){
+	public boolean inBetween(float source, float pos, float scale){
 		if (source >= pos - scale && source <= pos + scale){
 			return true;
 		}

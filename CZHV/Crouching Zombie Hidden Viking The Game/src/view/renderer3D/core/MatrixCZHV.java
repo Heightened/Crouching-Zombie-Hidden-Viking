@@ -88,7 +88,9 @@ public class MatrixCZHV {
 	}
 	
 	public static Line3D getPickingRayStartDir(float mousex, float mousey, Vector3f camPos, Matrix4f viewMatrix, Matrix4f projectionMatrix){
-        Vector4f startpoint = new Vector4f(camPos.x, camPos.y, camPos.z, 1);
+        Vector4f startpoint = new Vector4f(camPos.x, camPos.y,camPos.z, 1);
+        
+        mousey *= -1;
         
         Vector3f norm = new Vector3f(
         		mousex,
@@ -106,7 +108,10 @@ public class MatrixCZHV {
         
         Vector4f dir = new Vector4f();
         Vector4f.sub(endpoint, startpoint, dir);
+        dir.w = 0;
         dir.normalise();
+
+        dir.y *= -1;
         
         return new Line3D(startpoint, dir);
     }

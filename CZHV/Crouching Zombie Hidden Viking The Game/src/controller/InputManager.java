@@ -191,7 +191,7 @@ public class InputManager extends ConcreteController{
 				endClick = new Point(Mouse.getX(), Mouse.getY());
 				double distance = Math.abs(endClick.x - startClick.x) + Math.abs(endClick.y - startClick.y);
 				//distance determines whether we select with selectbox or a single point
-				if (distance > 10){
+				if (false || distance > 10){
 					return renderer.squareSelect(startClick, endClick);
 				} else {
 					Object obj = renderer.click(startClick.x, startClick.y);
@@ -204,6 +204,7 @@ public class InputManager extends ConcreteController{
 					}
 				}
 			} 
+			startClick = null;
 		}
 		return null;
 	}

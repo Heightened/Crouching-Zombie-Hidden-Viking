@@ -9,7 +9,6 @@ import java.util.List;
 
 import model.Game;
 import model.character.GameCharacter;
-import model.item.Item;
 import model.map.Cell;
 import model.map.Map;
 
@@ -20,6 +19,9 @@ import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
@@ -50,7 +52,7 @@ public class Renderer3D implements RendererInfoInterface{
 	private DEMOselecter selecter;
 	private LightManager lightManager;
 	private ShadowManager shadowManager;
-	
+
 	private FlockingManager flockingManager;
 	private Vector4f flockingTarget;
 	private Model quadModel;
@@ -60,6 +62,23 @@ public class Renderer3D implements RendererInfoInterface{
 	private ViewGrid viewGrid;
 	private Collection<Cell> activeCells;
 	private Collection<Cell> impassibleCells;
+
+	private FrameBufferObject mainPass;
+	private TextureObject mainDepthTexture;
+	private TextureObject mainColorTexture;
+
+	private ShaderObject bloomShaderHor;
+	private ShaderObject bloomShaderVer;
+	private FrameBufferObject preBloomPass;
+	private TextureObject preBloomTexture;
+	private FrameBufferObject bloomPassHor;
+	private TextureObject bloomColorTextureHor;
+	private FrameBufferObject bloomPassVer;
+	private TextureObject bloomColorTextureVer;
+	
+	private ShaderObject combineShader;
+
+
 	public Renderer3D(Game game){
 		setupDisplay();
 		this.game = game;
@@ -70,7 +89,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 		} 
 		impassibleCells = map.getImpassibleCells();
-    	shadowManager = new ShadowManager(this);
+		shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
 		new LevelLoader("level.xml", this);
 		MVP = new Matrix4f();
@@ -79,45 +98,45 @@ public class Renderer3D implements RendererInfoInterface{
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(8*6);//8 floats per vert, 6 verts
 		int scale = 1;
 		//tri 1
-		putVertex(buffer, 0, 0, 0);
-		putVertex(buffer, 1, 0, 0);
-		putVertex(buffer, 1, 1, 0);
+		putVertexXY(buffer, 0, 0, 0);
+		putVertexXY(buffer, 1, 0, 0);
+		putVertexXY(buffer, 1, 1, 0);
 		//tri2
-		putVertex(buffer, 0, 0, 0);
-		putVertex(buffer, 0, 1, 0);
-		putVertex(buffer, 1, 1, 0);
-		
+		putVertexXY(buffer, 0, 0, 0);
+		putVertexXY(buffer, 0, 1, 0);
+		putVertexXY(buffer, 1, 1, 0);
+
 		buffer.flip();
 		quadVBO.bind();
 		quadVBO.put(buffer);
 		quadVBO.unbind();
-		
+
 		lineVBO = new VBO(VBO.STATIC_DRAW);
 		buffer = BufferUtils.createFloatBuffer(8*2);//8 floats per vert, 2 verts
 		//line
 		putVertex(buffer, 1, 0, 0);
 		putVertex(buffer, 0, 1, 0);
-		
+
 		buffer.flip();
 		lineVBO.bind();
 		lineVBO.put(buffer);
 		lineVBO.unbind();
-		
+
 		tex = new TextureObject("tex.png");
 		tex.setup();
 		tex.setMINMAG(GL11.GL_LINEAR);
 		tex.setWRAPST(GL11.GL_REPEAT);
 		tex.mipMap();
 		tex.unbind();
-		
+
 		normtex = new TextureObject("gradient_map.png");
 		normtex.setup();
 		normtex.setMINMAG(GL11.GL_LINEAR);
 		normtex.setWRAPST(GL11.GL_REPEAT);
 		normtex.mipMap();
 		normtex.unbind();
-		
-		
+
+
 		lightShader = new ShaderObject("lighting shader");
 		lightShader.addVertexSource(FileToString.read("defaultlighting/defaultlighting.vert"));
 		lightShader.addFragmentSource(FileToString.read("defaultlighting/defaultlighting.frag"));
@@ -128,7 +147,7 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.findUniforms();
 		lightShader.findAttributes();
 		lightShader.unbind();
-		
+
 		lineShader = new ShaderObject("line shader");
 		lineShader.addVertexSource(FileToString.read("lineshader.vert"));
 		lineShader.addFragmentSource(FileToString.read("lineshader.frag"));
@@ -139,7 +158,7 @@ public class Renderer3D implements RendererInfoInterface{
 		lineShader.findUniforms();
 		lineShader.findAttributes();
 		lineShader.unbind();
-		
+
 		quadShader = new ShaderObject("fullscreen quad shader");
 		quadShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
 		quadShader.addFragmentSource(FileToString.read("orthscreenspace.frag"));
@@ -150,33 +169,123 @@ public class Renderer3D implements RendererInfoInterface{
 		quadShader.findUniforms();
 		quadShader.findAttributes();
 		quadShader.unbind();
+
+		bloomShaderHor = new ShaderObject("bloom hor");
+		bloomShaderHor.addVertexSource(FileToString.read("orthscreenspace.vert"));
+		bloomShaderHor.addFragmentSource(FileToString.read("bloomshaders/bloomhor.frag"));
+		bloomShaderHor.compileVertex();
+		bloomShaderHor.compileFragment();
+		bloomShaderHor.link();
+		bloomShaderHor.bind();
+		bloomShaderHor.findUniforms();
+		bloomShaderHor.findAttributes();
+		bloomShaderHor.unbind();
+
+		bloomShaderVer = new ShaderObject("bloom ver");
+		bloomShaderVer.addVertexSource(FileToString.read("orthscreenspace.vert"));
+		bloomShaderVer.addFragmentSource(FileToString.read("bloomshaders/bloomver.frag"));
+		bloomShaderVer.compileVertex();
+		bloomShaderVer.compileFragment();
+		bloomShaderVer.link();
+		bloomShaderVer.bind();
+		bloomShaderVer.findUniforms();
+		bloomShaderVer.findAttributes();
+		bloomShaderVer.unbind();
 		
+		combineShader = new ShaderObject("combine shader");
+		combineShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
+		combineShader.addFragmentSource(FileToString.read("combine.frag"));
+		combineShader.compileVertex();
+		combineShader.compileFragment();
+		combineShader.link();
+		combineShader.bind();
+		combineShader.findUniforms();
+		combineShader.findAttributes();
+		combineShader.unbind();
+
 		selecter = new DEMOselecter( objList);
-		
+
 		quadModel = new Model("quad.obj");
-		
+
 		viewGrid = new ViewGrid(quadModel, 2.5f, 1.4f);
-		
+
 		Matrix4f model = new Matrix4f();
-    	MatrixCZHV.getModelMatrix(new Vector3f(1,-0.035f,1), new Vector3f(1,1,1), new Vector3f(0,0,0), model);
-    	modelz = BufferUtils.createFloatBuffer(16);
-    	MatrixCZHV.MatrixToBuffer(model, modelz);
-    	
-    	fireTest = new ParticleTest();
+		MatrixCZHV.getModelMatrix(new Vector3f(1,-0.035f,1), new Vector3f(1,1,1), new Vector3f(0,0,0), model);
+		modelz = BufferUtils.createFloatBuffer(16);
+		MatrixCZHV.MatrixToBuffer(model, modelz);
+
+		fireTest = new ParticleTest();
+
+		mainColorTexture = new TextureObject("FBOCOLORTEX", screenSize.width, screenSize.height, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
+		mainColorTexture.setup();
+		mainColorTexture.setMINMAG(GL11.GL_LINEAR);
+		mainColorTexture.setWRAPST(GL12.GL_CLAMP_TO_EDGE);
+		mainColorTexture.unbind();
+
+		mainDepthTexture = new TextureObject("FBODEPTHTEX", screenSize.width, screenSize.height, GL30.GL_DEPTH_COMPONENT32F, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT);
+		mainDepthTexture.setup();
+		mainDepthTexture.setMINMAG(GL11.GL_LINEAR);
+		mainDepthTexture.setWRAPST(GL12.GL_CLAMP_TO_EDGE);
+		mainDepthTexture.unbind();
+
+		mainPass = new FrameBufferObject("main pass", screenSize.width, screenSize.height);
+		mainPass.setup();
+		mainPass.addTexture(mainColorTexture, GL30.GL_COLOR_ATTACHMENT0);
+		mainPass.addTexture(mainDepthTexture, GL30.GL_DEPTH_ATTACHMENT);
+		mainPass.done();
+
+		preBloomTexture = new TextureObject("pre bloom texture", screenSize.width/2, screenSize.height/2, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
+		preBloomTexture.setup();
+		preBloomTexture.setMINMAG(GL11.GL_LINEAR);
+		preBloomTexture.setWRAPST(GL12.GL_CLAMP_TO_EDGE);
+		preBloomTexture.unbind();
+
+		bloomColorTextureHor = new TextureObject("bloom texture hor", screenSize.width/2, screenSize.height/2, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
+		bloomColorTextureHor.setup();
+		bloomColorTextureHor.setMINMAG(GL11.GL_LINEAR);
+		bloomColorTextureHor.setWRAPST(GL12.GL_CLAMP_TO_EDGE);
+		bloomColorTextureHor.unbind();
+
+		bloomColorTextureVer = new TextureObject("bloom texture ver", screenSize.width/2, screenSize.height/2, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
+		bloomColorTextureVer.setup();
+		bloomColorTextureVer.setMINMAG(GL11.GL_LINEAR);
+		bloomColorTextureVer.setWRAPST(GL12.GL_CLAMP_TO_EDGE);
+		bloomColorTextureVer.unbind();
+
+		preBloomPass = new FrameBufferObject("pre bloom pass", screenSize.width/2, screenSize.height/2);
+		preBloomPass.setup();
+		preBloomPass.addTexture(preBloomTexture, GL30.GL_COLOR_ATTACHMENT0);
+		preBloomPass.done();
+
+		bloomPassHor = new FrameBufferObject("bloom hor pass", screenSize.width/2, screenSize.height/2);
+		bloomPassHor.setup();
+		bloomPassHor.addTexture(bloomColorTextureHor, GL30.GL_COLOR_ATTACHMENT0);
+		bloomPassHor.done();
+
+		bloomPassVer = new FrameBufferObject("bloom ver pass", screenSize.width/2, screenSize.height/2);
+		bloomPassVer.setup();
+		bloomPassVer.addTexture(bloomColorTextureVer, GL30.GL_COLOR_ATTACHMENT0);
+		bloomPassVer.done();
 	}
-	
+
 	ParticleTest fireTest;
-	
+
 	public LightManager getLightManager(){
 		return lightManager;
 	}
-	
+
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
 		buffer.put(x).put(y).put(z);
 		buffer.put(0).put(1).put(0);
 		buffer.put(x).put(z);
 	}
-	
+
+	public void putVertexXY(FloatBuffer buffer, float x, float y, float z){
+		buffer.put(x).put(y).put(z);
+		buffer.put(0).put(1).put(0);
+		buffer.put(x).put(y);
+	}
+
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
@@ -197,7 +306,7 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 
 		activeCells = map.getActiveCells();
-		
+
 		for (Cell cell : activeCells){
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter gameChar : gameChars){
@@ -206,17 +315,18 @@ public class Renderer3D implements RendererInfoInterface{
 				}
 			}
 		}
-		
+
+
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
-		
+
 		//selecter.update(MVP);
 		lightManager.setGridOffset(camera.getWorldPosition().x-2f,0, camera.getWorldPosition().z-3f);
 		lightManager.update();
-		
+
 		shadowManager.update();
-		
-		
+
+
 		long sleeptime = System.currentTimeMillis();
 		sleep(framedelay);
 		sleeptime = System.currentTimeMillis() - sleeptime;
@@ -224,29 +334,31 @@ public class Renderer3D implements RendererInfoInterface{
 		frametime = System.currentTimeMillis() - frametime;
 		totalframetime += frametime - sleeptime;
 		frametime = System.currentTimeMillis();
-		
-		
+
+
 		framecounter++;
 		if (framecounter == 100){
 			framecounter = 0;
 			System.out.println("100 frames in " + (totalframetime/100f) + " ms");
 			totalframetime = 0;
 		}
-		
+
+		mainPass.bind();
+
 		camera.lookThrough();
-		
+
 
 		viewGrid.update(camera);
-		
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glCullFace(GL11.GL_BACK);
 
-		
-		
-		
+
+
+
 		currentTime += 0.001f;
-		
+
 		lightShader.bind();
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
@@ -256,67 +368,157 @@ public class Renderer3D implements RendererInfoInterface{
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
 		lightShader.putMat4("projectionMatrix", projectionMatrix);
-		
+
 		lightShader.putMat4("shadowProjectionMatrix", lightManager.getLight(1).getProjectionMatrix());
 		lightShader.putMat4("shadowMVP", lightManager.getLight(1).getViewMatrix());
 		lightShader.putMat4("biasMatrix", shadowManager.getBiasMatrix());
-		
+
 		Vector3f pos = camera.getPosition();
 		lightShader.putUnifFloat4("eyeposition", -pos.x, -pos.y, -pos.z, 1);
 
 		viewGrid.draw(lightShader);
-		
-		bufferGeo(lightShader);
-    	
-		fireTest.update(lightShader);
-		
-        lightManager.unbind();
-        lightShader.unbind();
-        
-        quadShader.bind();
-        
-        selecter.draw(quadShader, quadVBO, selectboxColor);
-		
-        quadShader.unbind();
 
-        if (game.AI_DRAW_HIERARCHY){
-        	drawLines();
-        }
-        
+		bufferGeo(lightShader);
+		
+		drawLines();
+
+
+		lightManager.unbind();
+		lightShader.unbind();
+
+		mainPass.unBind();
+
+		bloomPass();
+
+		//drawFullscreenQuad(screenSize.width, screenSize.height, bloomColorTextureVer);
+		//drawFullscreenQuad(screenSize.width, screenSize.height, preBloomTexture);
+		//drawFullscreenQuad(screenSize.width, screenSize.height, mainColorTexture);
+		
+		combinePass();
+
+		//if (game.AI_DRAW_HIERARCHY){
+		//}
+
 		TOOLBOX.checkGLERROR(true);
 
 		Display.update();
 	}
 	
+	public void combinePass(){
+		combineShader.bind();
+		combineShader.bindTexture("colorTexture", mainColorTexture);
+		combineShader.bindTexture("bloomTexture", bloomColorTextureVer);
+		drawFullscreenQuadBloom(combineShader, screenSize.width, screenSize.height);
+		combineShader.unbind();
+	}
+
+	public void bloomPass(){
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glViewport(0, 0, screenSize.width/2, screenSize.height/2);
+
+		//PRE PASS
+		preBloomPass.bind();
+		GL11.glClearColor(0, 0, 0, 1);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+		lightShader.bind();
+		fireTest.update(lightShader);
+		lightShader.unbind();
+		preBloomPass.unBind();
+		
+		//HORIZONTAL PASS
+		bloomPassHor.bind();
+		GL11.glClearColor(1, 0, 0, 1);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+		bloomShaderHor.bind();
+		bloomShaderHor.putUnifFloat("size", screenSize.width/2);
+		drawFullscreenQuadBloom(bloomShaderHor, screenSize.width/2, screenSize.height/2, preBloomTexture);
+		bloomShaderHor.unbind();
+		bloomPassHor.unBind();
+		
+		//VERTICAL PASS
+		bloomPassVer.bind();
+		GL11.glClearColor(0, 0, 0, 1);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+		bloomShaderVer.bind();
+		bloomShaderVer.putUnifFloat("size", screenSize.height/2);
+		drawFullscreenQuadBloom(bloomShaderVer, screenSize.width/2, screenSize.height/2, bloomColorTextureHor);
+		bloomShaderVer.unbind();
+		bloomPassVer.unBind();
+
+		GL11.glViewport(0, 0, screenSize.width, screenSize.height);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+	}
+
+	public void drawFullscreenQuad(float width, float height, TextureObject obj){
+		quadShader.bind();
+		quadShader.bindTexture("texture", obj);
+		quadVBO.bind();
+		quadShader.putUnifFloat4("color", 1,1,1,1);
+		quadShader.putUnifFloat4("quadSize", -1,-1,2,2);
+		quadVBO.prepareForDraw(quadShader);
+		quadVBO.draw();
+		quadVBO.unbind();
+		quadShader.unbind();
+	}
+	
+	public void drawFullscreenQuadBloom(ShaderObject shader, float width, float height, TextureObject obj){
+		shader.bindTexture("texture", obj);
+		quadVBO.bind();
+		shader.putUnifFloat4("color", 1,1,1,1);
+		shader.putUnifFloat4("quadSize", -1,-1,2,2);
+		quadVBO.prepareForDraw(quadShader);
+		quadVBO.draw();
+		quadVBO.unbind();
+	}
+	
+	public void drawFullscreenQuadBloom(ShaderObject shader, float width, float height){
+		quadVBO.bind();
+		shader.putUnifFloat4("color", 1,1,1,1);
+		shader.putUnifFloat4("quadSize", -1,-1,2,2);
+		quadVBO.prepareForDraw(quadShader);
+		quadVBO.draw();
+		quadVBO.unbind();
+	}
+
+	public static Line3D ray;
 	public Vector3f lineColor = new Vector3f(1,0,0);
 	public void drawLines(){
 		lineShader.bind();
 		lineShader.putMat4("viewMatrix", viewMatrix);
 		lineShader.putMat4("projectionMatrix", projectionMatrix);
-		
+
 		for (Cell cell : activeCells){
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter gameChar : gameChars){
 				for (GameCharacter follower : gameChar.getFollowers()){
-						drawLine(new Vector3f(gameChar.getAbsX()*cellSize,0.05f,gameChar.getAbsY()*cellSize), new Vector3f(follower.getAbsX()*cellSize,0.05f,follower.getAbsY()*cellSize), lineColor);
+					drawLine(new Vector3f(gameChar.getAbsX()*cellSize,0.05f,gameChar.getAbsY()*cellSize), new Vector3f(follower.getAbsX()*cellSize,0.05f,follower.getAbsY()*cellSize), lineColor);
+				}
+				ArrayList<Vector3f> box = gameChar.drawBoundingBox();
+				for (int i = 0; i < box.size(); i += 2){
+					drawLine(box.get(i), box.get(i+1), new Vector3f(0,0,1));
 				}
 			}
 		}
-		
+
+		if (ray != null){
+			drawLine(new Vector3f(ray.start.x, ray.start.y, ray.start.z), new Vector3f(ray.start.x+ray.dir.x, ray.start.y+ray.dir.y, ray.start.z+ray.dir.z), lineColor);
+			//drawLine(new Vector3f(0,1,0), new Vector3f(ray.dir.x, ray.dir.y+1, ray.dir.z), lineColor);
+		}
+		drawLine(new Vector3f(0,1,0), new Vector3f(0,0,0), lineColor);
 		lineShader.unbind();
 	}
-	
+
 	public void drawLine(Vector3f start, Vector3f end, Vector3f color){
 		lineShader.putUnifFloat4("startPos", start.x, start.y, start.z, 1);
 		lineShader.putUnifFloat4("endPos", end.x, end.y, end.z, 1);
 		lineShader.putUnifFloat4("color", color.x, color.y, color.z, 1);
-		
+
 		lineVBO.bind();
 		lineVBO.prepareForDraw(lineShader);
 		lineVBO.drawLines();
 		lineVBO.unbind();
 	}
-	
+
 	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
 		for (Cell cell : activeCells){
@@ -330,23 +532,23 @@ public class Renderer3D implements RendererInfoInterface{
 				}else{
 					shader.putUnifFloat4("color", vikingColor);
 				}
-		        c.draw(shader);
+				c.draw(shader);
 			}
 			model.item.Item i = cell.getItemHolder().getItem();
 			if (i != null){
 				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
-	        	shader.putUnifFloat4("color", itemColor);
-		        i.draw(shader);
+				shader.putUnifFloat4("color", itemColor);
+				i.draw(shader);
 			}
-			
+
 		}
 		Dummy3DObj d = new Dummy3DObj();
 		for (Cell cell : impassibleCells){
-				d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
-	        	shader.putUnifFloat4("color", decorColor);
-		        d.draw(shader);
+			d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
+			shader.putUnifFloat4("color", decorColor);
+			d.draw(shader);
 		}
-        
+
 	}
 
 	public void sleep(int time){
@@ -384,26 +586,26 @@ public class Renderer3D implements RendererInfoInterface{
 		float near_plane = 0.05f;
 		float far_plane = 300;
 
-        float y_scale = 1/(float)Math.tan(Math.toRadians(fieldOfView / 2f));
-        float x_scale = y_scale / aspectRatio;
-        float frustum_length = far_plane - near_plane;
-		
+		float y_scale = 1/(float)Math.tan(Math.toRadians(fieldOfView / 2f));
+		float x_scale = y_scale / aspectRatio;
+		float frustum_length = far_plane - near_plane;
+
 		projMat = new Matrix4f();
 		viewMat = new Matrix4f();
-		
+
 		projMat.m00 = x_scale;
 		projMat.m11 = y_scale;
 		projMat.m22 = -((far_plane + near_plane) / frustum_length);
 		projMat.m23 = -1;
 		projMat.m32 = -((2 * near_plane * far_plane) / frustum_length);
 		projMat.m33 = 0;    
-		
+
 		viewMatrix = BufferUtils.createFloatBuffer(16);
 		projectionMatrix = BufferUtils.createFloatBuffer(16);
-		
+
 		projMat.store(projectionMatrix);
 		projectionMatrix.flip();
-		
+
 		try{
 			Mouse.create();
 			Keyboard.create();
@@ -411,11 +613,11 @@ public class Renderer3D implements RendererInfoInterface{
 			e.printStackTrace();
 		}
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        
-        
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+
 		TOOLBOX.checkGLERROR(true);
 	}
 
@@ -423,8 +625,7 @@ public class Renderer3D implements RendererInfoInterface{
 	public Object click(float x, float y) {
 		//check interface, return button
 		Vector2f mouse = selecter.normalize(x, y);//selecter.getNormalizedMouse();
-		mouse.y *= -1;
-		Line3D ray = MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
+		ray = MatrixCZHV.getPickingRayStartDir(mouse.x,mouse.y, camera.getWorldPosition(), viewMat, projMat);
 		//else check characters
 		for (Cell c : activeCells){
 			List<GameCharacter> gameChars = c.getCharacterHolder().getItem();
@@ -446,13 +647,11 @@ public class Renderer3D implements RendererInfoInterface{
 		System.out.println(colPoint);
 		return new Vector2f(colPoint.x/cellSize, colPoint.z/cellSize);
 	}
-	
+
 	@Override
 	public Collection<Cell> squareSelect(Point start, Point end){
 		Vector2f startMouse = selecter.normalize(start.x, start.y);
 		Vector2f endMouse = selecter.normalize(end.x, end.y);
-		startMouse.y *= -1;
-		endMouse.y *= -1;
 		Collection<Cell> retCollection = new ArrayList<Cell>();
 		Line3D ray1 = MatrixCZHV.getPickingRayStartDir(startMouse.x, startMouse.y, camera.getWorldPosition(), viewMat, projMat);
 		Vector3f startCol = ray1.collideXZPlane(0);

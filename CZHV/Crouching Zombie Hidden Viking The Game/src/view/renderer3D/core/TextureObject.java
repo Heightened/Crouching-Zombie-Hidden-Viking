@@ -83,21 +83,21 @@ public class TextureObject {
 		textureID = glGenTextures();
 		bind(0);
 		glTexImage2D(GL_TEXTURE_2D, 0,internalFormat, width, height, 0,format, type, data);
-		TOOLBOX.checkGLERROR();
+        TOOLBOX.checkGLERROR(true);
 	}
 
 	public void setMINMAG(int filter){
 		classInv();
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-		TOOLBOX.checkGLERROR();
+        TOOLBOX.checkGLERROR(true);
 	}
 
 	public void setWRAPST(int filter){
 		classInv();
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, filter);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, filter);
-		TOOLBOX.checkGLERROR();
+        TOOLBOX.checkGLERROR(true);
 	}
 
 	public void bind(int activeNum){
