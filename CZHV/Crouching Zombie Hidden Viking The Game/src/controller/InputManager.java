@@ -303,14 +303,14 @@ public class InputManager extends ConcreteController{
 							GameCharacter gc = characters.get(i);
 							ItemSlot[] inventory = gc.getBag().getInventory();
 							Weapon v = getWeapon(inventory);
-							int range = 1;
+							float range = 1;
 							if(v != null){
 								range = v.getRange();
 							}
 							while(lockedTargets[i] == null && iter.hasNext()){
 								GameCharacter enemy = iter.next();
 								if(!enemy.isDead()){									
-									if(nearby(gc, enemy, v.getRange())){
+									if(nearby(gc, enemy, range)){
 										lockedTargets[i] = enemy;
 									}
 								} else {
