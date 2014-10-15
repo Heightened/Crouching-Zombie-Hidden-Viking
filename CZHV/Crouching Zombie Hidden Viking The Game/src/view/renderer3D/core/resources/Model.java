@@ -1,4 +1,4 @@
-package view.renderer3D;
+package view.renderer3D.core.resources;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -59,8 +59,8 @@ public class Model {
 					//System.out.println(Arrays.toString(attributes));
 					
 					position[index1] = distinctVertices.get(attributes[0] - 1);
-					//float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
-					textureCoord[index1] = new float[] {0.0f, 0.0f};
+					textureCoord[index1] = distinctTextureCoords.get(attributes[1] - 1);
+					//textureCoord[index1] = new float[] {0.0f, 0.0f};
 					normal[index1] = distinctNormals.get(attributes[2] - 1);
 					
 					vertices[i * 3] = position[index1][0];
