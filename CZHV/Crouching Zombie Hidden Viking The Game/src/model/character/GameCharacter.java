@@ -32,7 +32,7 @@ public class GameCharacter extends Vehicle{
 	private PathFinder pathFinder;
 	private List<Node> path;
 	private int pathPointer;
-	private float accuracy;
+	private float accuracy = 1;
 	private boolean selected;
 	
 	public GameCharacter(){
