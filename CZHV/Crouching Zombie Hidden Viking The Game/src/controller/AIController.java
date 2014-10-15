@@ -52,4 +52,6 @@ public abstract class AIController implements Controller {
 	public abstract Strategy getOrders(AIController c);
 
 	public abstract Collection<AIController> getFollowers();
+
+	public abstract void removeLeader();
 }

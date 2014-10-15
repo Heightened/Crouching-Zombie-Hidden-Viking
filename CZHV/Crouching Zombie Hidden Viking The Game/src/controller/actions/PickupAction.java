@@ -15,6 +15,7 @@ public class PickupAction implements Action{
 	@Override
 	public boolean perform(Game g){
 		if(chara.getBag().addItem(chara.getCell().getItemHolder().getItem())){
+			System.out.println("PICKUP");
 			chara.getCell().getItemHolder().removeItem();
 			return true;
 		}

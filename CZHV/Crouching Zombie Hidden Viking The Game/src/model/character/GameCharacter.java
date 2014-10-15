@@ -23,7 +23,7 @@ public class GameCharacter extends Vehicle{
 	private int strength = 0;
 	private float maxSpeed = 0;
 	private float speedX = 0, speedY = 0;
-	private float x=0.5f,y=0.5f; // in-cell position 0<=x<1 and 0<=y<1
+	private float x=0.0f,y=0.0f; // in-cell position 0<=x<1 and 0<=y<1
 	
 	private Map<Skill, Boolean> skills = new HashMap<>();
 	private boolean infected;
