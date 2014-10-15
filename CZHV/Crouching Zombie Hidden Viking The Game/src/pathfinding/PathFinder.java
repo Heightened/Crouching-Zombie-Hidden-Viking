@@ -25,6 +25,11 @@ public abstract class PathFinder
 				this.map.getWidth(), this.map.getHeight());
 	}
 	
+	public GameCharacter getCharacter()
+	{
+		return this.character;
+	}
+	
 	// returns a path from (x1,y1) to (x2,y2)
 	public abstract List<Node> calculatePath(int x1, int y1, int x2, int y2);
 	

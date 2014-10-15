@@ -51,6 +51,9 @@ public class SimpleAIController extends AIController
 		long dtime = System.currentTimeMillis() - this.time;
 		this.time  = System.currentTimeMillis();
 		
+		if(this.destructIfDead())
+			return;
+		
 		GameCharacter leaderCharacter;
 		boolean justChoseLeader = false;
 		
@@ -76,6 +79,28 @@ public class SimpleAIController extends AIController
 		
 		if(this.commands.getAction() != null)
 			this.getGame().getActionBuffer().add(this.commands.getAction());
+	}
+	
+	public boolean destructIfDead()
+	{
+		if(!this.getCharacter().isDead())
+			return false;
+		
+		this.leader.unregister(this);
+		synchronized(this.followers)
+		{
+			for(AIController aic : this.followers)
+			{
+				aic.removeLeader();
+			}
+		}
+		this.commands = null;
+		this.leaderChooser = null;
+		this.leader = null;
+		this.strategyChooser = null;
+		this.setCharacter(null);
+		
+		return true;
 	}
 	
 	public Collection<GameCharacter> getCloseAllies()
@@ -206,5 +231,11 @@ public class SimpleAIController extends AIController
 		{
 			this.followers.remove(c);
 		}
+	}
+
+	@Override
+	public void removeLeader()
+	{
+		this.leader = null;
 	}
 }

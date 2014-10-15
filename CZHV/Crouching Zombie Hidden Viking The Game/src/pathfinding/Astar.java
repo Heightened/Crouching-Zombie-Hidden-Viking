@@ -26,16 +26,28 @@ public class Astar extends PathFinder
 	
 	public List<Node> calculatePath(Node start, Node goal)
 	{
-		if(start == goal || goal == null || start == null) return null;
+		if(start == goal || goal == null || start == null)
+		{
+			return null;
+		}
 		
 		//System.out.println("START PATHFINDING");
 		SortedList<Node> closedset = new SortedList<>();
 		SortedList<Node> openset = new SortedList<>();
 		
-		if (goal.isSolid()){
+		if (goal.isSolid())
+		{
 			return null;
 		}
-		if (start.isSolid()){
+		if (start.isSolid())
+		{
+			if(!this.getCharacter().isInfected())
+			{
+				System.out.println("regel 49");
+				System.out.println("position of character: ("+getCharacter().getAbsX()+", "+getCharacter().getAbsY()+")");
+				for(Node n : start.getNeighbours())
+					System.out.println("("+n.getX()+", "+n.getY()+")");
+			}
 			return null;
 		}
 		openset.add(start);
@@ -46,17 +58,18 @@ public class Astar extends PathFinder
 		int counter = 0;//counts number of nodes processed
 		while (!openset.isEmpty()){
 			counter++;
-			if (counter > 100){
+			//if (counter > 100){
 				//visited too much nodes, destination unreachable or too far away
 				//bail
 				//System.out.println("PATH NOT FOUND/TOO FAR AWAY");
-				break;
-			}
+				//break;
+			//}
 			Node current = openset.getFirst();
 			//System.out.println("it current:" + current.x + " " + current.y);
 			
 			if (current.equals(goal)){
-				//System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
+				if(!this.getCharacter().isInfected())
+					System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
 				return reconstructPath( goal, start);
 			}
 			
@@ -93,7 +106,9 @@ public class Astar extends PathFinder
 			}
 		}
 		//System.out.println("NO PATH");
-		//System.out.println("NO PATH FOUND");
+		if(!this.getCharacter().isInfected())
+			System.out.println("NO PATH FOUND");
+		
 		return null;
 	}
 	
