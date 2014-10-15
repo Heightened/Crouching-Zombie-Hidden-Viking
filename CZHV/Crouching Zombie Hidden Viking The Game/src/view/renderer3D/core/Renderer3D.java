@@ -40,6 +40,7 @@ public class Renderer3D implements RendererInfoInterface{
 	private VBO quadVBO;
 	private VBO lineVBO;
 	private TextureObject tex;
+	private TextureObject normtex;
 	private ShaderObject lightShader;
 	private ShaderObject quadShader;
 	private ShaderObject lineShader;
@@ -68,10 +69,11 @@ public class Renderer3D implements RendererInfoInterface{
 			for (int j = 0; j < 15; j++){
 				game.getFlockingMap().getActiveCells(2*i, 2*j);
 			}
-		}
+		} 
 		impassibleCells = map.getImpassibleCells();
     	shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
+		new LevelLoader("level.xml", this);
 		MVP = new Matrix4f();
 		camera = new Camera(viewMatrix, viewMat);
 		quadVBO = new VBO(VBO.STATIC_DRAW);
@@ -108,6 +110,14 @@ public class Renderer3D implements RendererInfoInterface{
 		tex.setWRAPST(GL11.GL_REPEAT);
 		tex.mipMap();
 		tex.unbind();
+		
+		normtex = new TextureObject("gradient_map.png");
+		normtex.setup();
+		normtex.setMINMAG(GL11.GL_LINEAR);
+		normtex.setWRAPST(GL11.GL_REPEAT);
+		normtex.mipMap();
+		normtex.unbind();
+		
 		
 		lightShader = new ShaderObject("lighting shader");
 		lightShader.addVertexSource(FileToString.read("defaultlighting/defaultlighting.vert"));
@@ -158,12 +168,16 @@ public class Renderer3D implements RendererInfoInterface{
 	
 	ParticleTest fireTest;
 	
+	public LightManager getLightManager(){
+		return lightManager;
+	}
+	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){
 		buffer.put(x).put(y).put(z);
 		buffer.put(0).put(1).put(0);
 		buffer.put(x).put(z);
 	}
-
+	
 	long totaltime = 0;
 	int framecounter = 0;
 	int framedelay = 10;
@@ -238,6 +252,7 @@ public class Renderer3D implements RendererInfoInterface{
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
 		//lightShader.bindTexture("texture", tex);
+		lightShader.bindTexture("normsamp", normtex);
 		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
 		lightShader.putMat4("viewMatrix", viewMatrix);
@@ -261,11 +276,13 @@ public class Renderer3D implements RendererInfoInterface{
         
         quadShader.bind();
         
-        selecter.draw(quadShader, quadVBO, selectboxColor);;
+        selecter.draw(quadShader, quadVBO, selectboxColor);
 		
         quadShader.unbind();
 
-        drawLines();
+        if (game.AI_DRAW_HIERARCHY){
+        	drawLines();
+        }
         
 		TOOLBOX.checkGLERROR(true);
 

@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 
 public class LVLEditorLight extends LVLEditorObject{
-	private float radius;
-	private float cutoff;
-	private Vector3f color;
-	private Vector3f specularColor;
-	private Vector3f direction;
-	private Vector3f direction1;
+	public float radius;
+	public float cutoff;
+	public Vector3f color;
+	public Vector3f specularColor;
+	public Vector3f direction;
 	
 	public LVLEditorLight(){
 		super("Light", new Vector3f(1,0.9f,0.2f));

@@ -5,7 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.Drawable3D;
 import view.renderer3D.core.ShaderObject;
@@ -42,41 +45,101 @@ public class Model {
 			int i = 0;
 			for (String[] face : faces) {
 				//System.out.println(Arrays.toString(face));
-				for (String vertex : face) {
-					if (vertex.equals("f")) {
+				float[][] position = new float[3][];
+				float[][] textureCoord = new float[3][];
+				float[][] normal = new float[3][];
+				for (int index = 1; index < 4; index++) {
+					if (face[index].equals("f")) {
 						continue;
 					}
 					
-					int[] attributes = getIntArray(0, vertex.split("/"));
+					int index1 = index - 1;
+					
+					int[] attributes = getIntArray(0, face[index].split("/"));
 					//System.out.println(Arrays.toString(attributes));
 					
-					float[] position = distinctVertices.get(attributes[0] - 1);
+					position[index1] = distinctVertices.get(attributes[0] - 1);
 					//float[] textureCoord = distinctTextureCoords.get(attributes[1] - 1);
-					float[] textureCoord = new float[] {0.0f, 0.0f};
-					float[] normal = distinctNormals.get(attributes[2] - 1);
+					textureCoord[index1] = new float[] {0.0f, 0.0f};
+					normal[index1] = distinctNormals.get(attributes[2] - 1);
 					
-					vertices[i * 3] = position[0];
-					vertices[i * 3 + 1] = position[1];
-					vertices[i * 3 + 2] = position[2];
+					vertices[i * 3] = position[index1][0];
+					vertices[i * 3 + 1] = position[index1][1];
+					vertices[i * 3 + 2] = position[index1][2];
 					
-					uvcoords[i * 2] = textureCoord[0];
-					uvcoords[i * 2 + 1] = textureCoord[1];
+					uvcoords[i * 2] = textureCoord[index1][0];
+					uvcoords[i * 2 + 1] = textureCoord[index1][1];
 					
-					normals[i * 3] = normal[0];
-					normals[i * 3 + 1] = normal[1];
-					normals[i * 3 + 2] = normal[2];
+					normals[i * 3] = normal[index1][0];
+					normals[i * 3 + 1] = normal[index1][1];
+					normals[i * 3 + 2] = normal[index1][2];
 					
 					i++;
 				}
+				float[] tangent = calcTangentNonIP2(position[0], position[1], position[2], normal[0], normal[1], normal[2], textureCoord[0], textureCoord[1], textureCoord[2]);
+
+				i -= 3;
+				tangents[i*3] = tangent[0];
+				tangents[i*3 + 1] = tangent[1];
+				tangents[i*3 + 2] = tangent[2];
+				tangents[i*3] = tangent[0];
+				tangents[i*3 + 1] = tangent[1];
+				tangents[i*3 + 2] = tangent[2];
+				tangents[i*3] = tangent[0];
+				tangents[i*3 + 1] = tangent[1];
+				tangents[i*3 + 2] = tangent[2];
+				i += 3;
 			}
 			
-			initialize(size, vertices, uvcoords, normals, normals);
+			initialize(size, vertices, uvcoords, normals, tangents);
 			
 			// Delete reference to unused information
 			
 			faces = null;
 		}
 	}
+	
+	 public static float[] calcTangentNonIP2(float[] v1, float[] v2,float[] v3,float[] n1,float[] n2,float[] n3,float[] w1,float[] w2,float[] w3){
+	       Vector3f v2v1 = new Vector3f();
+	       Vector3f v3v1 = new Vector3f();
+	       Vector3f tangent = new Vector3f();
+	       Vector3f biTangent = new Vector3f();
+	        //Calculate the vectors from the current vertex to the two other vertices in the triangle
+	       v2v1.x = v2[0] - v1[0];
+	       v2v1.y = v2[1] - v1[1];
+	       v2v1.z = v2[2] - v1[2];
+	       
+	       v3v1.x = v3[0] - v1[0];
+	       v3v1.y = v3[1] - v1[1];
+	       v3v1.z = v3[2] - v1[2];
+	      //  Vector3f.sub( v2, v1 , v2v1);
+	       // Vector3f.sub( v3, v1 , v3v1);
+
+	        // Calculate c2c1_T and c2c1_B
+	        float c2c1_T = w2[0] - w1[0];
+	        float c2c1_B = w2[1] - w1[1];
+
+	        // Calculate c3c1_T and c3c1_B
+	        float c3c1_T = w3[0] - w1[0];
+	        float c3c1_B = w3[1] - w1[1];
+
+	        float fDenominator = c2c1_T * c3c1_B - c3c1_T * c2c1_B;
+	        float fScale1 = 1.0f / fDenominator;
+
+	        tangent.x = ( c3c1_B * v2v1.x - c2c1_B * v3v1.x ) * fScale1;
+	        tangent.y = ( c3c1_B * v2v1.y - c2c1_B * v3v1.y ) * fScale1;
+	        tangent.z = ( c3c1_B * v2v1.z - c2c1_B * v3v1.z ) * fScale1;
+
+	        biTangent.x = ( -c3c1_T * v2v1.x + c2c1_T * v3v1.x ) * fScale1;
+	        biTangent.y = ( -c3c1_T * v2v1.y + c2c1_T * v3v1.y ) * fScale1;
+	        biTangent.z = ( -c3c1_T * v2v1.z + c2c1_T * v3v1.z ) * fScale1;
+
+	        float[] retFloat = new float[3];
+	        retFloat[0] = tangent.x;
+	        retFloat[1] = tangent.y;
+	        retFloat[2] = tangent.z;
+	        return retFloat;
+	    }
 	
 	modelSegment[] model;
 	
