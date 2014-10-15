@@ -9,6 +9,7 @@ import model.map.Cell;
 import pathfinding.Astar;
 import pathfinding.Node;
 import pathfinding.PathFindingMap;
+import pathfinding.PathFindingMap.CellType;
 
 public class GroupMoveAction implements Action{
 	private List<GameCharacter> characters;

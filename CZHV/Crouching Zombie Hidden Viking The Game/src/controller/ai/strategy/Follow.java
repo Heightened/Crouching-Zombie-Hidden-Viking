@@ -30,7 +30,6 @@ public class Follow extends Strategy
 			
 			return new CommandSet(
 					new MoveAction(follower.getCharacter(), this.followee.getAbsX(), this.followee.getAbsY()),
-					//null,
 					null
 				);
 		}

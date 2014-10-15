@@ -2,22 +2,22 @@ package controller.actions;
 
 import model.Game;
 import model.character.GameCharacter;
-import model.map.Cell;
+import model.character.Inventory;
 
 
 public class PickupAction implements Action{
-	private Cell c;
 	private GameCharacter chara;
 	
-	public PickupAction(GameCharacter chara, Cell c){
+	public PickupAction(GameCharacter chara){
 		this.chara = chara;
-		this.c = c;
 	}
 	
 	@Override
 	public boolean perform(Game g){
-		chara.getBag().addItem(c.getItemHolder().getItem());
-		c.getItemHolder().removeItem();
-		return true;
+		if(chara.getBag().addItem(chara.getCell().getItemHolder().getItem())){
+			chara.getCell().getItemHolder().removeItem();
+			return true;
+		}
+		return false;
 	}
 }

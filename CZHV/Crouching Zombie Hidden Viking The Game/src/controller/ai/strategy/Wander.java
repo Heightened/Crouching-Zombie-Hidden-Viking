@@ -47,14 +47,18 @@ public class Wander extends Strategy
 					new HashMap<AIController, Strategy>()
 				);
 
+			Collection<AIController> followers = commander.getFollowers();
 			
-			for(AIController f : commander.getFollowers())
+			synchronized(followers)
 			{
-				if(commander.getCharacter().distanceTo(f.getCharacter()) > 4)
-					commands.setStrategy(f, new Follow(commander.getCharacter()));
-				else
-					commands.setStrategy(f, new GoTo(x, y));
-				
+				for(AIController f : followers)
+				{
+					if(commander.getCharacter().distanceTo(f.getCharacter()) > 4)
+						commands.setStrategy(f, new Follow(commander.getCharacter()));
+					else
+						commands.setStrategy(f, new GoTo(x, y));
+					
+				}
 			}
 			
 			return commands;

@@ -32,7 +32,7 @@ public class GameCharacter extends Vehicle{
 	private PathFinder pathFinder;
 	private List<Node> path;
 	private int pathPointer;
-	
+	private int accuracy;
 	private boolean selected;
 	
 	public GameCharacter(){
@@ -74,12 +74,12 @@ public class GameCharacter extends Vehicle{
 	{
 		if(path != null)
 		{
-			float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
-			if(distance < this.targetRadius)
+			if(this.isAtTarget())
 			{
 				this.setFlockingTargetNode(path.get(++pathPointer));
 				if (pathPointer >= path.size() - 1)
 				{
+					this.setFlockingTargetRadius(0.5f);
 					this.path = null;
 					this.pathPointer = 0;
 				}
@@ -114,6 +114,7 @@ public class GameCharacter extends Vehicle{
 				//System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}*/
+			this.setFlockingTargetRadius(2.0f);
 			this.pathPointer = 0;
 			this.path = nodes;
 			this.setFlockingTargetNode(path.get(pathPointer));
@@ -212,8 +213,21 @@ public class GameCharacter extends Vehicle{
 		return this.pathFinder;
 	}
 	
+	public void stopMovement(){
+		path = null;
+		pathPointer = 0;
+	}
+	
 	public Inventory getBag() {
 		return bag;
+	}
+
+	public int getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(int accuracy) {
+		this.accuracy = accuracy;
 	}
 
 	public void setBag(Inventory bag) {
@@ -264,6 +278,10 @@ public class GameCharacter extends Vehicle{
 		return currentHp;
 	}
 
+	public List<Node> getPath(){
+		return path;
+	}
+
 	public void applyDamage(int Damage) {
 		currentHp = currentHp-Damage;
 		if(isDead()){
@@ -306,12 +324,16 @@ public class GameCharacter extends Vehicle{
 
 	// ---vvv--- DEBUG CODE ---vvv---
 	private Collection<AIController> followers;
+
 	public void setFollowers(Collection<AIController> followers)
 	{
 		this.followers = followers;
 	}
 	public Collection<GameCharacter> getFollowers()
 	{
+		if(this.followers == null)
+			return new LinkedList<>();
+		
 		Collection<GameCharacter> f = new LinkedList<>();
 		synchronized(this.followers)
 		{

@@ -1,9 +1,11 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import model.character.GameCharacter;
+import model.map.Cell;
 import model.map.ChunkedMap;
 import model.map.Map;
 import controller.actions.Action;
@@ -15,20 +17,19 @@ public class Game {
 	private LinkedBlockingQueue<Action> controlBuffer;
 	private LinkedBlockingQueue<Action> actionBuffer;
 	private ArrayList<GameCharacter> controlledCharacters;
-	private ArrayList<GameCharacter> aiCharacters;
 
 	public Game() {
 		//TODO: fill in stuff
 		controlBuffer = new LinkedBlockingQueue<Action>();
 		actionBuffer = new LinkedBlockingQueue<Action>();
-		aiCharacters = new ArrayList<GameCharacter>();
-		controlledCharacters = new ArrayList<GameCharacter>();
 		createMap();
+		controlledCharacters = map.getControlledCharacters();
 	}
 
 	private void createMap() {
 		//TODO do map creation
 		map = new Map(30,30);
+		map.populate();
 		flockingMap = new ChunkedMap(map, 2, 225);
 		//TODO add characters to map
 	}	
@@ -81,7 +82,20 @@ public class Game {
 		return actionBuffer;
 	}
 
-	public ArrayList<GameCharacter> getAiCharacters() {
-		return aiCharacters;
+	public boolean isAIControlled(GameCharacter character) {
+		return character.isInfected() && !this.controlledCharacters.contains(character);
+	}
+	
+	public ArrayList<GameCharacter> getUndead(){
+		ArrayList<GameCharacter> undead = new ArrayList<GameCharacter>();
+		Collection<Cell> all = map.getActiveCells();
+		for(Cell c: all){
+			for(GameCharacter gc: c.getCharacterHolder().getItem()){
+				if(gc.isInfected()){
+					undead.add(gc);
+				}
+			}
+		}
+		return undead;
 	}
 }

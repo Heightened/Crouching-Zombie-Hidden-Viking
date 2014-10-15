@@ -24,7 +24,7 @@ public class Astar extends PathFinder
 	
 	public List<Node> calculatePath(Node start, Node goal)
 	{
-		if(start == goal) return null;
+		if(start == goal || goal == null || start == null) return null;
 		
 		//System.out.println("START PATHFINDING");
 		SortedList<Node> closedset = new SortedList<>();

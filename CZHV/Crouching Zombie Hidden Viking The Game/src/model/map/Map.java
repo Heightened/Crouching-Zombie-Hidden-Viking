@@ -1,5 +1,6 @@
 package model.map;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ public class Map implements ChangeListener<Cell>
 {
 	protected Cell[][] grid;
 	private Collection<ChangeListener<Cell>> listeners = new LinkedList<>();
+	private ArrayList<GameCharacter> controlled = new ArrayList<GameCharacter>();
 	
 	public Map(int width, int height)
 	{
@@ -105,6 +107,8 @@ public class Map implements ChangeListener<Cell>
 			{
 				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
 			}
+			controlled.add(c);
+			
 		}
 		//*/
 	}
@@ -219,5 +223,9 @@ public class Map implements ChangeListener<Cell>
 	{
 		for(ChangeListener<Cell> l : this.listeners)
 			l.characterMoved(character, cell);
+	}
+
+	public ArrayList<GameCharacter> getControlledCharacters() {
+		return controlled;
 	}
 }

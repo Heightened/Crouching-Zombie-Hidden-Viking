@@ -53,15 +53,20 @@ public class AIManager implements MapChangeListener {
 	
 	@Override
 	public void setActive(GameCharacter character) {
-		addControlBinding(character);
-		setActive(controlBinding.get(character));
+		if(game.isAIControlled(character))
+		{
+			addControlBinding(character);
+			setActive(controlBinding.get(character));
+		}
 	}
 
 	@Override
 	public void setInactive(GameCharacter character) {
-		addControlBinding(character);
-		setInactive(controlBinding.get(character));
-		
+		if(game.isAIControlled(character))
+		{
+			addControlBinding(character);
+			setInactive(controlBinding.get(character));
+		}
 	}
 
 	private void addControlBinding(GameCharacter character) {
