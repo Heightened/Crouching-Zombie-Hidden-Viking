@@ -134,16 +134,14 @@ public class InputManager extends ConcreteController{
 									if (obj instanceof Cell){
 										doAttack((Cell) obj);
 									}
-								}
+								} 
 							}
 							if (obj instanceof Vector2f){
-								stopAttack();
 								doGroupMoveAction((Vector2f)obj);
 							}	
 							if (obj instanceof Cell){
 								doPickupItem((Cell)obj);
 							}
-							//stopAttack();
 						}
 					}
 					startClick = null;
@@ -210,10 +208,6 @@ public class InputManager extends ConcreteController{
 		attack.start();
 	}
 	
-	private void stopAttack(){
-		attack.removeAttackers(getControllableCharacters());
-	}
-	
 	private void stopThreads(ActionThread at) {
 		if(at.isAlive()){				
 			try {
@@ -226,11 +220,9 @@ public class InputManager extends ConcreteController{
 	}
 	
 	private void doPickupItem(Cell c) {
-		stopThreads(attack);
-		pickUp = af.attackThread();
-		
+		stopThreads(pickUp);
+		pickUp = af.pickUpItemThread();		
 		doGroupMoveAction(cellToVector2f(c));
-		
 		pickUp.start();
 		//TODO stuff here
 	}
@@ -264,7 +256,6 @@ public class InputManager extends ConcreteController{
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
 		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
-		private Item i;
 		
 		public void cancel(){
 			running = false;
@@ -347,10 +338,10 @@ public class InputManager extends ConcreteController{
 								}
 								
 							} 
-							if(lockedTargets[i].isDead()){
-								lockedTargets[i] = null;
-							}
 							if(lockedTargets[i]!=null){
+								if(lockedTargets[i].isDead()){
+									lockedTargets[i] = null;
+								}
 								if(nearby(gc, lockedTargets[i], v.getRange())){
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
@@ -388,6 +379,7 @@ public class InputManager extends ConcreteController{
 						for(GameCharacter gc: selectedCharacters){
 							if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
 								getGame().getActionBuffer().add(new PickupAction(gc));
+								cancel();
 							}
 						}
 						try {
