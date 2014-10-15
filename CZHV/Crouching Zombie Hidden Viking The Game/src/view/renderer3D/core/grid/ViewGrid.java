@@ -7,10 +7,10 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import view.renderer3D.Model;
 import view.renderer3D.core.Camera;
 import view.renderer3D.core.MatrixCZHV;
 import view.renderer3D.core.ShaderObject;
+import view.renderer3D.core.resources.Model;
 
 public class ViewGrid {
 	private final int numGridCells = 16;

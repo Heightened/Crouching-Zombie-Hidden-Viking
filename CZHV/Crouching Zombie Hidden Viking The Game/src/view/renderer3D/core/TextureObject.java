@@ -59,8 +59,15 @@ public class TextureObject {
 			return;
 		}
 		byte[] imgarray = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
-		data = BufferUtils.createByteBuffer(imgarray.length);
-		data.put(imgarray);
+		byte[] imgarray2 = new byte[imgarray.length];
+		for (int i = 0; i < imgarray.length; i += 4){
+			imgarray2[i + 0] = imgarray[i + 3];
+			imgarray2[i + 1] = imgarray[i + 2];
+			imgarray2[i + 2] = imgarray[i + 1];
+			imgarray2[i + 3] = imgarray[i + 0];
+		}
+		data = BufferUtils.createByteBuffer(imgarray2.length);
+		data.put(imgarray2);
 		data.flip();
 
 		this.width = bi.getWidth();

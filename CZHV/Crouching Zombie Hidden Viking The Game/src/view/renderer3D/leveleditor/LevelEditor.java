@@ -15,13 +15,13 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import view.renderer3D.Model;
 import view.renderer3D.core.Camera;
 import view.renderer3D.core.MatrixCZHV;
 import view.renderer3D.core.ShaderObject;
 import view.renderer3D.core.TOOLBOX;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
+import view.renderer3D.core.resources.Model;
 import view.renderer3D.inputoutput.FileToString;
 import view.renderer3D.leveleditor.objtypes.Fire;
 import view.renderer3D.leveleditor.objtypes.LVLEditorLight;

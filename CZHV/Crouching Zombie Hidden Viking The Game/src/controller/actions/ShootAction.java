@@ -8,7 +8,11 @@ public class ShootAction implements Action {
 	private Weapon w;
 	private GameCharacter target;
 	private GameCharacter source;
-	private int accuracy;
+	
+	public ShootAction(GameCharacter source, GameCharacter target){
+		this.target = target;
+		this.source = source;
+	}
 	
 	public ShootAction(Weapon w, GameCharacter source, GameCharacter target){
 		this.w = w;
@@ -16,28 +20,30 @@ public class ShootAction implements Action {
 		this.source = source;
 	}
 	
-	public ShootAction(Weapon w, GameCharacter source, GameCharacter target, int accuracy){
-		this.w = w;
-		this.target = target;
-		this.accuracy = accuracy;
-		this.source = source;
-	}
-	
 	
 	@Override
 	public boolean perform(Game g) {
-		int appliedDamage = w.getPower();
-		if(w.isMeleeWeapon()){
-			appliedDamage += source.getStrength();
+		int appliedDamage = source.getStrength();
+		if(w!=null){
+			appliedDamage += w.getPower();
+			if(!w.isMeleeWeapon()){
+				appliedDamage -= source.getStrength();
+			}
+			if(hitSuccess(Math.min(w.getAccuracy(), source.getAccuracy()))){
+				target.applyDamage(appliedDamage);
+				return true;
+			}
+		} else {
+			if(hitSuccess(source.getAccuracy())){
+				target.applyDamage(appliedDamage);
+				return true;
+			}
 		}
-		if(hitSuccess()){
-			target.applyDamage(appliedDamage);
-			return true;
-		}
+		
 		return false;
 	}
 
-	private boolean hitSuccess(){
+	private boolean hitSuccess(int accuracy){
 		return Math.random() < accuracy;
 	}
 

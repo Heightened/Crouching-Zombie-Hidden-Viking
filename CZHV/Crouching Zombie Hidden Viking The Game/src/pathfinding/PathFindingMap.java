@@ -52,7 +52,7 @@ public class PathFindingMap
 			this.grid.put(c.getX(), new HashMap<Integer, CellCapsule>());
 		
 		CellType value;
-		if(c.isFree(this.character))
+		if(c.isPassible())
 			value = CellType.PASSIBLE;
 		else
 			value = CellType.IMPASSIBLE;
