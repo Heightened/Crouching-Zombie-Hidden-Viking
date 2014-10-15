@@ -1,4 +1,4 @@
-package view.renderer3D;
+package view.renderer3D.core.resources;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;

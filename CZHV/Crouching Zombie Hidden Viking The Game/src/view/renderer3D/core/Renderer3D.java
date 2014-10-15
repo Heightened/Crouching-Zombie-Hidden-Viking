@@ -28,9 +28,9 @@ import org.lwjgl.util.vector.Vector4f;
 
 import simulator.tempFlocking.FlockingManager;
 import simulator.tempFlocking.Vehicle;
-import view.renderer3D.Model;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
+import view.renderer3D.core.resources.Model;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.inputoutput.FileToString;
 import view.renderer3D.particles.ParticleTest;

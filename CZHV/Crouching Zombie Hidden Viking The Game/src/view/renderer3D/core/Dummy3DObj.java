@@ -8,11 +8,11 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import view.renderer3D.Animation;
-import view.renderer3D.Model;
+import view.renderer3D.core.resources.Animation;
+import view.renderer3D.core.resources.Model;
+import view.renderer3D.core.resources.Resource;
 
 public class Dummy3DObj {
-	//private static Model mesh;
 	private static Animation mesh;
 	protected Vector4f position;
 	private Matrix4f modelMat;
@@ -91,7 +91,6 @@ public class Dummy3DObj {
 	
 	public void update() {
 		if (mesh == null){
-			//mesh = new Model("tricube.obj");
 			mesh = new Animation(120, "Animation/Cube/cube");
 		}
 		animationTime += 0.005f ;
@@ -129,6 +128,8 @@ public class Dummy3DObj {
 		calcModelMatrix();
 		shader.putMat4("modelMatrix", modelMatrix);
 		
+		//shader.bindTexture("texture", Resource.vikingTexture);
+		//Resource.viking.draw(shader);
 		mesh.draw(shader);
 		/*
         mesh.bind();
