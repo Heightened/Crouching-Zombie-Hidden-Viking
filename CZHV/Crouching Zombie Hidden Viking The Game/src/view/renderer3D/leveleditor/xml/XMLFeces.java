@@ -35,7 +35,7 @@ public class XMLFeces {
                         values.put(reader.getAttributeLocalName(i),  reader.getAttributeValue(i));
                     }
                     try{
-                    	map.add( (LVLEditorObject)(XMLSerializeInterface.parse(values).getInstance()));
+                    	map.add( (LVLEditorObject)(Java8FTW.parse(values).getInstance()));
                     }catch(Exception e){
                     	e.printStackTrace();
                     }
