@@ -19,4 +19,10 @@ public class MoveAction implements Action{
 		c.moveTo(x, y);
 		return true;
 	}
+
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 }

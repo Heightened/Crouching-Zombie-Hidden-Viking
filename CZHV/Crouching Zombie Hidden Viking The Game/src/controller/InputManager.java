@@ -30,6 +30,8 @@ public class InputManager extends ConcreteController{
 	private RendererInfoInterface renderer;
 	private ArrayList<GameCharacter> selectedCharacters;
 	private ActionThreadFactory af= new ActionThreadFactory();
+	ActionThread attack = af.attackThread();
+	ActionThread pickUp = af.pickUpItemThread();
 	
 	public InputManager(Game game, RendererInfoInterface renderer){
 		super(game);
@@ -44,8 +46,10 @@ public class InputManager extends ConcreteController{
 	}
 	
 	public void stopManager(){
+		stopThreads(pickUp);
+		stopThreads(attack);
 		Keyboard.destroy();
-		Mouse.destroy();
+		Mouse.destroy();		
 	}
 	
 	
@@ -89,14 +93,6 @@ public class InputManager extends ConcreteController{
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
 						if (obj != null){
-							if (obj instanceof Vector2f){
-								stopAttack();
-								doGroupMoveAction((Vector2f)obj);
-							}	
-							if (obj instanceof Cell){
-								doPickupItem((Cell)obj);
-							}
-							stopAttack();
 							if(Keyboard.getEventKey() == Keyboard.KEY_A){
 								//if mouse clicked and A pressed
 								if(Keyboard.getEventKeyState()){
@@ -108,6 +104,14 @@ public class InputManager extends ConcreteController{
 									}
 								}
 							}
+							if (obj instanceof Vector2f){
+								stopAttack();
+								doGroupMoveAction((Vector2f)obj);
+							}	
+							if (obj instanceof Cell){
+								doPickupItem((Cell)obj);
+							}
+							//stopAttack();
 						}
 						startClick = null;
 					}
@@ -132,11 +136,10 @@ public class InputManager extends ConcreteController{
 		}
 	}
 
-	ActionThread attack = af.attackThread();
 	private void doAttack(Cell cell) {
-		stopThreads(attack); //halt the previous attack command
+		System.out.println("ATTTAAAAAAAACK");
+		stopThreads(attack);
 		attack = af.attackThread();
-		attack.start();
 		//if a target cell was specified we target it with the selected characters
 		if(cell != null){
 			List<GameCharacter> characters = cell.getCharacterHolder().getItem();
@@ -152,6 +155,7 @@ public class InputManager extends ConcreteController{
 			attack.addAttackers(getControllableCharacters());
 			attack.setTargets(getGame().getUndead());
 		}
+		attack.start();
 	}
 	
 	private void stopAttack(){
@@ -169,14 +173,9 @@ public class InputManager extends ConcreteController{
 		}
 	}
 	
-	ActionThread pickUp = af.pickUpItemThread();
 	private void doPickupItem(Cell c) {
 		Item i = c.getItemHolder().getItem();
 		doGroupMoveAction(cellToVector2f(c));
-		//only one pickup thread may spawn
-		stopThreads(pickUp);
-		pickUp = af.pickUpItemThread();
-		pickUp.start();
 		//TODO stuff here
 	}
 	
@@ -233,7 +232,7 @@ public class InputManager extends ConcreteController{
 
 	
 	class ActionThread extends Thread{
-		protected boolean running;
+		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
 		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
@@ -287,15 +286,16 @@ public class InputManager extends ConcreteController{
 				@Override
 				public void run(){
 					while(running){
-						int numChars = getGame().getControlledCharacters().size();
+						int numChars = getControllableCharacters().size();
 						GameCharacter[] lockedTargets = new GameCharacter[numChars];
-						ArrayList<GameCharacter> characters = getGame().getControlledCharacters();
+						ArrayList<GameCharacter> characters = getControllableCharacters();
 						for(int i = 0; i<characters.size(); i++) {
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
 								}
 								if(getControllableCharacters().contains(characters.get(i))){
+									System.out.println("TARGET SELECTED");
 									lockedTargets[i] = focusedTarget;
 								}
 							}
@@ -306,6 +306,7 @@ public class InputManager extends ConcreteController{
 							float range = 1;
 							if(v != null){
 								range = v.getRange();
+								System.out.println("Weapon found" + range);
 							}
 							while(lockedTargets[i] == null && iter.hasNext()){
 								GameCharacter enemy = iter.next();
@@ -323,6 +324,7 @@ public class InputManager extends ConcreteController{
 							}
 							if(lockedTargets[i]!=null){
 								if(nearby(gc, lockedTargets[i], v.getRange())){
+									System.out.println("WAAAAAAAAAH: "+lockedTargets[i].getCurrentHp());
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
 								} else {

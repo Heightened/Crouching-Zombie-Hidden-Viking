@@ -94,7 +94,7 @@ public class Map implements ChangeListener<Cell>
 			int x,y;
 			GameCharacter c = new GameCharacter(128,16,16,2,false);
 			c.setPathFinder(new Astar(this,100,c));
-			c.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 1, 0.7f));
+			c.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 3, 0.7f));
 			
 			do
 			{

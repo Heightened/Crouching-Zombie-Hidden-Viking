@@ -81,4 +81,10 @@ public class GroupMoveAction implements Action{
 	private boolean isInMap(int X, int Y, PathFindingMap map){
 		return map.getGrid().containsKey(X) && map.getGrid().get(X).containsKey(Y);
 	}
+
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 }

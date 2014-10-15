@@ -16,4 +16,10 @@ public class TickAction implements Action {
 		
 		return true;
 	}
+
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 }

@@ -37,7 +37,9 @@ public class Game {
 	public void update(){
 		controlBuffer.drainTo(actionBuffer);
 		while(!actionBuffer.isEmpty()){
-			actionBuffer.remove().perform(this);
+			Action a = actionBuffer.remove();
+			System.out.print(a.type());
+			a.perform(this);
 		}
 	}
 	

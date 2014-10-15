@@ -16,5 +16,12 @@ public class StopMovingAction implements Action{
 		c.stopMovement();
 		return false;
 	}
+
+
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 	
 }

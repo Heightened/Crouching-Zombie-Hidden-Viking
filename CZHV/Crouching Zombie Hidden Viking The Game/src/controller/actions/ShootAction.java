@@ -30,6 +30,7 @@ public class ShootAction implements Action {
 				appliedDamage -= source.getStrength();
 			}
 			if(hitSuccess(Math.min(w.getAccuracy(), source.getAccuracy()))){
+				System.out.println("HIT DAMAGE  WHOA: "+appliedDamage);
 				target.applyDamage(appliedDamage);
 				return true;
 			}
@@ -45,6 +46,12 @@ public class ShootAction implements Action {
 
 	private boolean hitSuccess(float accuracy){
 		return Math.random() < accuracy;
+	}
+
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "Shoot Action";
 	}
 
 }

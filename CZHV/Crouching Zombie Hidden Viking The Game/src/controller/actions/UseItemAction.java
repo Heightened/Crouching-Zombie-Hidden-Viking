@@ -18,4 +18,10 @@ public class UseItemAction implements Action{
 		return i.interact(c);
 	}
 
+	@Override
+	public String type() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
 }

@@ -22,4 +22,9 @@ public class DropItemAction implements Action {
 		chara.getBag().removeItem(i);
 		return true;
 	}
+
+	@Override
+	public String type() {
+		return "";
+	}
 }
