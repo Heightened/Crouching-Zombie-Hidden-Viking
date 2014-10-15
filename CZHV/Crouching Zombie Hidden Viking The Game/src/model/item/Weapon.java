@@ -4,16 +4,19 @@ public class Weapon extends Item {
 	private boolean melee;
 	private String name;
 	private int power;
-	private int range;
-	private int accuracy;
+	private float range;
+	private float accuracy;
 
 	
-	public Weapon(String name, int power ,boolean isMelee, int range, int accuracy){
+	public Weapon(String name, int power ,boolean isMelee, float range, float accuracy){
 		this.name = name;
 		this.melee = isMelee;
 		this.power = power;
 		this.range = range;
 		this.accuracy = accuracy;
+		
+		if(accuracy < 0 || accuracy > 1)
+			throw new IllegalArgumentException("verplicht 0 < accuracy < 1");
 	}
 	
 	/* once a weapon is created one shouldn't be able to 
@@ -21,11 +24,11 @@ public class Weapon extends Item {
 	 * or something
 	 */
 	
-	public final int getAccuracy(){
+	public final float getAccuracy(){
 		return accuracy;//XXX: maybe scale this as a function of range
 	}
 	
-	public final int getRange(){
+	public final float getRange(){
 		return range;
 	}
 

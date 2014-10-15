@@ -19,6 +19,9 @@ public class Inventory {
 	
 	public boolean addItem(Item item){
 		for(int i = 0; i<inventory.length; i++){
+			if(inventory[i] == null){
+				inventory[i] = new ItemSlot();
+			}
 			if(inventory[i].isEmpty()){
 				inventory[i].setItem(item);
 				return true;

@@ -32,7 +32,7 @@ public class GameCharacter extends Vehicle{
 	private PathFinder pathFinder;
 	private List<Node> path;
 	private int pathPointer;
-	private int accuracy;
+	private float accuracy;
 	private boolean selected;
 	
 	public GameCharacter(){
@@ -222,11 +222,11 @@ public class GameCharacter extends Vehicle{
 		return bag;
 	}
 
-	public int getAccuracy() {
+	public float getAccuracy() {
 		return accuracy;
 	}
 
-	public void setAccuracy(int accuracy) {
+	public void setAccuracy(float accuracy) {
 		this.accuracy = accuracy;
 	}
 

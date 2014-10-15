@@ -224,7 +224,7 @@ public class InputManager extends ConcreteController{
 			return c.isAtTarget() && c.getPath() == null;		
 		}
 		
-		public boolean nearby(GameCharacter c, GameCharacter c2, int radius){
+		public boolean nearby(GameCharacter c, GameCharacter c2, float radius){
 			return c.distanceTo(c2)<radius;
 		}
 		
