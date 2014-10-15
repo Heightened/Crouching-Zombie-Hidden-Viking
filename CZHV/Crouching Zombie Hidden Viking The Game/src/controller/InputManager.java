@@ -270,17 +270,22 @@ public class InputManager extends ConcreteController{
 								Weapon v = getWeapon(inventory);
 								while(lockedTargets[i] == null && iter.hasNext()){
 									GameCharacter enemy = iter.next();
-									if(nearby(gc, enemy, v.getRange())){
-										lockedTargets[i] = enemy;
+									if(!enemy.isDead()){
+										if(nearby(gc, enemy, v.getRange())){
+											lockedTargets[i] = enemy;
+										}
+									} else {
+										iter.remove();
 									}
+									
 								} 
+								if(lockedTargets[i].isDead()){
+									lockedTargets[i] = null;
+								}
 								if(lockedTargets[i]!=null){
 									if(nearby(gc, lockedTargets[i], v.getRange())){
 										getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
 									} else {
-										lockedTargets[i] = null;
-									}
-									if(lockedTargets[i].isDead()){
 										lockedTargets[i] = null;
 									}
 								}
