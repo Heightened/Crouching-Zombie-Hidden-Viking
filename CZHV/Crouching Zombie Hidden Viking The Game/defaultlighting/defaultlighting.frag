@@ -118,12 +118,15 @@ void main(void)
         final_color.rgb += light.speccolor.rgb*specular*min(1,lambertTerm)*spotfactordiffuse*diffuseDist;;
     }	
 
-	texelColor = texture2D(texture,texture_coordinate);
-    texelColor = vec4(final_color.rgb*color.rgb,1);
+	vec4 textureColor = texture2D(texture,vec2(texture_coordinate.x, 1-texture_coordinate.y));
+	
+	//texelColor = vec4(texture_coordinate,1,1);
+    //texelColor = vec4(final_color.rgb*color.rgb*textureColor.rgb,1);
+    texelColor = vec4(color.rgb*textureColor.rgb,1);
+    
     //texelColor = vec4(shadow, shadow, shadow,1);
     //texelColor = vec4(final_color.rgb,1);
-    texelColor = vec4(color.rgb,1);
     //texelColor.r = lights[1].color.a;
-  //texelColor.g = color.r;
-   // texelColor.b = 0;
+  	//texelColor.g = color.r;
+   	//texelColor.b = 0;
 }
