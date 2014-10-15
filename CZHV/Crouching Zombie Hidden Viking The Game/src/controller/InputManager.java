@@ -60,28 +60,60 @@ public class InputManager extends ConcreteController{
 		while(Mouse.next() || Keyboard.next()){
 			//if left mouse button was pressed
 			if(Mouse.getEventButton() == 0){
-				//select cells
-				Collection<Cell> selected = selector();
-				if(selected != null){
-					for(Cell c: selected){
-						//get the characters
-						List<GameCharacter> characters = c.getCharacterHolder().getItem();
-						//if characters were selected add them to the selection
-						for(GameCharacter character: characters){
-							if(!character.isSelected()){
-								character.setSelected(true);
-								selectedCharacters.add(character);
+				
+				if(Mouse.getEventButtonState()){
+					startClick = new Point(Mouse.getX(), Mouse.getY());
+				} else {
+					Collection<Cell> selected = selector();
+					if (startClick != null) {
+						// select cells
+						ArrayList<GameCharacter> temp = new ArrayList<GameCharacter>();
+						temp.addAll(selectedCharacters);
+						if (selected != null) {
+							for (GameCharacter gc : selectedCharacters) {
+								gc.setSelected(false);
 							}
+							selectedCharacters.clear();
+							for (Cell c : selected) {
+								// get the characters
+								List<GameCharacter> characters = c
+										.getCharacterHolder().getItem();
+								// if characters were selected add them to the
+								// selection
+								if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT
+										|| Keyboard.getEventKey() == Keyboard.KEY_RSHIFT) {
+									if (Keyboard.getEventKeyState()) {
+										for (GameCharacter character : characters) {
+
+											temp.add(character);
+											selectedCharacters = temp;
+										}
+										for (GameCharacter character : selectedCharacters) {
+											character.setSelected(true);
+										}
+									}
+								} else {
+
+									for (GameCharacter character : characters) {
+										if (!character.isSelected()) {
+											character.setSelected(true);
+											selectedCharacters.add(character);
+										}
+									}
+								}
+							}
+						} else {
+							// if no characters were selected deselect all
+							// characters
+							for (GameCharacter character : selectedCharacters) {
+								character.setSelected(false);
+							}
+							selectedCharacters.clear();
 						}
 					}
-				} else {
-					//if no characters were selected deselect all characters
-					for(GameCharacter character: selectedCharacters){
-						character.setSelected(false);
-					}
-					selectedCharacters.clear();
+					startClick = null;
 				}
-			}
+			} 
 			//right mouse button
 			if(Mouse.getEventButton() == 1){				
 				if(Mouse.getEventButtonState()) {
@@ -113,8 +145,8 @@ public class InputManager extends ConcreteController{
 							}
 							//stopAttack();
 						}
-						startClick = null;
 					}
+					startClick = null;
 				}
 			}			
 
@@ -135,6 +167,28 @@ public class InputManager extends ConcreteController{
 			}
 		}
 	}
+	
+	private Collection<Cell> selector(){
+		Collection<Cell> selection;
+		if (startClick != null){
+			endClick = new Point(Mouse.getX(), Mouse.getY());
+			double distance = Math.abs(endClick.x - startClick.x) + Math.abs(endClick.y - startClick.y);
+			//distance determines whether we select with selectbox or a single point
+			if (distance > 10){
+				return renderer.squareSelect(startClick, endClick);
+			} else {
+				Object obj = renderer.click(startClick.x, startClick.y);
+				if (obj != null){
+					if (obj instanceof Cell){
+						selection = new ArrayList<Cell>();
+						selection.add((Cell)obj);
+						return selection;
+					}
+				}
+			}
+		} 
+		return null;
+	}
 
 	private void doAttack(Cell cell) {
 		stopThreads(attack);
@@ -144,7 +198,6 @@ public class InputManager extends ConcreteController{
 			List<GameCharacter> characters = cell.getCharacterHolder().getItem();
 			for(GameCharacter c: characters){
 				if(c.isInfected()){				
-					doGroupMoveAction(cellToVector2f(c.getCell()));
 					//only one attack thread may spawn
 					attack.addAttackers(getControllableCharacters());
 					attack.setTarget(c);
@@ -188,7 +241,7 @@ public class InputManager extends ConcreteController{
 			GroupMoveAction m = new GroupMoveAction(controllable,  vec.getX(), vec.getY());
 			getGame().getActionBuffer().add(m);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//Nothing has to be done
 		}
 	}
 
@@ -201,35 +254,7 @@ public class InputManager extends ConcreteController{
 		}
 		return controllable;
 	}
-	
-	private Collection<Cell> selector(){
-		Collection<Cell> selection;
-		if(Mouse.getEventButtonState()){
-			startClick = new Point(Mouse.getX(), Mouse.getY());
-		} else {
-			if (startClick != null){
-				endClick = new Point(Mouse.getX(), Mouse.getY());
-				double distance = Math.abs(endClick.x - startClick.x) + Math.abs(endClick.y - startClick.y);
-				//distance determines whether we select with selectbox or a single point
-				if (distance > 10){
-					return renderer.squareSelect(startClick, endClick);
-				} else {
-					Object obj = renderer.click(startClick.x, startClick.y);
-					if (obj != null){
-						if (obj instanceof Cell){
-							selection = new ArrayList<Cell>();
-							selection.add((Cell)obj);
-							return selection;
-						}
-					}
-				}
-			} 
-		}
-		return null;
-	}
-	
-
-	
+		
 	class ActionThread extends Thread{
 		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
@@ -292,6 +317,8 @@ public class InputManager extends ConcreteController{
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
+								} else {
+									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()));
 								}
 								if(getControllableCharacters().contains(characters.get(i))){
 									lockedTargets[i] = focusedTarget;
@@ -321,7 +348,6 @@ public class InputManager extends ConcreteController{
 							}
 							if(lockedTargets[i]!=null){
 								if(nearby(gc, lockedTargets[i], v.getRange())){
-									System.out.println("WAAAAAAAAAH: "+lockedTargets[i].getCurrentHp());
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
 								} else {
@@ -330,7 +356,7 @@ public class InputManager extends ConcreteController{
 							}
 						}
 						try {
-							Thread.sleep(10);
+							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
