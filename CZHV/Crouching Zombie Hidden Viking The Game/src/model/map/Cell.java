@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import pathfinding.Node;
+
 import model.Container;
 import model.character.GameCharacter;
 import model.item.Item;
@@ -21,7 +23,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	private int x,y;
 	private float spaceRadius;
 	
-	public Cell(Map map, int x, int y)
+	public Cell(Map map, int x, int y, float defaultRadius)
 	{
 		this.map = map;
 		this.x   = x;
@@ -30,7 +32,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		this.characterHolder.addListener(this);
 		this.decorHolder.addListener(this);
 		this.characterHolder.setItem(new ArrayList<GameCharacter>());
-		spaceRadius = 2;
+		spaceRadius = defaultRadius;
 	}
 	
 	// should be taken over by decor later
@@ -114,4 +116,8 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	{
 		this.spaceRadius = r;
 	}
+    
+    public static float distance(Cell c1, Cell c2){
+        return (float)Math.sqrt((Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2)));
+    }
 }
