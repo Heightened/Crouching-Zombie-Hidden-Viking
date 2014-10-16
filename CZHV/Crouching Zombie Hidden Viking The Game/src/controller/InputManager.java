@@ -9,8 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import model.Game;
 import model.character.GameCharacter;
-import model.character.ItemSlot;
-import model.item.Item;
 import model.item.Weapon;
 import model.map.Cell;
 
@@ -138,14 +136,14 @@ public class InputManager extends ConcreteController{
 								boolean Switch = false;;
 								Collection<Cell> cells = getGame().getMap().getActiveCells();
 								for(Cell c: cells){
-									if(c.getX() == ((Vector2f)obj).x & c.getY() == ((Vector2f)obj).y){
+									if(c.getX() == (int)(((Vector2f)obj).x+0.5f) && c.getY() == (int)(((Vector2f)obj).y+0.5f)){
 										if(!c.getItemHolder().isEmpty()){
 											doPickupItem((Vector2f)obj);
 											Switch = true;
 										} 
 									} 
 								}
-								if(Switch = false){
+								if(!Switch){
 									doGroupMoveAction((Vector2f)obj);
 								}
 							} 
@@ -262,12 +260,11 @@ public class InputManager extends ConcreteController{
 		return controllable;
 	}
 		
-	class ActionThread extends Thread implements itemCallback{
+	class ActionThread extends Thread {
 		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
 		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
-		protected boolean itemPickedup = false;
 		
 		public void cancel(){
 			running = false;
@@ -308,11 +305,6 @@ public class InputManager extends ConcreteController{
 		
 		public void setTargets(ArrayList<GameCharacter> targets) {
 			this.targets.addAll(targets);
-		}
-
-		@Override
-		public void itemPickedUp() {
-			itemPickedup = true;	
 		}
 	}
 	
@@ -381,27 +373,22 @@ public class InputManager extends ConcreteController{
 				@Override
 				public void run(){
 					ArrayList<GameCharacter> temp = selectedCharacters;
+					boolean areMoving = false;
 					while(running){
-						System.out.println("TRYING TO PICKUP ITEM");
-						boolean areMoving = false;
-						if(!areMoving && running){
+						if(!areMoving){
 							boolean temp2 = true;
 							for(GameCharacter gc: temp){
-								temp2 &= gc.isMoving();
+								temp2 = temp2 && gc.isMoving();
 							}
 							areMoving = temp2;
 							try {
 								Thread.sleep(100);
 							} catch (InterruptedException e) {
 							}
-						}else
-						if(running){
-							System.out.println("LETS START PICKUP ITEM");
+						} else {
 							for(GameCharacter gc: temp){
 								if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
-									System.out.println("ITEM FOUND!");
-									getGame().getActionBuffer().add(new PickupAction(gc, this));
-									while(!itemPickedup) {}
+									getGame().getActionBuffer().add(new PickupAction(gc));
 									cancel();
 								}
 							}
