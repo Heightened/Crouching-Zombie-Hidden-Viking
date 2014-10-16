@@ -18,6 +18,7 @@ public class Map implements ChangeListener<Cell>
 	protected Cell[][] grid;
 	private Collection<ChangeListener<Cell>> listeners = new LinkedList<>();
 	private ArrayList<GameCharacter> controlled = new ArrayList<GameCharacter>();
+	final float defaultRadius = 10;
 	
 	public Map(int width, int height)
 	{
@@ -25,7 +26,7 @@ public class Map implements ChangeListener<Cell>
 		
 		for(int x=0; x<width; x++)
 			for(int y=0; y<height; y++)
-				this.grid[x][y] = new Cell(this, x, y);
+				this.grid[x][y] = new Cell(this, x, y, defaultRadius);
 	}
 	
 	public void populate()
@@ -132,6 +133,7 @@ public class Map implements ChangeListener<Cell>
 			
 		}
 		//*/
+		setRadii();
 	}
 	
 	public boolean isInGrid(int x, int y)
@@ -248,5 +250,18 @@ public class Map implements ChangeListener<Cell>
 
 	public ArrayList<GameCharacter> getControlledCharacters() {
 		return controlled;
+	}
+	
+	private void setRadii(){
+		Collection<Cell> impassibleCells = getImpassibleCells();
+		Collection<Cell> nearbyCells;
+		for(Cell c1 : impassibleCells) 
+		{
+			nearbyCells = getNearbyCells(c1.getX(), c1.getY(), (int) defaultRadius);
+			for(Cell c2 : nearbyCells)
+			{
+				c2.setSpaceRadius(Math.min(c2.getSpaceRadius(), Cell.distance(c1, c2) - 0.5f));
+			}
+		}
 	}
 }

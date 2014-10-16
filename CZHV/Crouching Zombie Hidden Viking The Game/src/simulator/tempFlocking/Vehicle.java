@@ -52,7 +52,6 @@ public class Vehicle extends Dummy3DObj{
 		float tX = n.getX() * scaling;
 		float tZ = n.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
-		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetRadius(float r){
