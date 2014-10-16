@@ -28,7 +28,7 @@ public class ShootAction implements Action {
 	public boolean perform(Game g) {
 		int appliedDamage = source.getStrength();
 		if(w!=null){
-			if(inRange(w.getRange())){
+			if(!inRange(w.getRange())){
 				return false;
 			}
 			appliedDamage += w.getPower();
@@ -40,7 +40,7 @@ public class ShootAction implements Action {
 				return true;
 			}
 		} else {
-			if(inRange(GameCharacter.DEFAULT_MELEE_RANGE)){
+			if(!inRange(GameCharacter.DEFAULT_MELEE_RANGE)){
 				return false;
 			}
 			if(hitSuccess(source.getAccuracy())){
