@@ -85,8 +85,8 @@ public class Renderer3D implements RendererInfoInterface{
 		setupDisplay();
 		this.game = game;
 		map = game.getMap();
-		for (int i = 0; i < 15; i++){
-			for (int j = 0; j < 15; j++){
+		for (int i = 0; i < 50; i++){
+			for (int j = 0; j < 50; j++){
 				game.getFlockingMap().getActiveCells(2*i, 2*j);
 			}
 		} 
@@ -580,7 +580,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 			model.item.Item i = cell.getItemHolder().getItem();
 			if (i != null){
-				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+				i.setPosition(cell.getX()*cellSize, 0, cell.getY()*cellSize);
 				shader.putUnifFloat4("color", itemColor);
 				i.draw(shader);
 			}
@@ -595,7 +595,7 @@ public class Renderer3D implements RendererInfoInterface{
 			if (index > impassibleCells.size()/4){
 				break;
 			}
-			d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
+			d.setPosition(cell.getX()*cellSize, 0.02f, cell.getY()*cellSize);
 			d.draw(shader);
 		}
 
