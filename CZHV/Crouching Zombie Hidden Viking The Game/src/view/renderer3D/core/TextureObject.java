@@ -58,20 +58,27 @@ public class TextureObject {
 			e.printStackTrace();
 			return;
 		}
+
+		this.width = bi.getWidth();
+		this.height = bi.getHeight();
+		
+		//abgr to rgba + flip Y
 		byte[] imgarray = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
 		byte[] imgarray2 = new byte[imgarray.length];
-		for (int i = 0; i < imgarray.length; i += 4){
-			imgarray2[i + 0] = imgarray[i + 3];
-			imgarray2[i + 1] = imgarray[i + 2];
-			imgarray2[i + 2] = imgarray[i + 1];
-			imgarray2[i + 3] = imgarray[i + 0];
+		for (int x = 0; x < width; x ++){
+			for (int y = 0; y < height; y ++){
+				int i = y*width*4 + x*4;
+				int invi = (height-y-1)*width*4 + x*4;
+				imgarray2[invi + 0] = imgarray[i + 3];
+				imgarray2[invi + 1] = imgarray[i + 2];
+				imgarray2[invi + 2] = imgarray[i + 1];
+				imgarray2[invi + 3] = imgarray[i + 0];
+			}
 		}
 		data = BufferUtils.createByteBuffer(imgarray2.length);
 		data.put(imgarray2);
 		data.flip();
 
-		this.width = bi.getWidth();
-		this.height = bi.getHeight();
 		this.name = filename;
 		this.internalFormat = GL11.GL_RGBA;
 		this.format = GL11.GL_RGBA;

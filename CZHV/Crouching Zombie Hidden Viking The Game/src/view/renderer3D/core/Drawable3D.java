@@ -76,6 +76,7 @@ public class Drawable3D {
 			vertexBuffer.putShort(getShort(normals[i*3])).putShort(getShort(normals[i*3 + 1])).putShort(getShort(normals[i*3 + 2]));
 			//buffer vertex tangent vector
 			vertexBuffer.putShort(getShort(tangents[i*3])).putShort(getShort(tangents[i*3 + 1])).putShort(getShort(tangents[i*3 + 2]));
+			//vertexBuffer.putShort(getShort(1f)).putShort(getShort(1f)).putShort(getShort(0f));
 			//buffer vertex texture coordinates
 			vertexBuffer.putShort(getShort(uvcoords[i*2])).putShort(getShort(uvcoords[i*2 + 1]));
 			//padding

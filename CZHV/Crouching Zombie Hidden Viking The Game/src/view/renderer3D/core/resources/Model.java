@@ -41,6 +41,11 @@ public class Model {
 			float[] uvcoords = new float[size * 2];
 			float[] normals = new float[size * 3];
 			float[] tangents = new float[size * 3];
+			ArrayList<Vector3f> distinctTangents = new ArrayList<>();
+			System.out.println(size);
+			for (int i = 0; i < distinctNormals.size(); i++){
+				distinctTangents.add(new Vector3f());
+			}
 			
 			int i = 0;
 			for (String[] face : faces) {
@@ -48,6 +53,7 @@ public class Model {
 				float[][] position = new float[3][];
 				float[][] textureCoord = new float[3][];
 				float[][] normal = new float[3][];
+				int[] normindex = new int[3];
 				for (int index = 1; index < 4; index++) {
 					if (face[index].equals("f")) {
 						continue;
@@ -59,9 +65,11 @@ public class Model {
 					//System.out.println(Arrays.toString(attributes));
 					
 					position[index1] = distinctVertices.get(attributes[0] - 1);
-					//textureCoord[index1] = distinctTextureCoords.get(attributes[1] - 1);
-					textureCoord[index1] = new float[] {0.0f, 0.0f};
+					textureCoord[index1] = distinctTextureCoords.get(attributes[1] - 1);
+					//textureCoord[index1] = new float[] {0.0f, 0.0f};
 					normal[index1] = distinctNormals.get(attributes[2] - 1);
+					normindex[index1] = attributes[2] - 1;
+					tangents[i*3] = attributes[2] - 1;
 					
 					vertices[i * 3] = position[index1][0];
 					vertices[i * 3 + 1] = position[index1][1];
@@ -76,19 +84,20 @@ public class Model {
 					
 					i++;
 				}
-				float[] tangent = calcTangentNonIP2(position[0], position[1], position[2], normal[0], normal[1], normal[2], textureCoord[0], textureCoord[1], textureCoord[2]);
-
-				i -= 3;
-				tangents[i*3] = tangent[0];
-				tangents[i*3 + 1] = tangent[1];
-				tangents[i*3 + 2] = tangent[2];
-				tangents[i*3] = tangent[0];
-				tangents[i*3 + 1] = tangent[1];
-				tangents[i*3 + 2] = tangent[2];
-				tangents[i*3] = tangent[0];
-				tangents[i*3 + 1] = tangent[1];
-				tangents[i*3 + 2] = tangent[2];
-				i += 3;
+				Vector3f tangent = calcTangentForNormal(position[0], position[1], position[2], normal[0], textureCoord[0], textureCoord[1], textureCoord[2]);
+				Vector3f.add(distinctTangents.get(normindex[0]),tangent, distinctTangents.get(normindex[0]));
+				tangent = calcTangentForNormal(position[0], position[1], position[2], normal[1], textureCoord[0], textureCoord[1], textureCoord[2]);
+				Vector3f.add(distinctTangents.get(normindex[1]),tangent, distinctTangents.get(normindex[1]));
+				tangent = calcTangentForNormal(position[0], position[1], position[2], normal[2], textureCoord[0], textureCoord[1], textureCoord[2]);
+				Vector3f.add(distinctTangents.get(normindex[2]),tangent, distinctTangents.get(normindex[2]));
+			}
+			
+			for (i = 0; i < tangents.length; i += 3){
+				int index = (int)tangents[i];
+				distinctTangents.get(index).normalise();
+				tangents[i + 0] = distinctTangents.get(index).x;
+				tangents[i + 1] = distinctTangents.get(index).y;
+				tangents[i + 2] = distinctTangents.get(index).z;
 			}
 			
 			initialize(size, vertices, uvcoords, normals, tangents);
@@ -99,47 +108,80 @@ public class Model {
 		}
 	}
 	
-	 public static float[] calcTangentNonIP2(float[] v1, float[] v2,float[] v3,float[] n1,float[] n2,float[] n3,float[] w1,float[] w2,float[] w3){
-	       Vector3f v2v1 = new Vector3f();
-	       Vector3f v3v1 = new Vector3f();
-	       Vector3f tangent = new Vector3f();
-	       Vector3f biTangent = new Vector3f();
-	        //Calculate the vectors from the current vertex to the two other vertices in the triangle
-	       v2v1.x = v2[0] - v1[0];
-	       v2v1.y = v2[1] - v1[1];
-	       v2v1.z = v2[2] - v1[2];
-	       
-	       v3v1.x = v3[0] - v1[0];
-	       v3v1.y = v3[1] - v1[1];
-	       v3v1.z = v3[2] - v1[2];
-	      //  Vector3f.sub( v2, v1 , v2v1);
-	       // Vector3f.sub( v3, v1 , v3v1);
+	public static float[] calcTangentNonIP2(float[] v1, float[] v2,float[] v3,float[] n1,float[] n2,float[] n3,float[] w1,float[] w2,float[] w3){
+		Vector3f v2v1 = new Vector3f();
+		Vector3f v3v1 = new Vector3f();
+		Vector3f tangent = new Vector3f();
+		Vector3f biTangent = new Vector3f();
+		//Calculate the vectors from the current vertex to the two other vertices in the triangle
+		v2v1.x = v2[0] - v1[0];
+		v2v1.y = v2[1] - v1[1];
+		v2v1.z = v2[2] - v1[2];
 
-	        // Calculate c2c1_T and c2c1_B
-	        float c2c1_T = w2[0] - w1[0];
-	        float c2c1_B = w2[1] - w1[1];
+		v3v1.x = v3[0] - v1[0];
+		v3v1.y = v3[1] - v1[1];
+		v3v1.z = v3[2] - v1[2];
+		//  Vector3f.sub( v2, v1 , v2v1);
+		// Vector3f.sub( v3, v1 , v3v1);
 
-	        // Calculate c3c1_T and c3c1_B
-	        float c3c1_T = w3[0] - w1[0];
-	        float c3c1_B = w3[1] - w1[1];
+		// Calculate c2c1_T and c2c1_B
+		float c2c1_T = w2[0] - w1[0];
+		float c2c1_B = w2[1] - w1[1];
 
-	        float fDenominator = c2c1_T * c3c1_B - c3c1_T * c2c1_B;
-	        float fScale1 = 1.0f / fDenominator;
+		// Calculate c3c1_T and c3c1_B
+		float c3c1_T = w3[0] - w1[0];
+		float c3c1_B = w3[1] - w1[1];
 
-	        tangent.x = ( c3c1_B * v2v1.x - c2c1_B * v3v1.x ) * fScale1;
-	        tangent.y = ( c3c1_B * v2v1.y - c2c1_B * v3v1.y ) * fScale1;
-	        tangent.z = ( c3c1_B * v2v1.z - c2c1_B * v3v1.z ) * fScale1;
+		float fDenominator = c2c1_T * c3c1_B - c3c1_T * c2c1_B;
+		float fScale1 = 1.0f / fDenominator;
 
-	        biTangent.x = ( -c3c1_T * v2v1.x + c2c1_T * v3v1.x ) * fScale1;
-	        biTangent.y = ( -c3c1_T * v2v1.y + c2c1_T * v3v1.y ) * fScale1;
-	        biTangent.z = ( -c3c1_T * v2v1.z + c2c1_T * v3v1.z ) * fScale1;
+		tangent.x = ( c3c1_B * v2v1.x - c2c1_B * v3v1.x ) * fScale1;
+		tangent.y = ( c3c1_B * v2v1.y - c2c1_B * v3v1.y ) * fScale1;
+		tangent.z = ( c3c1_B * v2v1.z - c2c1_B * v3v1.z ) * fScale1;
 
-	        float[] retFloat = new float[3];
-	        retFloat[0] = tangent.x;
-	        retFloat[1] = tangent.y;
-	        retFloat[2] = tangent.z;
-	        return retFloat;
-	    }
+		biTangent.x = ( -c3c1_T * v2v1.x + c2c1_T * v3v1.x ) * fScale1;
+		biTangent.y = ( -c3c1_T * v2v1.y + c2c1_T * v3v1.y ) * fScale1;
+		biTangent.z = ( -c3c1_T * v2v1.z + c2c1_T * v3v1.z ) * fScale1;
+
+		float[] retFloat = new float[3];
+		retFloat[0] = tangent.x;
+		retFloat[1] = tangent.y;
+		retFloat[2] = tangent.z;
+		return retFloat;
+	}
+	
+	public Vector3f[] calcTangentForNormal(float[] v1, float[] v2,float[] v3,float[] n1,float[] n2,float[] n3,float[] w1,float[] w2,float[] w3){
+		Vector3f[] tangents = new Vector3f[3];
+		tangents[0] = calcTangentForNormal(v1, v2, v3, n1, w1, w2, w3);
+		tangents[1] = calcTangentForNormal(v1, v2, v3, n2, w1, w2, w3);
+		tangents[2] = calcTangentForNormal(v1, v2, v3, n3, w1, w2, w3);
+		return tangents;
+	}
+	
+	public Vector3f calcTangentForNormal(float[] v1, float[] v2,float[] v3,float[] n,float[] w1,float[] w2,float[] w3){
+
+		Vector3f norm = new Vector3f(n[0], n[1], n[2]);
+		
+        Vector3f v2v1 = new Vector3f();//pos2.sub(pos1);
+        Vector3f v3v1 = new Vector3f();//pos3.sub(pos1);
+		v2v1.x = v2[0] - v1[0];
+		v2v1.y = v2[1] - v1[1];
+		v2v1.z = v2[2] - v1[2];
+
+		v3v1.x = v3[0] - v1[0];
+		v3v1.y = v3[1] - v1[1];
+		v3v1.z = v3[2] - v1[2];
+
+        float c2c1b = w2[1] - w1[1];
+        float c3c1b = w3[1] - w1[1];
+        Vector3f t = new Vector3f(),b = new Vector3f();
+        Vector3f.sub(((Vector3f)v2v1.scale(c3c1b)), (Vector3f)v3v1.scale(c2c1b), t);
+
+        Vector3f.cross(norm, t, b);
+        Vector3f.cross(b,norm, t);
+        //the final tangent
+        return (Vector3f)t.normalise();      
+	}
 	
 	modelSegment[] model;
 	

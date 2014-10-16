@@ -53,7 +53,7 @@ public class ViewGrid {
 	        	//shader.putUnifFloat4("color", 1, 1, 1, 1);//normal
 				FloatBuffer modelMatrix = BufferUtils.createFloatBuffer(16);
 				Matrix4f modelMat = new Matrix4f();
-				MatrixCZHV.getModelMatrix(new Vector3f((x)*gridSizeX, -0.035f, (y)*gridSizeY), new Vector3f(gridSizeX,1,gridSizeY), new Vector3f(0,0,0), modelMat);
+				MatrixCZHV.getModelMatrix(new Vector3f((x)*gridSizeX, 0, (y)*gridSizeY), new Vector3f(gridSizeX,1,gridSizeY), new Vector3f(0,0,0), modelMat);
 				MatrixCZHV.MatrixToBuffer(modelMat, modelMatrix);
 				shader.putMat4("modelMatrix", modelMatrix);
 				quadModel.draw(shader);

@@ -152,11 +152,11 @@ public class LightManager {
     		return;
     	}
         //stay idle for now
-        for (int i = 3; i < lights.size(); i++){
+        for (int i = 1; i < lights.size(); i++){
             lights.get(i).setDirty();
-           // lights.get(i).position.y = ((float)Math.sin(Renderer3D.currentTime*20+i)*0.5f);
-           lights.get(i).spotDirection.z = ((float)Math.sin(Renderer3D.currentTime*20+i)*1f);
-           lights.get(i).spotDirection.x = ((float)Math.cos(Renderer3D.currentTime*20+i)*1f);
+           //lights.get(i).position.y = ((float)Math.sin(Renderer3D.currentTime*50+i)/4);
+           //lights.get(i).spotDirection.z = ((float)Math.sin(Renderer3D.currentTime*20+i)*1f);
+           //lights.get(i).spotDirection.x = ((float)Math.cos(Renderer3D.currentTime*20+i)*1f);
           // lights.get(i).radius = (float)Math.sin(Renderer3D.currentTime*20)+1f;
            // lights.get(i).cutoffangle = 0.8f;
             //lights.get(i).radius = (float)Math.sin(Renderer3D.currentTime*10)*1+1;

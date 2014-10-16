@@ -76,7 +76,7 @@ void main(void)
     vec4 lightindex = indices[cellx+cellz*16];
     
     vec3 Tangent = normalize(tangents);
-    Tangent = normalize(Tangent - dot(Tangent, normal) * normal);
+    //Tangent = normalize(Tangent - dot(Tangent, normal) * normal);
     vec3 Bitangent = cross(Tangent, normal);
    // Light lights[3] = Light[3](
    //   Light(vec4(50,20,0,0), vec4(1,0,0,0),vec4(0.75,0,0,0),vec4(150.0,0,0,0)),
@@ -86,7 +86,8 @@ void main(void)
    // lights[0] = lights2[0];//dummy
 	vec4 final_color = vec4(0,0,0,1);//dummy
     vec4 eyevec = normalize(eyeposition - worldspacePos);
-    vec3 BumpMapNormal = texture2D(normsamp,worldspacePos.xz*4).gbr*2 - 1;//texture2D(normsamp,texture_coordinate);
+    vec3 BumpMapNormal = texture2D(normsamp,texture_coordinate*4).rgb*2 - 1;//texture2D(normsamp,texture_coordinate);
+    BumpMapNormal.r *= -1;
     //BumpMapNormal = vec3(0,1,0);
 	mat3 TBN = mat3(Tangent, Bitangent, normal);
     vec3 N = TBN * BumpMapNormal;
@@ -119,6 +120,7 @@ void main(void)
     }	
 
 	texelColor = texture2D(texture,texture_coordinate);
+    texelColor = vec4(normalize((Bitangent+1)/2).rgb,1);
     texelColor = vec4(final_color.rgb*color.rgb,1);
     //texelColor = vec4(shadow, shadow, shadow,1);
     texelColor = vec4(color.rgb,1);
