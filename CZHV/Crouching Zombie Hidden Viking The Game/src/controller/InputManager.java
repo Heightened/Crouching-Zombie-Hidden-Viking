@@ -117,13 +117,11 @@ public class InputManager extends ConcreteController{
 			//right mouse button
 			if(Mouse.getEventButton() == 1){				
 				if(Mouse.getEventButtonState()) {
-					//TODO clicked zombie while characters selected: attack
-					//TODO click on viking while selected: open inventory
-					//TODO clicked/drag from any tile while nothing selected, selection mode
 					startClick = new Point(Mouse.getX(), Mouse.getY());
 				} else {
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
+						startClick = null;
 						if (obj != null){
 							if(Keyboard.getEventKey() == Keyboard.KEY_A){
 								//if mouse clicked and A pressed
@@ -137,14 +135,13 @@ public class InputManager extends ConcreteController{
 								} 
 							}
 							if (obj instanceof Vector2f){
-								doGroupMoveAction((Vector2f)obj);
-							}	
+								doPickupItem((Vector2f)obj);
+							} 
 							if (obj instanceof Cell){
-								doPickupItem((Cell)obj);
+								doPickupItem(cellToVector2f((Cell)obj));
 							}
 						}
 					}
-					startClick = null;
 				}
 			}			
 
@@ -219,18 +216,18 @@ public class InputManager extends ConcreteController{
 		}
 	}
 	
-	private void doPickupItem(Cell c) {
+	private void doPickupItem(Vector2f obj) {
 		stopThreads(pickUp);
 		pickUp = af.pickUpItemThread();		
-		doGroupMoveAction(cellToVector2f(c));
+		System.out.println("Picking up item");
+		doGroupMoveAction(obj);
 		pickUp.start();
-		//TODO stuff here
 	}
 	
 	private Vector2f cellToVector2f(Cell c){
 		return new Vector2f(c.getX(), c.getY());
 	}
-
+	
 	private void doGroupMoveAction(Vector2f vec) {
 		ArrayList<GameCharacter> controllable = getControllableCharacters();
 		try {
@@ -251,11 +248,12 @@ public class InputManager extends ConcreteController{
 		return controllable;
 	}
 		
-	class ActionThread extends Thread{
+	class ActionThread extends Thread implements itemCallback{
 		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
 		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
 		protected GameCharacter focusedTarget;
+		protected boolean itemPickedup = false;
 		
 		public void cancel(){
 			running = false;
@@ -297,6 +295,11 @@ public class InputManager extends ConcreteController{
 		public void setTargets(ArrayList<GameCharacter> targets) {
 			this.targets.addAll(targets);
 		}
+
+		@Override
+		public void itemPickedUp() {
+			itemPickedup = true;	
+		}
 	}
 	
 	class ActionThreadFactory {
@@ -321,8 +324,7 @@ public class InputManager extends ConcreteController{
 							}
 							Iterator<GameCharacter> iter = targets.iterator();
 							GameCharacter gc = characters.get(i);
-							ItemSlot[] inventory = gc.getBag().getInventory();
-							Weapon v = getWeapon(inventory);
+							Weapon w = getWeapon(gc);
 							float range = 1;
 							if(v != null){
 								range = v.getRange();
@@ -359,7 +361,8 @@ public class InputManager extends ConcreteController{
 					}		
 				}
 				
-				private Weapon getWeapon(ItemSlot[] inventory) {
+				private Weapon getWeapon(GameCharacter gc) {
+					ItemSlot[] inventory = gc.getBag().getInventory();
 					for (int i = 0; i < inventory.length; i++) {
 						Item item = inventory[i].getItem();
 						if(item instanceof Weapon){
@@ -375,19 +378,36 @@ public class InputManager extends ConcreteController{
 			return new ActionThread(){
 				@Override
 				public void run(){
+					ArrayList<GameCharacter> temp = selectedCharacters;
 					while(running){
-						for(GameCharacter gc: selectedCharacters){
-							if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
-								getGame().getActionBuffer().add(new PickupAction(gc));
-								cancel();
+						System.out.println("TRYING TO PICKUP ITEM");
+						boolean areMoving = false;
+						if(!areMoving && running){
+							boolean temp2 = true;
+							for(GameCharacter gc: temp){
+								temp2 &= gc.isMoving();
 							}
-						}
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+							areMoving = temp2;
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+						}else
+						if(running){
+							System.out.println("LETS START PICKUP ITEM");
+							for(GameCharacter gc: temp){
+								if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
+									System.out.println("ITEM FOUND!");
+									getGame().getActionBuffer().add(new PickupAction(gc, this));
+									while(!itemPickedup) {}
+									cancel();
+								}
+							}
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+						}						
 					}
 				}
 			};

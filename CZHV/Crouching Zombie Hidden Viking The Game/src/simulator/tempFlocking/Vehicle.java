@@ -246,4 +246,9 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
 		return distance < this.targetRadius;
 	}
+	
+	public Vector4f getTarget(){
+		return this.target;
+	}
 }
+
