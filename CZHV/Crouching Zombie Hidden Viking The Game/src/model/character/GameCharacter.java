@@ -253,7 +253,7 @@ public class GameCharacter extends Vehicle{
 			if(w.getRange()<range){
 				if(best == null){
 					best = w;
-				} else if (w.getPower()+w.getRange() > best.getPower()+w.getRange()){
+				} else if (w.getPower()> best.getPower()){
 					best = w;
 				}
 			}

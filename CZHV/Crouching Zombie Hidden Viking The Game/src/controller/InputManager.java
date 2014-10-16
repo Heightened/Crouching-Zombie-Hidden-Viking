@@ -318,6 +318,7 @@ public class InputManager extends ConcreteController{
 						GameCharacter[] lockedTargets = new GameCharacter[numChars];
 						ArrayList<GameCharacter> characters = getControllableCharacters();
 						for(int i = 0; i<characters.size(); i++) {
+// This block determines the targets -------------------------------------------------------------------
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
@@ -346,6 +347,7 @@ public class InputManager extends ConcreteController{
 								}
 								
 							} 
+// end target determination -----------------------------------------------------------------------------
 							if(lockedTargets[i]!=null){
 								if(lockedTargets[i].isDead()){
 									lockedTargets[i] = null;
@@ -360,7 +362,6 @@ public class InputManager extends ConcreteController{
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}		
