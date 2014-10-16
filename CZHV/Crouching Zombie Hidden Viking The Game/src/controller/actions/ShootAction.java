@@ -10,8 +10,7 @@ public class ShootAction implements Action {
 	private GameCharacter source;
 	
 	public ShootAction(GameCharacter source, GameCharacter target){
-		this.target = target;
-		this.source = source;
+		this(source.getBestWeapon(source.distanceTo(target)), source, target);
 	}
 	
 	public ShootAction(Weapon w, GameCharacter source, GameCharacter target){
