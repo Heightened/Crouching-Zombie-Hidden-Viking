@@ -38,6 +38,8 @@ public class GameCharacter extends Vehicle{
 	private float accuracy = 1;
 	private boolean selected;
 	private boolean isMoving = false;
+	private long lastHit;
+	private long delay = 1000;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -224,6 +226,19 @@ public class GameCharacter extends Vehicle{
 		pathPointer = 0;
 	}
 	
+
+	public boolean isMoving() {
+		return isMoving;
+	}
+
+	public boolean hit() {
+		boolean hit = this.lastHit+this.delay < System.currentTimeMillis();
+		if(hit)
+			this.lastHit = System.currentTimeMillis();
+		
+		return hit;
+	}
+	
 	public Inventory getBag() {
 		return bag;
 	}
@@ -390,9 +405,5 @@ public class GameCharacter extends Vehicle{
 		}
 			
 		return f;
-	}
-
-	public boolean isMoving() {
-		return isMoving;
 	}
 }
