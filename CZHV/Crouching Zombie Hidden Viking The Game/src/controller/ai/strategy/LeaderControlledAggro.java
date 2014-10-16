@@ -29,11 +29,14 @@ public class LeaderControlledAggro extends Wander
 			GameCharacter target = null;
 			float distance = -1;
 			for(Cell c : surroundingCells)
-				for(GameCharacter gc : c.getCharacterHolder().getItem())
-					if(!gc.isInfected() && distance < 0 || distance > commander.getCharacter().distanceTo(gc))
-					{
-						target = gc;
-					}
+				synchronized(c.getCharacterHolder().getItem())
+				{
+					for(GameCharacter gc : c.getCharacterHolder().getItem())
+						if(!gc.isInfected() && distance < 0 || distance > commander.getCharacter().distanceTo(gc))
+						{
+							target = gc;
+						}
+				}
 			
 			if(target == null)
 				return super.getCommandSet(commander, dtime);

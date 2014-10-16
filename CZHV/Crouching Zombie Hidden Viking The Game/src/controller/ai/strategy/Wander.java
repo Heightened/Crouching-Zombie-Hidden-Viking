@@ -14,7 +14,7 @@ import model.map.Cell;
 public class Wander extends Strategy
 {
 	public static final int WANDER_DISTANCE = 10;
-	private int x=0,y=0;
+	private int wanderDirectionX=0,yWanderDirectionY=0;
 
 	@Override
 	public CommandSet getCommandSet(AIController commander, long dtime)
@@ -22,8 +22,8 @@ public class Wander extends Strategy
 		if(Rand.randInt(0, 3000) < dtime) // roughly every 3 seconds
 		{
 			Collection<Cell> cells = commander.getGame().getMap().getNearbyCells(
-					commander.getCharacter().getCell().getX()+x,
-					commander.getCharacter().getCell().getY()+y,
+					commander.getCharacter().getCell().getX()+wanderDirectionX,
+					commander.getCharacter().getCell().getY()+yWanderDirectionY,
 					Wander.WANDER_DISTANCE
 				);
 			
@@ -38,39 +38,54 @@ public class Wander extends Strategy
 			}
 			
 			Action action = null;
-			
-			if(possibleTargets.size() != 0)
-			{
-				Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
-				float x = target.getX()+Rand.randInt(-50, +49)/100f;
-				float y = target.getY()+Rand.randInt(-50, +49)/100f;
-				this.x = (int)Math.min(x, 0.7 * Wander.WANDER_DISTANCE);
-				this.y = (int)Math.min(y, 0.7 * Wander.WANDER_DISTANCE);
-				
-				action = new MoveAction(
-						commander.getCharacter(),
-						x, y
-					);
-			}
-			else
-				System.out.println("No cells to wander to.. at ("+(commander.getCharacter().getCell().getX()+x)+", "+(commander.getCharacter().getCell().getY()+y)+")");
-			
+
 			CommandSet commands = new CommandSet(
 					action,
 					new HashMap<AIController, Strategy>()
 				);
-
-			Collection<AIController> followers = commander.getFollowers();
 			
-			synchronized(followers)
+			float wanderTargetX;
+			float wanderTargetY;
+			if(possibleTargets.size() != 0)
 			{
-				for(AIController f : followers)
+				Cell target = possibleTargets.get(Rand.randInt(0,possibleTargets.size()-1));
+				wanderTargetX = this.wanderDirectionX +target.getX()+Rand.randInt(-50, +49)/100f;
+				wanderTargetY = this.yWanderDirectionY+target.getY()+Rand.randInt(-50, +49)/100f;
+				this.wanderDirectionX  = (int)Math.max(0.7 * Wander.WANDER_DISTANCE, Math.min(wanderTargetX-commander.getCharacter().getAbsX(), 0.7 * Wander.WANDER_DISTANCE));
+				this.yWanderDirectionY = (int)Math.max(0.7 * Wander.WANDER_DISTANCE, Math.min(wanderTargetY-commander.getCharacter().getAbsY(), 0.7 * Wander.WANDER_DISTANCE));
+				
+				commands.setAction(new MoveAction(
+						commander.getCharacter(),
+						wanderTargetX, wanderTargetY
+					));
+				
+
+				Collection<AIController> followers = commander.getFollowers();
+				synchronized(followers)
 				{
-					if(commander.getCharacter().distanceTo(f.getCharacter()) > 5)
-						commands.setStrategy(f, new Follow(commander.getCharacter()));
-					else
-						commands.setStrategy(f, new GoTo(x, y));
-					
+					for(AIController f : followers)
+					{
+						if(commander.getCharacter().distanceTo(f.getCharacter()) > 5)
+							commands.setStrategy(f, new Follow(commander.getCharacter()));
+						else if(action != null)
+							commands.setStrategy(f, new GoTo(wanderTargetX, wanderTargetY));
+					}
+				}
+			}
+			else
+			{
+				System.out.println("No cells to wander to.. at ("+(commander.getCharacter().getCell().getX()+wanderDirectionX)+", "+(commander.getCharacter().getCell().getY()+yWanderDirectionY)+")");
+				
+				Collection<AIController> followers = commander.getFollowers();
+				synchronized(followers)
+				{
+					for(AIController f : followers)
+					{
+						if(commander.getCharacter().distanceTo(f.getCharacter()) > 5)
+							commands.setStrategy(f, new Follow(commander.getCharacter()));
+						else if(action != null)
+							commands.setStrategy(f, null);
+					}
 				}
 			}
 			
