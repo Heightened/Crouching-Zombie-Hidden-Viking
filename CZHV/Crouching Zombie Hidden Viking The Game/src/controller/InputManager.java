@@ -137,6 +137,7 @@ public class InputManager extends ConcreteController{
 								} 
 							}
 							if (obj instanceof Vector2f){
+								stopThreads(attack);
 								boolean Switch = false;;
 								Collection<Cell> cells = getGame().getMap().getActiveCells();
 								for(Cell c: cells){
