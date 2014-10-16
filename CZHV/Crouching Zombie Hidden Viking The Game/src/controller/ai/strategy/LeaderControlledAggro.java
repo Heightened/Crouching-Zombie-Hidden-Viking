@@ -16,7 +16,7 @@ public class LeaderControlledAggro extends Wander
 	@Override
 	public CommandSet getCommandSet(AIController commander, long dtime)
 	{
-		if(firstTime || Rand.randInt(0, 500) < dtime) // roughly every second
+		if(firstTime || Rand.randInt(0, 500) < dtime) // roughly every 0.5 second
 		{
 			firstTime = false;
 			
@@ -39,7 +39,7 @@ public class LeaderControlledAggro extends Wander
 				}
 			
 			if(target == null)
-				return super.getCommandSet(commander, dtime);
+				return super.getCommandSet(commander, 500);
 			
 			CommandSet commands;
 			
@@ -49,9 +49,6 @@ public class LeaderControlledAggro extends Wander
 						new ShootAction(commander.getCharacter(), target),
 						new HashMap<AIController, Strategy>()
 					);
-				
-				for(AIController follower : commander.getFollowers())
-					commands.setStrategy(follower, new Attack(target));
 			}
 			else
 			{
@@ -59,9 +56,13 @@ public class LeaderControlledAggro extends Wander
 						new MoveAction(commander.getCharacter(), target.getAbsX(), target.getAbsY()),
 						new HashMap<AIController, Strategy>()
 					);
-				
-				for(AIController follower : commander.getFollowers())
-					commands.setStrategy(follower, new Attack(target));
+			}
+			
+			Collection<AIController> followers = commander.getFollowers();
+			synchronized(followers)
+			{
+				for(AIController f : followers)
+					commands.setStrategy(f, new Attack(target));
 			}
 			
 			return commands;

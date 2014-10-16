@@ -26,7 +26,7 @@ public class Follow extends Strategy
 	{
 		timeSinceLastFollow += dtime;
 		
-		if(timeSinceLastFollow > 1000 && this.followee != null)
+		if(timeSinceLastFollow > 500 && this.followee != null)
 		{
 			timeSinceLastFollow = 0;
 			

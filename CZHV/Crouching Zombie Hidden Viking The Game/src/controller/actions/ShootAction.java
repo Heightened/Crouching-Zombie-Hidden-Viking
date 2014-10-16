@@ -26,28 +26,31 @@ public class ShootAction implements Action {
 	@Override
 	public boolean perform(Game g) {
 		int appliedDamage = source.getStrength();
-			if(w!=null){
-				if(!inRange(w.getRange())){
-					return false;
-				}
-				appliedDamage += w.getPower();
-				if(!w.isMeleeWeapon()){
-					appliedDamage -= source.getStrength();
-				}
-				if(source.hit() && hitSuccess(Math.min(w.getAccuracy(), source.getAccuracy()))){
-					target.applyDamage(appliedDamage);
-					return true;
-				}
-			} else {
-				if(!inRange(GameCharacter.DEFAULT_MELEE_RANGE)){
-					return false;
-				}
-				if(source.hit() && hitSuccess(source.getAccuracy())){
-					target.applyDamage(appliedDamage);
-					return true;
-				}
-			}
 		
+		if(source.isDead() || target.isDead())
+			return false;
+		
+		if(w!=null){
+			if(!inRange(w.getRange())){
+				return false;
+			}
+			appliedDamage += w.getPower();
+			if(!w.isMeleeWeapon()){
+				appliedDamage -= source.getStrength();
+			}
+			if(source.hit() && hitSuccess(Math.min(w.getAccuracy(), source.getAccuracy()))){
+				target.applyDamage(appliedDamage);
+				return true;
+			}
+		} else {
+			if(!inRange(GameCharacter.DEFAULT_MELEE_RANGE)){
+				return false;
+			}
+			if(source.hit() && hitSuccess(source.getAccuracy())){
+				target.applyDamage(appliedDamage);
+				return true;
+			}
+		}
 		return false;
 	}
 
