@@ -137,7 +137,8 @@ public class InputManager extends ConcreteController{
 								} 
 							}
 							if (obj instanceof Vector2f){
-								stopThreads(attack);
+								//stopThreads(attack);
+								stopAttack();
 								boolean Switch = false;;
 								Collection<Cell> cells = getGame().getMap().getActiveCells();
 								for(Cell c: cells){
@@ -149,7 +150,7 @@ public class InputManager extends ConcreteController{
 									} 
 								}
 								if(!Switch){
-									doGroupMoveAction((Vector2f)obj);
+									doGroupMoveAction((Vector2f)obj, getControllableCharacters());
 								}
 							} 
 							if (obj instanceof Cell){
@@ -203,23 +204,26 @@ public class InputManager extends ConcreteController{
 	}
 
 	private void doAttack(Cell cell) {
-		stopThreads(attack);
-		attack = af.attackThread();
+		if(!attack.isAlive()){
+			attack = af.attackThread();
+			attack.start();
+		}
 		//if a target cell was specified we target it with the selected characters
 		if(cell != null){
 			List<GameCharacter> characters = cell.getCharacterHolder().getItem();
 			for(GameCharacter c: characters){
 				if(c.isInfected()){				
-					//only one attack thread may spawn
-					attack.addAttackers(getControllableCharacters());
 					attack.setTarget(c);
 				}
 			}
 		} else {
-			attack.addAttackers(getControllableCharacters());
 			attack.setTargets(getGame().getUndead());
 		}
-		attack.start();
+		attack.addAttackers(getControllableCharacters());
+	}
+	
+	private void stopAttack(){
+		attack.removeAttackers(getControllableCharacters());
 	}
 	
 	private void stopThreads(ActionThread at) {
@@ -236,8 +240,7 @@ public class InputManager extends ConcreteController{
 	private void doPickupItem(Vector2f obj) {
 		stopThreads(pickUp);
 		pickUp = af.pickUpItemThread();		
-		System.out.println("Picking up item");
-		doGroupMoveAction(obj);
+		doGroupMoveAction(obj, getControllableCharacters());
 		pickUp.start();
 	}
 	
@@ -245,8 +248,8 @@ public class InputManager extends ConcreteController{
 		return new Vector2f(c.getX(), c.getY());
 	}
 	
-	private void doGroupMoveAction(Vector2f vec) {
-		ArrayList<GameCharacter> controllable = getControllableCharacters();
+	private void doGroupMoveAction(Vector2f vec, ArrayList<GameCharacter> characters) {
+		ArrayList<GameCharacter> controllable = characters;
 		try {
 			GroupMoveAction m = new GroupMoveAction(controllable,  vec.getX(), vec.getY());
 			getGame().getActionBuffer().add(m);
@@ -319,19 +322,22 @@ public class InputManager extends ConcreteController{
 				@Override
 				public void run(){
 					while(running){
-						int numChars = getControllableCharacters().size();
+						int numChars = attacker.size();
 						GameCharacter[] lockedTargets = new GameCharacter[numChars];
-						ArrayList<GameCharacter> characters = getControllableCharacters();
+						ArrayList<GameCharacter> characters = new ArrayList<GameCharacter>();
+						characters.addAll(attacker);
 						for(int i = 0; i<characters.size(); i++) {
 // This block determines the targets -------------------------------------------------------------------
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
 								} else {
-									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()));
+									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()), characters);
 								}
-								if(getControllableCharacters().contains(characters.get(i))){
-									lockedTargets[i] = focusedTarget;
+								if(attacker.contains(characters.get(i))){
+									if(lockedTargets[i] == null){
+										lockedTargets[i] = focusedTarget;
+									}
 								}
 							}
 							Iterator<GameCharacter> iter = targets.iterator();
@@ -365,7 +371,7 @@ public class InputManager extends ConcreteController{
 							}
 						}
 						try {
-							Thread.sleep(1000);
+							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
