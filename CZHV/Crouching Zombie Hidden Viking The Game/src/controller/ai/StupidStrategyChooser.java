@@ -10,7 +10,7 @@ public class StupidStrategyChooser implements StrategyChooser
 {
 	public Strategy currentStrategy;
 	public long timeSinceLastConsideration = 0;
-	public static final long RECONSIDER_DELAY = 5000;
+	public static final long RECONSIDER_DELAY = 500;
 	
 	@Override
 	public Strategy choose(AIController leader, long dtime)
@@ -34,15 +34,18 @@ public class StupidStrategyChooser implements StrategyChooser
 		
 		if(this.timeSinceLastConsideration > RECONSIDER_DELAY)
 		{
-			this.reconsider();
+			this.reconsider(leader);
 			this.timeSinceLastConsideration = 0;
 		}
 		
 		return this.currentStrategy;
 	}
 	
-	protected void reconsider()
+	protected void reconsider(AIController leader)
 	{
-		//
+		if(leader ==  null)
+			this.currentStrategy = new LeaderControlledAggro();
+		else
+			this.currentStrategy = new Follow(leader.getCharacter());
 	}
 }
