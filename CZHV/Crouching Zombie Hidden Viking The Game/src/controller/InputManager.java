@@ -66,7 +66,11 @@ public class InputManager extends ConcreteController{
 					if (startClick != null) {
 						// select cells
 						ArrayList<GameCharacter> temp = new ArrayList<GameCharacter>();
-						temp.addAll(selectedCharacters);
+						for(GameCharacter gc: selectedCharacters){
+							if(!gc.isDead()){
+								temp.add(gc);
+							}
+						}
 						if (selected != null) {
 							for (GameCharacter gc : selectedCharacters) {
 								gc.setSelected(false);

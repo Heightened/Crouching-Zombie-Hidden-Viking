@@ -330,10 +330,11 @@ public class GameCharacter extends Vehicle{
 	}
 
 	public void applyDamage(int Damage) {
-		currentHp = currentHp-Damage;
+		currentHp = currentHp-Damage;		
 		if(isDead()){
 			if(cell!=null){
 				cell.getCharacterHolder().getItem().remove(this);
+				cell.getMap().getControlledCharacters().remove(this);
 			}
 		}
 	}
