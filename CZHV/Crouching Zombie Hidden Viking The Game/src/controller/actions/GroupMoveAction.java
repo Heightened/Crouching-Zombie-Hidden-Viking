@@ -36,14 +36,16 @@ public class GroupMoveAction implements Action{
 		}
 
 		Node start = merged.getNode(avgX, avgY);
-		Node goal = merged.getNode(x, y);
+		Node goal = merged.getNode(ix, iy);
 		
 		Astar pathfinder = (Astar) characters.get(0).getPathFinder();
 		pathfinder.setMap(merged);
-		List<Node> path = pathfinder.calculatePath(start, goal);
-		
+		path = pathfinder.calculatePath(start, goal);
+	}
+
+	@Override
+	public boolean perform(Game g) {
 		for(GameCharacter gc: characters){
-			//TODO use smarter follow path
 			gc.followPath(path);
 		}
 		return true;
@@ -82,4 +84,5 @@ public class GroupMoveAction implements Action{
 	private boolean isInMap(int X, int Y, PathFindingMap map){
 		return map.getGrid().containsKey(X) && map.getGrid().get(X).containsKey(Y);
 	}
+
 }
