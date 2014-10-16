@@ -135,10 +135,24 @@ public class InputManager extends ConcreteController{
 								} 
 							}
 							if (obj instanceof Vector2f){
-								doPickupItem((Vector2f)obj);
+								boolean Switch = false;;
+								Collection<Cell> cells = getGame().getMap().getActiveCells();
+								for(Cell c: cells){
+									if(c.getX() == ((Vector2f)obj).x & c.getY() == ((Vector2f)obj).y){
+										if(!c.getItemHolder().isEmpty()){
+											doPickupItem((Vector2f)obj);
+											Switch = true;
+										} 
+									} 
+								}
+								if(Switch = false){
+									doGroupMoveAction((Vector2f)obj);
+								}
 							} 
 							if (obj instanceof Cell){
-								doPickupItem(cellToVector2f((Cell)obj));
+								if(!((Cell)obj).getItemHolder().isEmpty()){
+									doPickupItem(cellToVector2f((Cell)obj));
+								}
 							}
 						}
 					}
@@ -324,10 +338,10 @@ public class InputManager extends ConcreteController{
 							}
 							Iterator<GameCharacter> iter = targets.iterator();
 							GameCharacter gc = characters.get(i);
-							Weapon w = getWeapon(gc);
+							Weapon w = gc.getBestWeapon(gc.getBestRange());
 							float range = 1;
-							if(v != null){
-								range = v.getRange();
+							if(w != null){
+								range = w.getRange();
 							}
 							while(lockedTargets[i] == null && iter.hasNext()){
 								GameCharacter enemy = iter.next();
@@ -343,10 +357,9 @@ public class InputManager extends ConcreteController{
 							if(lockedTargets[i]!=null){
 								if(lockedTargets[i].isDead()){
 									lockedTargets[i] = null;
-								}
-								if(nearby(gc, lockedTargets[i], v.getRange())){
+								} else if(nearby(gc, lockedTargets[i], range)){
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
-									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
+									getGame().getActionBuffer().add(new ShootAction(w,gc,lockedTargets[i]));
 								} else {
 									lockedTargets[i] = null;
 								}
@@ -359,17 +372,6 @@ public class InputManager extends ConcreteController{
 							e.printStackTrace();
 						}
 					}		
-				}
-				
-				private Weapon getWeapon(GameCharacter gc) {
-					ItemSlot[] inventory = gc.getBag().getInventory();
-					for (int i = 0; i < inventory.length; i++) {
-						Item item = inventory[i].getItem();
-						if(item instanceof Weapon){
-							return (Weapon) item;
-						}
-					}
-					return null;
 				}
 			};
 		}

@@ -17,6 +17,7 @@ import pathfinding.distanceHeuristics.ApproxEuclid;
 import simulator.tempFlocking.Vehicle;
 
 public class GameCharacter extends Vehicle{
+	public static final float DEFAULT_MELEE_RANGE = 2;
 	
 	private Inventory bag;
 	

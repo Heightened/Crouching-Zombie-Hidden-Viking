@@ -15,6 +15,9 @@ public class Inventory {
 
 	public void setInventory(ItemSlot[] inventory) {
 		this.inventory = inventory;
+		for(int i = 0; i<inventory.length; i++){
+			inventory[i] = new ItemSlot();
+		}
 	}
 	
 	public boolean addItem(Item item){
