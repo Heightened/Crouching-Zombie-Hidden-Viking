@@ -9,6 +9,6 @@ out vec4 texelColor;
 
 void main() 
 { 
-	texelColor = texture2D(colorTexture, texture_coordinate) + texture2D(bloomTexture, texture_coordinate)*2;
+	texelColor = texture2D(colorTexture, texture_coordinate) + texture2D(bloomTexture, texture_coordinate);
 	texelColor.a = 1;
 }

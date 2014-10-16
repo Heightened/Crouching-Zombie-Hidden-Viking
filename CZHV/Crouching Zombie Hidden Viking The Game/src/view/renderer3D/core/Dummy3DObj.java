@@ -55,13 +55,22 @@ public class Dummy3DObj {
 		rotation.z = z;
 	}
 	
-	public void calcScreenSpace(Matrix4f mvp){
+	public Vector4f calcScreenSpace(Matrix4f mvp){
 		Matrix4f.transform(mvp, position, screenPos);
 		screenPos.x /= screenPos.w;//divide by W for perspective (normally the GC does this for you)
 		screenPos.y /= screenPos.w;
 		//translate to absolute window coordinates to comply with LWJGL.Mouse
 		screenPos.x = (screenPos.x + 1)/2*Renderer3D.screenSize.width;
 		screenPos.y = (screenPos.y + 1)/2*Renderer3D.screenSize.height;
+		return screenPos;
+	}
+	
+	public Vector4f calcScreenSpace(float height, Matrix4f mvp){
+		Matrix4f.transform(mvp, new Vector4f(position.x, position.y+height, position.z, 1), screenPos);
+		screenPos.x /= screenPos.w;//divide by W for perspective (normally the GC does this for you)
+		screenPos.y /= screenPos.w;
+		//translate to absolute window coordinates to comply with LWJGL.Mouse
+		return screenPos;
 	}
 	
 	final float radius = 30f;
@@ -99,7 +108,7 @@ public class Dummy3DObj {
 	}
 	
 	private float scalex = scale;
-	private float scaley = scale*4;
+	private float scaley = scale*7;
 	private float scalez = scale;
 	
 	public ArrayList<Vector3f> drawBoundingBox(){

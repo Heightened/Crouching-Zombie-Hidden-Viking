@@ -13,7 +13,6 @@ public class Line3D {
 	}
 	
 	public Vector3f collideXZPlane(float y){
-		System.out.println(start + " " + dir);
 		Vector3f colPoint = new Vector3f();
 		
 		float difY = y - start.y;
@@ -26,8 +25,7 @@ public class Line3D {
 		colPoint.x = start.x + steps*dir.x;
 		colPoint.y = start.y + steps*dir.y;//this should be y
 		colPoint.z = start.z + steps*dir.z;
-		
-		System.out.println(colPoint);
+	
 		
 		return colPoint;
 	}

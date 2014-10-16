@@ -33,6 +33,7 @@ import simulator.tempFlocking.Vehicle;
 import view.renderer3D.core.grid.ViewGrid;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.resources.Model;
+import view.renderer3D.core.resources.Resource;
 import view.renderer3D.core.shadows.ShadowManager;
 import view.renderer3D.inputoutput.FileToString;
 import view.renderer3D.particles.ParticleTest;
@@ -46,6 +47,7 @@ public class Renderer3D implements RendererInfoInterface{
 	private TextureObject normtex;
 	private ShaderObject lightShader;
 	private ShaderObject quadShader;
+	private ShaderObject quadColorShader;
 	private ShaderObject lineShader;
 	private Matrix4f MVP;
 	private ArrayList<Vehicle> objList;
@@ -87,8 +89,7 @@ public class Renderer3D implements RendererInfoInterface{
 			for (int j = 0; j < 50; j++){
 				game.getFlockingMap().getActiveCells(2*i, 2*j);
 			}
-		}
-		
+		} 
 		impassibleCells = map.getImpassibleCells();
 		shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -170,6 +171,17 @@ public class Renderer3D implements RendererInfoInterface{
 		quadShader.findUniforms();
 		quadShader.findAttributes();
 		quadShader.unbind();
+		
+		quadColorShader = new ShaderObject("fullscreen quad color shader");
+		quadColorShader.addVertexSource(FileToString.read("orthscreenspace.vert"));
+		quadColorShader.addFragmentSource(FileToString.read("healthbar.frag"));
+		quadColorShader.compileVertex();
+		quadColorShader.compileFragment();
+		quadColorShader.link();
+		quadColorShader.bind();
+		quadColorShader.findUniforms();
+		quadColorShader.findAttributes();
+		quadColorShader.unbind();
 
 		bloomShaderHor = new ShaderObject("bloom hor");
 		bloomShaderHor.addVertexSource(FileToString.read("orthscreenspace.vert"));
@@ -306,6 +318,7 @@ public class Renderer3D implements RendererInfoInterface{
 			mainClass.exit();
 		}
 
+		long fixtime = System.currentTimeMillis();
 		activeCells = map.getActiveCells();
 
 		for (Cell cell : activeCells){
@@ -318,8 +331,6 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 
 
-		MVP.setIdentity();
-		Matrix4f.mul(projMat, viewMat, MVP);
 
 		//selecter.update(MVP);
 		lightManager.setGridOffset(camera.getWorldPosition().x-2f,0, camera.getWorldPosition().z-3f);
@@ -329,11 +340,10 @@ public class Renderer3D implements RendererInfoInterface{
 
 
 		long sleeptime = System.currentTimeMillis();
-		sleep(framedelay);
 		sleeptime = System.currentTimeMillis() - sleeptime;
 
 		frametime = System.currentTimeMillis() - frametime;
-		totalframetime += frametime - sleeptime;
+		totalframetime += frametime;
 		frametime = System.currentTimeMillis();
 
 
@@ -341,12 +351,15 @@ public class Renderer3D implements RendererInfoInterface{
 		if (framecounter == 100){
 			framecounter = 0;
 			System.out.println("100 frames in " + (totalframetime/100f) + " ms");
+			System.out.println("or " + (1000/(totalframetime/100f)) + " fps");
 			totalframetime = 0;
 		}
 
 		mainPass.bind();
 
 		camera.lookThrough();
+		MVP.setIdentity();
+		Matrix4f.mul(projMat, viewMat, MVP);
 
 
 		viewGrid.update(camera);
@@ -363,7 +376,7 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.bind();
 		lightManager.bind(lightShader);
 		//lightShader.putUnifFloat("time", currentTime);
-		//lightShader.bindTexture("texture", tex);
+		lightShader.bindTexture("texture", tex);
 		lightShader.bindTexture("normsamp", normtex);
 		lightShader.bindTexture("shadowMap", shadowManager.getShadowDepthTexture());
 		//viewMatrix = lightManager.getLight(1).calcViewMatrix().getViewMatrix();
@@ -382,6 +395,7 @@ public class Renderer3D implements RendererInfoInterface{
 		bufferGeo(lightShader);
 		
 		drawLines();
+		drawSquares();
 
 
 		lightManager.unbind();
@@ -494,10 +508,10 @@ public class Renderer3D implements RendererInfoInterface{
 				for (GameCharacter follower : gameChar.getFollowers()){
 					drawLine(new Vector3f(gameChar.getAbsX()*cellSize,0.05f,gameChar.getAbsY()*cellSize), new Vector3f(follower.getAbsX()*cellSize,0.05f,follower.getAbsY()*cellSize), lineColor);
 				}
-				ArrayList<Vector3f> box = gameChar.drawBoundingBox();
-				for (int i = 0; i < box.size(); i += 2){
-					drawLine(box.get(i), box.get(i+1), new Vector3f(0,0,1));
-				}
+				//ArrayList<Vector3f> box = gameChar.drawBoundingBox();
+				//for (int i = 0; i < box.size(); i += 2){
+					//drawLine(box.get(i), box.get(i+1), new Vector3f(0,0,1));
+				//}
 			}
 		}
 
@@ -507,6 +521,24 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		drawLine(new Vector3f(0,1,0), new Vector3f(0,0,0), lineColor);
 		lineShader.unbind();
+	}
+	
+	public void drawSquares(){
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		quadColorShader.bind();
+		for (Cell cell : activeCells){
+			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
+			for (GameCharacter gameChar : gameChars){
+				Vector4f screenspace = gameChar.calcScreenSpace(0.3f, MVP);
+				drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,0.08f,0.02f,new Vector3f(1,0.1f,0));
+				//life
+				float health = 0.08f*gameChar.getCurrentHp() / (float)gameChar.getMaxHp();
+				drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,health,0.02f,new Vector3f(0.2f,1,0f));
+			}
+		}
+		
+		quadColorShader.unbind();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 
 	public void drawLine(Vector3f start, Vector3f end, Vector3f color){
@@ -519,9 +551,20 @@ public class Renderer3D implements RendererInfoInterface{
 		lineVBO.drawLines();
 		lineVBO.unbind();
 	}
+	
+	public void drawSquare(float x, float y, float width, float height, Vector3f color){
+		quadColorShader.putUnifFloat4("quadSize", x, y, width, height);
+		quadColorShader.putUnifFloat4("color", color.x, color.y, color.z, 1);
+
+		quadVBO.bind();
+		quadVBO.prepareForDraw(quadColorShader);
+		quadVBO.draw();
+		quadVBO.unbind();
+	}
 
 	public static final float cellSize = 0.1f;
 	public void bufferGeo(ShaderObject shader){	
+		long fixtime = System.currentTimeMillis();
 		for (Cell cell : activeCells){
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter c : gameChars){
@@ -544,9 +587,15 @@ public class Renderer3D implements RendererInfoInterface{
 
 		}
 		Dummy3DObj d = new Dummy3DObj();
+		shader.putUnifFloat4("color", decorColor);
+		shader.bindTexture("texture", Resource.vikingTexture);
+		int index = 0;
 		for (Cell cell : impassibleCells){
+			index++;
+			if (index > impassibleCells.size()/4){
+				break;
+			}
 			d.setPosition(cell.getX()*cellSize, 0.02f, cell.getY()*cellSize);
-			shader.putUnifFloat4("color", decorColor);
 			d.draw(shader);
 		}
 
@@ -624,6 +673,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 	@Override
 	public Object click(float x, float y) {
+		
 		//check interface, return button
 		Vector2f mouse = selecter.normalize(x, y);//selecter.getNormalizedMouse();
 		ray = MatrixCZHV.getPickingRayStartDir(mouse.x,mouse.y, camera.getWorldPosition(), viewMat, projMat);
@@ -645,7 +695,6 @@ public class Renderer3D implements RendererInfoInterface{
 				return c;
 			}
 		}
-		System.out.println(colPoint);
 		return new Vector2f(colPoint.x/cellSize, colPoint.z/cellSize);
 	}
 
