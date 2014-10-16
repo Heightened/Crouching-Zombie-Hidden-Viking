@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.resources.Animation;
+import view.renderer3D.core.resources.Resource;
 
 public class Dummy3DObj {
 	private static Animation mesh;
