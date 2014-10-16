@@ -536,7 +536,7 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 			model.item.Item i = cell.getItemHolder().getItem();
 			if (i != null){
-				i.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0, cell.getY()*cellSize + 0.5f*cellSize);
+				i.setPosition(cell.getX()*cellSize, 0, cell.getY()*cellSize);
 				shader.putUnifFloat4("color", itemColor);
 				i.draw(shader);
 			}
@@ -544,7 +544,7 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		Dummy3DObj d = new Dummy3DObj();
 		for (Cell cell : impassibleCells){
-			d.setPosition(cell.getX()*cellSize + 0.5f*cellSize, 0.02f, cell.getY()*cellSize + 0.5f*cellSize);
+			d.setPosition(cell.getX()*cellSize, 0.02f, cell.getY()*cellSize);
 			shader.putUnifFloat4("color", decorColor);
 			d.draw(shader);
 		}
