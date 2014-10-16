@@ -149,4 +149,13 @@ public class Astar extends PathFinder
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void addMapKnowledge(PathFindingMap map) {
+		this.currentMap.addKnowledge(map);
+	}
+	
+	public void setMap(PathFindingMap map) {
+		this.currentMap = map;
+	}
 }

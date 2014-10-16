@@ -34,13 +34,14 @@ public class GroupMoveAction implements Action{
 			//re-calculate the vision range of the group
 			merged = PathFindingMap.mergeMap(maps);
 		}
+
+		Node start = merged.getNode(avgX, avgY);
+		Node goal = merged.getNode(x, y);
 		
 		Astar pathfinder = (Astar) characters.get(0).getPathFinder();
-		path = pathfinder.calculatePath(avgX, avgY, ix, iy);
-	}
-
-	@Override
-	public boolean perform(Game g) {		
+		pathfinder.setMap(merged);
+		List<Node> path = pathfinder.calculatePath(start, goal);
+		
 		for(GameCharacter gc: characters){
 			//TODO use smarter follow path
 			gc.followPath(path);
