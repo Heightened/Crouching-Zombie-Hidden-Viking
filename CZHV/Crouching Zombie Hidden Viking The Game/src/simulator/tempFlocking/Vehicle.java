@@ -71,7 +71,7 @@ public class Vehicle extends Dummy3DObj{
 					Vehicle v = iter.next();
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
-						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*1);//all performance issues here
+						Vector2f vec = fleeTarget(v.position, Renderer3D.cellSize*1, true);//all performance issues here
 						/*
 TODO: exception
 Exception in thread "Thread-11" java.lang.NullPointerException
@@ -79,24 +79,24 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 	at simulator.tempFlocking.FlockingManager.loop(FlockingManager.java:36)
 	at simulator.Simulator.run(Simulator.java:49)
 						 */
-						steering.x += vec.x*1f;
-						steering.y += vec.y*1f;
+						steering.x += vec.x*2f;
+						steering.y += vec.y*2f;
 					}
 				}
 				Iterator<Cell> iterC = map.getImpassibleCells(x, y).iterator();
 				while(iterC.hasNext()){
 					Cell c = iterC.next();
 					Vector2f vec = fleeTarget(new Vector4f(c.getX() * scaling, 0, 
-							c.getY() * scaling, 1), Renderer3D.cellSize*1.0f);
+							c.getY() * scaling, 1), Renderer3D.cellSize*0.6f, false);
 					if(vec.x > vec.y) {
-						steering.x += (vec.x + vec.y)*2f;
+						steering.x += (vec.x + vec.y)*20f;
 						steering.y += vec.y*1f;
 					} else {
-						steering.y += (vec.x + vec.y)*2f;
+						steering.y += (vec.x + vec.y)*20f;
 						steering.x += vec.x*1f;
 					}
-					//steering.x += vec.x*2f;
-					//steering.y += vec.y*2f;
+					//steering.x += vec.x*200f;
+					//steering.y += vec.y*200f;
 				}
 			}
 		}
@@ -171,7 +171,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		temp.y = target.position.z - position.z;
 		float distance = temp.length();
 		float temp2 = distance/max_speed/8;
-		return fleeTarget(target.getFuturePosition(temp2), radius);
+		return fleeTarget(target.getFuturePosition(temp2), radius, true);
 	}
 
 	Vector2f tempsteering = new Vector2f(0,0);
@@ -199,20 +199,24 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 
 	public Vector2f correction = new Vector2f(0,0);
 	//OPTIMIZED AND UGLY
-	public Vector2f fleeTarget(Vector4f target, float fleeRadius){
+	public Vector2f fleeTarget(Vector4f target, float fleeRadius, boolean euclidian){
 		float targetvx = target.x - position.x;//local float faster than shared vertex
 		float targetvy = target.z - position.z;
-		
-		//compute length of targetVelocity
-		float number = targetvx*targetvx + targetvy*targetvy;//faster than math.pow
-		//magic starts here
-		float xhalf = 0.5f*number;
-	    int i = Float.floatToIntBits(number);
-	    i = 0x5f3759df - (i>>1);
-	    number = Float.intBitsToFloat(i);
-	    number = number*(1.5f - xhalf*number*number);
-	    float distance = 1/number;//faster than math.sqrt
-	    //end compute length
+		float distance = 1;
+		if (euclidian){
+			//compute length of targetVelocity
+			float number = targetvx*targetvx + targetvy*targetvy;//faster than math.pow
+			//magic starts here
+			float xhalf = 0.5f*number;
+		    int i = Float.floatToIntBits(number);
+		    i = 0x5f3759df - (i>>1);
+		    number = Float.intBitsToFloat(i);
+		    number = number*(1.5f - xhalf*number*number);
+		    distance = 1/number;//faster than math.sqrt
+		    //end compute length
+		} else {
+			distance = Math.max(Math.abs(targetvy), Math.abs(targetvx));
+		}
 
 	    float factor = fleeRadius - distance;
 	    

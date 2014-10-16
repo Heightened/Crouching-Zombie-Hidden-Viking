@@ -35,11 +35,31 @@ public class PathFindingMap
 	 */
 	public static PathFindingMap mergeMap(ArrayList<PathFindingMap> maps){
 		for(PathFindingMap map: maps){
-			for(Integer key: map.grid.keySet()){
-				maps.get(0).grid.put(key, map.grid.get(key));
+			for(Integer key1: map.grid.keySet()){
+				if(!maps.get(0).grid.containsKey(key1)){
+					maps.get(0).grid.put(key1, new HashMap<Integer, CellCapsule>());
+				}
+				for(Integer key2: map.grid.get(key1).keySet()){
+					if(map.grid.get(key1).get(key2).celltype != PathFindingMap.CellType.UNKNOWN){
+						maps.get(0).grid.get(key1).put(key2, map.grid.get(key1).get(key2));
+					}
+				}
 			}
 		}
 		return maps.get(0);
+	}
+	
+	public void addKnowledge(PathFindingMap map){
+		for(Integer key1: map.grid.keySet()){
+			if(!this.grid.containsKey(key1)){
+				this.grid.put(key1, new HashMap<Integer, CellCapsule>());
+			}
+			for(Integer key2: map.grid.get(key1).keySet()){
+				if(map.grid.get(key1).get(key2).celltype != PathFindingMap.CellType.UNKNOWN){
+					this.grid.get(key1).put(key2, map.grid.get(key1).get(key2));
+				}
+			}
+		}
 	}
 	
 	public Map<Integer, Map<Integer, CellCapsule>> getGrid() {

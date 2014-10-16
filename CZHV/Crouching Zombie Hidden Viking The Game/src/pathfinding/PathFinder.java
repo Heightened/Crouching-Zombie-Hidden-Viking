@@ -49,4 +49,9 @@ public abstract class PathFinder
 	
 	// adds new data to make the pathfinder smarter.
 	public abstract void addData(PathFindingData data);
+	
+	// adds new map knowledge to make the pathfinder smarter.
+	public abstract void addMapKnowledge(PathFindingMap map);
+	
+	public abstract void setMap(PathFindingMap map);
 }

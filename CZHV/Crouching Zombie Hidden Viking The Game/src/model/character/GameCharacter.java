@@ -82,12 +82,19 @@ public class GameCharacter extends Vehicle{
 		{
 			if(this.isAtTarget())
 			{
-				this.setFlockingTargetNode(path.get(++pathPointer));
 				Cell nextCell = this.pathFinder.getMap().getCell(path.get(pathPointer).getX(), path.get(pathPointer).getY());
-				this.setFlockingTargetRadius(nextCell.getSpaceRadius());
-				if (pathPointer >= path.size() - 1)
+				if(nextCell.isPassible())
 				{
-					this.setFlockingTargetRadius(0.5f);
+					this.setFlockingTargetNode(path.get(++pathPointer));
+					this.setFlockingTargetRadius(nextCell.getSpaceRadius());
+					if (pathPointer >= path.size() - 1)
+					{
+						this.setFlockingTargetRadius(0.5f);
+						stopMovement();
+					}
+				} 
+				else
+				{
 					stopMovement();
 				}
 			}
