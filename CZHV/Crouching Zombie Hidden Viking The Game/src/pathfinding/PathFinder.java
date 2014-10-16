@@ -30,6 +30,11 @@ public abstract class PathFinder
 		return this.character;
 	}
 	
+	public Map getMap()
+	{
+		return this.map;
+	}
+	
 	// returns a path from (x1,y1) to (x2,y2)
 	public abstract List<Node> calculatePath(int x1, int y1, int x2, int y2);
 	

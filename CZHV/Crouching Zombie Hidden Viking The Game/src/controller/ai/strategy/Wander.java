@@ -66,7 +66,7 @@ public class Wander extends Strategy
 			{
 				for(AIController f : followers)
 				{
-					if(commander.getCharacter().distanceTo(f.getCharacter()) > 3)
+					if(commander.getCharacter().distanceTo(f.getCharacter()) > 5)
 						commands.setStrategy(f, new Follow(commander.getCharacter()));
 					else
 						commands.setStrategy(f, new GoTo(x, y));

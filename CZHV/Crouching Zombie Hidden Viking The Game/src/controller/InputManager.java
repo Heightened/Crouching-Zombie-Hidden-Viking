@@ -9,8 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import model.Game;
 import model.character.GameCharacter;
-import model.character.ItemSlot;
-import model.item.Item;
 import model.item.Weapon;
 import model.map.Cell;
 
@@ -68,7 +66,11 @@ public class InputManager extends ConcreteController{
 					if (startClick != null) {
 						// select cells
 						ArrayList<GameCharacter> temp = new ArrayList<GameCharacter>();
-						temp.addAll(selectedCharacters);
+						for(GameCharacter gc: selectedCharacters){
+							if(!gc.isDead()){
+								temp.add(gc);
+							}
+						}
 						if (selected != null) {
 							for (GameCharacter gc : selectedCharacters) {
 								gc.setSelected(false);
@@ -117,13 +119,11 @@ public class InputManager extends ConcreteController{
 			//right mouse button
 			if(Mouse.getEventButton() == 1){				
 				if(Mouse.getEventButtonState()) {
-					//TODO clicked zombie while characters selected: attack
-					//TODO click on viking while selected: open inventory
-					//TODO clicked/drag from any tile while nothing selected, selection mode
 					startClick = new Point(Mouse.getX(), Mouse.getY());
 				} else {
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
+						startClick = null;
 						if (obj != null){
 							if(Keyboard.getEventKey() == Keyboard.KEY_A){
 								//if mouse clicked and A pressed
@@ -137,14 +137,28 @@ public class InputManager extends ConcreteController{
 								} 
 							}
 							if (obj instanceof Vector2f){
-								doGroupMoveAction((Vector2f)obj);
-							}	
+								stopThreads(attack);
+								boolean Switch = false;;
+								Collection<Cell> cells = getGame().getMap().getActiveCells();
+								for(Cell c: cells){
+									if(c.getX() == (int)(((Vector2f)obj).x+0.5f) && c.getY() == (int)(((Vector2f)obj).y+0.5f)){
+										if(!c.getItemHolder().isEmpty()){
+											doPickupItem((Vector2f)obj);
+											Switch = true;
+										} 
+									} 
+								}
+								if(!Switch){
+									doGroupMoveAction((Vector2f)obj);
+								}
+							} 
 							if (obj instanceof Cell){
-								doPickupItem((Cell)obj);
+								if(!((Cell)obj).getItemHolder().isEmpty()){
+									doPickupItem(cellToVector2f((Cell)obj));
+								}
 							}
 						}
 					}
-					startClick = null;
 				}
 			}			
 
@@ -219,18 +233,18 @@ public class InputManager extends ConcreteController{
 		}
 	}
 	
-	private void doPickupItem(Cell c) {
+	private void doPickupItem(Vector2f obj) {
 		stopThreads(pickUp);
 		pickUp = af.pickUpItemThread();		
-		doGroupMoveAction(cellToVector2f(c));
+		System.out.println("Picking up item");
+		doGroupMoveAction(obj);
 		pickUp.start();
-		//TODO stuff here
 	}
 	
 	private Vector2f cellToVector2f(Cell c){
 		return new Vector2f(c.getX(), c.getY());
 	}
-
+	
 	private void doGroupMoveAction(Vector2f vec) {
 		ArrayList<GameCharacter> controllable = getControllableCharacters();
 		try {
@@ -251,7 +265,7 @@ public class InputManager extends ConcreteController{
 		return controllable;
 	}
 		
-	class ActionThread extends Thread{
+	class ActionThread extends Thread {
 		protected boolean running = true;
 		protected LinkedBlockingQueue<GameCharacter> targets = new LinkedBlockingQueue<GameCharacter>();
 		protected LinkedBlockingQueue<GameCharacter> attacker = new LinkedBlockingQueue<GameCharacter>();
@@ -309,6 +323,7 @@ public class InputManager extends ConcreteController{
 						GameCharacter[] lockedTargets = new GameCharacter[numChars];
 						ArrayList<GameCharacter> characters = getControllableCharacters();
 						for(int i = 0; i<characters.size(); i++) {
+// This block determines the targets -------------------------------------------------------------------
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
@@ -321,11 +336,10 @@ public class InputManager extends ConcreteController{
 							}
 							Iterator<GameCharacter> iter = targets.iterator();
 							GameCharacter gc = characters.get(i);
-							ItemSlot[] inventory = gc.getBag().getInventory();
-							Weapon v = getWeapon(inventory);
+							Weapon w = gc.getBestWeapon(gc.getBestRange());
 							float range = 1;
-							if(v != null){
-								range = v.getRange();
+							if(w != null){
+								range = w.getRange();
 							}
 							while(lockedTargets[i] == null && iter.hasNext()){
 								GameCharacter enemy = iter.next();
@@ -338,13 +352,13 @@ public class InputManager extends ConcreteController{
 								}
 								
 							} 
+// end target determination -----------------------------------------------------------------------------
 							if(lockedTargets[i]!=null){
 								if(lockedTargets[i].isDead()){
 									lockedTargets[i] = null;
-								}
-								if(nearby(gc, lockedTargets[i], v.getRange())){
+								} else if(nearby(gc, lockedTargets[i], range)){
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
-									getGame().getActionBuffer().add(new ShootAction(v,gc,lockedTargets[i]));
+									getGame().getActionBuffer().add(new ShootAction(w,gc,lockedTargets[i]));
 								} else {
 									lockedTargets[i] = null;
 								}
@@ -353,20 +367,9 @@ public class InputManager extends ConcreteController{
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}		
-				}
-				
-				private Weapon getWeapon(ItemSlot[] inventory) {
-					for (int i = 0; i < inventory.length; i++) {
-						Item item = inventory[i].getItem();
-						if(item instanceof Weapon){
-							return (Weapon) item;
-						}
-					}
-					return null;
 				}
 			};
 		}
@@ -375,19 +378,31 @@ public class InputManager extends ConcreteController{
 			return new ActionThread(){
 				@Override
 				public void run(){
+					ArrayList<GameCharacter> temp = selectedCharacters;
+					boolean areMoving = false;
 					while(running){
-						for(GameCharacter gc: selectedCharacters){
-							if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
-								getGame().getActionBuffer().add(new PickupAction(gc));
-								cancel();
+						if(!areMoving){
+							boolean temp2 = true;
+							for(GameCharacter gc: temp){
+								temp2 = temp2 && gc.isMoving();
 							}
-						}
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+							areMoving = temp2;
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+						} else {
+							for(GameCharacter gc: temp){
+								if(getGame().getControlledCharacters().contains(gc) && atDestination(gc)){
+									getGame().getActionBuffer().add(new PickupAction(gc));
+									cancel();
+								}
+							}
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+						}						
 					}
 				}
 			};

@@ -40,7 +40,7 @@ public class Node implements Comparable<Node>
         this.map = map;
     }
     
-    protected PathFindingMap getMap()
+    public PathFindingMap getMap()
     {
     	return this.map;
     }

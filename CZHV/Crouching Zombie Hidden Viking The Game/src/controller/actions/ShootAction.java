@@ -10,8 +10,7 @@ public class ShootAction implements Action {
 	private GameCharacter source;
 	
 	public ShootAction(GameCharacter source, GameCharacter target){
-		this.target = target;
-		this.source = source;
+		this(source.getBestWeapon(source.distanceTo(target)), source, target);
 	}
 	
 	public ShootAction(Weapon w, GameCharacter source, GameCharacter target){
@@ -20,11 +19,17 @@ public class ShootAction implements Action {
 		this.source = source;
 	}
 	
+	public boolean inRange(float radius){
+		return source.distanceTo(target)<radius;
+	}
 	
 	@Override
 	public boolean perform(Game g) {
 		int appliedDamage = source.getStrength();
 		if(w!=null){
+			if(!inRange(w.getRange())){
+				return false;
+			}
 			appliedDamage += w.getPower();
 			if(!w.isMeleeWeapon()){
 				appliedDamage -= source.getStrength();
@@ -34,6 +39,9 @@ public class ShootAction implements Action {
 				return true;
 			}
 		} else {
+			if(!inRange(GameCharacter.DEFAULT_MELEE_RANGE)){
+				return false;
+			}
 			if(hitSuccess(source.getAccuracy())){
 				target.applyDamage(appliedDamage);
 				return true;

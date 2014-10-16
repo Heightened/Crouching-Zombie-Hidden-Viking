@@ -38,6 +38,7 @@ public class Game {
 		controlBuffer.drainTo(actionBuffer);
 		while(!actionBuffer.isEmpty()){
 			actionBuffer.remove().perform(this);
+			controlledCharacters = map.getControlledCharacters();
 		}
 	}
 	

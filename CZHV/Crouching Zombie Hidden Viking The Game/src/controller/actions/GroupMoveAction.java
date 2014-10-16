@@ -13,20 +13,17 @@ import pathfinding.PathFindingMap.CellType;
 
 public class GroupMoveAction implements Action{
 	private List<GameCharacter> characters;
-	private int x,y;
 	private int avgX = 0, avgY = 0;
+	List<Node> path;
 	
 	public GroupMoveAction(List<GameCharacter> characters, float x, float y) throws Exception{
 		if(characters.isEmpty()){
 			throw new Exception("no characters selected for group move");
 		}
 		this.characters = characters;
-		this.x = (int)(x+0.5);
-		this.y = (int)(y+0.5);
-	}
-
-	@Override
-	public boolean perform(Game g) {
+		int ix = (int)(x+0.5);
+		int iy = (int)(y+0.5);
+		
 		//get the individual characters vision range and calculate group centre
 		ArrayList<PathFindingMap> maps = getPathFindingMaps();		
 		//calculate the vision range of the group
@@ -39,8 +36,11 @@ public class GroupMoveAction implements Action{
 		}
 		
 		Astar pathfinder = (Astar) characters.get(0).getPathFinder();
-		List<Node> path = pathfinder.calculatePath(avgX, avgY, x, y);
-		
+		path = pathfinder.calculatePath(avgX, avgY, ix, iy);
+	}
+
+	@Override
+	public boolean perform(Game g) {		
 		for(GameCharacter gc: characters){
 			//TODO use smarter follow path
 			gc.followPath(path);

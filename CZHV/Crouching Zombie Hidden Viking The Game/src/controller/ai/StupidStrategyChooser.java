@@ -2,6 +2,7 @@ package controller.ai;
 
 import controller.AIController;
 import controller.ai.strategy.Follow;
+import controller.ai.strategy.LeaderControlledAggro;
 import controller.ai.strategy.Strategy;
 import controller.ai.strategy.Wander;
 
@@ -25,7 +26,7 @@ public class StupidStrategyChooser implements StrategyChooser
 		
 		if(this.currentStrategy == null)
 			if(leader ==  null)
-				this.currentStrategy = new Wander();
+				this.currentStrategy = new LeaderControlledAggro();
 			else
 				this.currentStrategy = new Follow(leader.getCharacter());
 		else

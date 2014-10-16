@@ -1,5 +1,6 @@
 package model.character;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import controller.AIController;
 import model.item.Item;
+import model.item.Weapon;
 import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
@@ -15,6 +17,7 @@ import pathfinding.distanceHeuristics.ApproxEuclid;
 import simulator.tempFlocking.Vehicle;
 
 public class GameCharacter extends Vehicle{
+	public static final float DEFAULT_MELEE_RANGE = 2;
 	
 	private Inventory bag;
 	
@@ -34,6 +37,7 @@ public class GameCharacter extends Vehicle{
 	private int pathPointer;
 	private float accuracy = 1;
 	private boolean selected;
+	private boolean isMoving = false;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -77,6 +81,8 @@ public class GameCharacter extends Vehicle{
 			if(this.isAtTarget())
 			{
 				this.setFlockingTargetNode(path.get(++pathPointer));
+				Cell nextCell = this.pathFinder.getMap().getCell(path.get(pathPointer).getX(), path.get(pathPointer).getY());
+				this.setFlockingTargetRadius(nextCell.getSpaceRadius());
 				if (pathPointer >= path.size() - 1)
 				{
 					this.setFlockingTargetRadius(0.5f);
@@ -113,11 +119,11 @@ public class GameCharacter extends Vehicle{
 				//System.out.println("("+n.getX()+","+n.getY()+")");
 				this.cell.getMap().getCell(n.getX(), n.getY()).getItemHolder().setItem(new Item());
 			}*/
-			this.setFlockingTargetRadius(1.0f);
 			this.pathPointer = 0;
 			this.path = nodes;
 			this.setFlockingTargetNode(path.get(pathPointer));
 			updatePathProgress();
+			isMoving = true;
 		}
 	}
 	
@@ -213,6 +219,7 @@ public class GameCharacter extends Vehicle{
 	}
 	
 	public void stopMovement(){
+		isMoving = false;
 		path = null;
 		pathPointer = 0;
 	}
@@ -223,6 +230,47 @@ public class GameCharacter extends Vehicle{
 
 	public float getAccuracy() {
 		return accuracy;
+	}
+	
+	public float getBestRange(){
+		float range = DEFAULT_MELEE_RANGE;
+		Collection<Weapon> weapons = getWeapons();
+		for(Weapon w: weapons){
+			if(w.getRange()> range){
+				range = w.getRange();
+			}
+		}
+		return range;
+	}
+	
+	public Weapon getBestWeapon(float range){
+		Weapon best = null;
+		if(getWeapons().isEmpty()){
+			return best;
+		}
+		Collection<Weapon> weapons = getWeapons();
+		for(Weapon w: weapons){
+			if(w.getRange()<range){
+				if(best == null){
+					best = w;
+				} else if (w.getPower()> best.getPower()){
+					best = w;
+				}
+			}
+		}
+		return best;
+	}
+	
+	public Collection<Weapon> getWeapons() {
+		ArrayList<Weapon> weapons = new ArrayList<Weapon>();
+		ItemSlot[] inventory = getBag().getInventory();
+		for (int i = 0; i < inventory.length; i++) {
+			Item item = inventory[i].getItem();
+			if(item instanceof Weapon){
+				weapons.add((Weapon)item);
+			}
+		}
+		return weapons;
 	}
 
 	public void setAccuracy(float accuracy) {
@@ -282,10 +330,11 @@ public class GameCharacter extends Vehicle{
 	}
 
 	public void applyDamage(int Damage) {
-		currentHp = currentHp-Damage;
+		currentHp = currentHp-Damage;		
 		if(isDead()){
 			if(cell!=null){
 				cell.getCharacterHolder().getItem().remove(this);
+				cell.getMap().getControlledCharacters().remove(this);
 			}
 		}
 	}
@@ -341,5 +390,9 @@ public class GameCharacter extends Vehicle{
 		}
 			
 		return f;
+	}
+
+	public boolean isMoving() {
+		return isMoving;
 	}
 }

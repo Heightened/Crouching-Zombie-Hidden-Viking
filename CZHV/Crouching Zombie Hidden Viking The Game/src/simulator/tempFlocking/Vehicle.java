@@ -52,7 +52,6 @@ public class Vehicle extends Dummy3DObj{
 		float tX = n.getX() * scaling;
 		float tZ = n.getY() * scaling;
 		this.target = new Vector4f(tX, 0, tZ, 1);
-		//this.targetRadius = c.getSpaceRadius() * scaling;
 	}
 	
 	public void setFlockingTargetRadius(float r){
@@ -246,4 +245,9 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		float distance = new ApproxEuclid().calculateValue(position.x, position.z, target.x, target.z);
 		return distance < this.targetRadius;
 	}
+	
+	public Vector4f getTarget(){
+		return this.target;
+	}
 }
+
