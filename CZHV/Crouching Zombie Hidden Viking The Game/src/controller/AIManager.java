@@ -27,6 +27,7 @@ public class AIManager implements MapChangeListener {
 		
 		this.game.getFlockingMap().addListener(this);
 		
+		System.out.println("Adding "+(this.game.getFlockingMap().getCharacters().size())+" zombie controllers");
 		for(GameCharacter c : this.game.getFlockingMap().getCharacters())
 			this.setActive(c);
 		
