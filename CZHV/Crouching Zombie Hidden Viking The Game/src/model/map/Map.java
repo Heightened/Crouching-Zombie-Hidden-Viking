@@ -264,4 +264,15 @@ public class Map implements ChangeListener<Cell>
 			}
 		}
 	}
+
+	public void remove(GameCharacter gameCharacter)
+	{
+		gameCharacter.getCell().getCharacterHolder().getItem().remove(gameCharacter);
+		gameCharacter.getCell().characterMoved(gameCharacter, gameCharacter.getCell());
+		
+		//for(ChangeListener<Cell> l : this.listeners)
+		//	l.characterMoved(gameCharacter, gameCharacter.getCell());
+
+		this.controlled.remove(gameCharacter);
+	}
 }

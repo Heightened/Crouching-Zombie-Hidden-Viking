@@ -41,13 +41,6 @@ public class Astar extends PathFinder
 		}
 		if (start.isSolid())
 		{
-			if(!this.getCharacter().isInfected())
-			{
-				System.out.println("regel 49");
-				System.out.println("position of character: ("+getCharacter().getAbsX()+", "+getCharacter().getAbsY()+")");
-				for(Node n : start.getNeighbours())
-					System.out.println("("+n.getX()+", "+n.getY()+")");
-			}
 			return null;
 		}
 		openset.add(start);
@@ -68,8 +61,6 @@ public class Astar extends PathFinder
 			//System.out.println("it current:" + current.x + " " + current.y);
 			
 			if (current.equals(goal)){
-				if(!this.getCharacter().isInfected())
-					System.out.println("FOUND PATH IN: " + (System.currentTimeMillis() - time) + "ms");
 				return reconstructPath( goal, start);
 			}
 			

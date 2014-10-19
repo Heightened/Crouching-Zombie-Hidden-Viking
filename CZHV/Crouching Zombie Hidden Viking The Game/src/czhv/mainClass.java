@@ -38,9 +38,15 @@ public class mainClass {
 	}
 	
 	private final static void loop(){
+		long time = System.currentTimeMillis();
 		while(!exit){
 			game.update();
-			renderer.update();
+			if(System.currentTimeMillis() - time > 13) //limit to 77 fps
+			{
+				time = System.currentTimeMillis();
+				renderer.update();
+			}
+			
 			inputManager.pollInput();
 		}
 		simulator.quit();
