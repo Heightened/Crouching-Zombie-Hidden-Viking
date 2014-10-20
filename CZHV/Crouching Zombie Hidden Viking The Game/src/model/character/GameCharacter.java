@@ -42,10 +42,10 @@ public class GameCharacter extends Vehicle{
 	private boolean sparkle = false;
 	
 	public GameCharacter(){
-		this(100,16,16,2,false);
+		this(100,16,1,2,false);
 	}
 	
-	public GameCharacter(int maxHp, int strength, int maxSpeed, int inventory_size, boolean infected){
+	public GameCharacter(int maxHp, int strength, float maxSpeed, int inventory_size, boolean infected){
 		setMaxHp(maxHp);
 		setStrength(strength);
 		setMaxSpeed(maxSpeed);
@@ -166,7 +166,10 @@ public class GameCharacter extends Vehicle{
 		this.y = y-yi;
 		
 		this.cell = newCell;
-		if(this.infected) this.setSpeedMod(this.cell.getSpeedModifier());
+		float speedMod = 1f;
+		speedMod *= this.maxSpeed;
+		if(this.infected) speedMod *= this.cell.getSpeedModifier();
+		this.setSpeedMod(speedMod);
 		oldCell.getCharacterHolder().getItem().remove(this);
 		
 		newCell.characterMoved(this, null);
