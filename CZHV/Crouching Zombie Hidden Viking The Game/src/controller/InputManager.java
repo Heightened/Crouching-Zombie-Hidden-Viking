@@ -19,6 +19,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 import view.renderer3D.core.RendererInfoInterface;
 import controller.actions.GroupMoveAction;
+import controller.actions.MoveAction;
 import controller.actions.PickupAction;
 import controller.actions.ShootAction;
 import controller.actions.StopMovingAction;
@@ -353,7 +354,7 @@ public class InputManager extends ConcreteController{
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
 								}
-								if(attacker.contains(characters.get(i))){
+								if(attacker.contains(characters.get(i)) && selectedCharacters.contains(characters.get(i))){
 									if(lockedTargets.length != 0 && lockedTargets[i] == null){
 										lockedTargets[i] = focusedTarget;
 									}
@@ -384,7 +385,8 @@ public class InputManager extends ConcreteController{
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(w,gc,lockedTargets[i]));
 								} else if(!nearby(gc,lockedTargets[i], range)){
-									doGroupMoveAction(cellToVector2f(lockedTargets[i].getCell()), characters);
+									Cell c = lockedTargets[i].getCell();
+									getGame().getActionBuffer().add(new MoveAction(gc, c.getX(), c.getY()));
 								} else {
 									lockedTargets[i] = null;
 								}
