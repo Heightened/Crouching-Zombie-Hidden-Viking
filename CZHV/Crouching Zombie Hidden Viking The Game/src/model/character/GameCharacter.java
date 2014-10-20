@@ -332,8 +332,12 @@ public class GameCharacter extends Vehicle{
 		this.strength = strength;
 	}
 	
-	public float getMaxSpeed() {
-		return this.maxSpeed;
+	public float getMaxSpeed()
+	{
+		if(this.isInfected())
+			return this.getCell().getSpeedMultiplyer()*this.maxSpeed;
+		else
+			return this.maxSpeed;
 	}
 	
 	public void setMaxSpeed(float maxSpeed) {
