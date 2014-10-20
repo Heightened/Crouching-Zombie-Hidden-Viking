@@ -22,7 +22,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	private Map map;
 	private int x,y;
 	private float spaceRadius;
-	private float lightIntensity;
+	private float lightIntensity = 0;
 	
 	public Cell(Map map, int x, int y, float defaultRadius)
 	{
@@ -132,7 +132,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		this.lightIntensity = intensity;
 	}
 
-	public float getSpeedMultiplyer()
+	public float getSpeedModifier()
 	{
 		return 1/(1+this.lightIntensity);
 	}
