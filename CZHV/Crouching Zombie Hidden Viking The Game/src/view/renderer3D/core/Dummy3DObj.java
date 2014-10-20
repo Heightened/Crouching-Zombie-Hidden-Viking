@@ -19,7 +19,7 @@ public class Dummy3DObj {
 	protected Vector3f rotation;
 	private FloatBuffer modelMatrix;
 	private Vector4f screenPos;
-	private float scale = 0.035f;
+	private float scale = 0.5f;//0.035f;
 	private boolean selected = false;
 	
 	public Dummy3DObj(){
@@ -172,8 +172,9 @@ public class Dummy3DObj {
 		calcModelMatrix();
 		shader.putMat4("modelMatrix", modelMatrix);
 		
-		shader.bindTexture("texture", Resource.vikingTexture);
-		Resource.viking.draw(shader);
+		//System.out.println(Resource.henk);
+		shader.bindTexture("texture", Resource.viking.texture);
+		Resource.viking.model.draw(shader);
 		//mesh.draw(shader);
 		/*
         mesh.bind();

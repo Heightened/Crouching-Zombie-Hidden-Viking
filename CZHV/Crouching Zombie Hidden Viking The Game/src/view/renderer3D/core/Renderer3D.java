@@ -223,6 +223,8 @@ public class Renderer3D implements RendererInfoInterface{
 		combineShader.findAttributes();
 		combineShader.unbind();
 
+		Resource.load();
+		
 		selecter = new DEMOselecter( objList);
 
 		quadModel = new Model("quad.obj");
@@ -590,7 +592,7 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 		Dummy3DObj d = new Dummy3DObj();
 		shader.putUnifFloat4("color", decorColor);
-		shader.bindTexture("texture", Resource.vikingTexture);
+		shader.bindTexture("texture", Resource.viking.texture);
 		int index = 0;
 		for (Cell cell : impassibleCells){
 			index++;
