@@ -86,20 +86,24 @@ public class InputManager extends ConcreteController{
 										|| Keyboard.getEventKey() == Keyboard.KEY_RSHIFT) {
 									if (Keyboard.getEventKeyState()) {
 										for (GameCharacter character : characters) {
-
-											temp.add(character);
-											selectedCharacters = temp;
+											if(getGame().getControlledCharacters().contains(character)){
+												temp.add(character);
+												selectedCharacters = temp;
+											}
 										}
 										for (GameCharacter character : selectedCharacters) {
-											character.setSelected(true);
+											if(getGame().getControlledCharacters().contains(character)){
+												character.setSelected(true);
+											}
 										}
 									}
 								} else {
-
 									for (GameCharacter character : characters) {
 										if (!character.isSelected()) {
-											character.setSelected(true);
-											selectedCharacters.add(character);
+											if(getGame().getControlledCharacters().contains(character)){
+												character.setSelected(true);
+												selectedCharacters.add(character);
+											}
 										}
 									}
 								}
@@ -373,8 +377,7 @@ public class InputManager extends ConcreteController{
 									}
 								} else {
 									iter.remove();
-								}
-								
+								}	
 							} 
 // end target determination -----------------------------------------------------------------------------
 							if(lockedTargets.length != 0 && lockedTargets[i]!=null){
@@ -384,11 +387,11 @@ public class InputManager extends ConcreteController{
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(w,gc,lockedTargets[i]));
 								} else if(!nearby(gc,lockedTargets[i], range)){
-									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()), characters);
+									doGroupMoveAction(cellToVector2f(lockedTargets[i].getCell()), characters);
 								} else {
 									lockedTargets[i] = null;
 								}
-							}
+							} 
 						}
 						try {
 							Thread.sleep(100);
