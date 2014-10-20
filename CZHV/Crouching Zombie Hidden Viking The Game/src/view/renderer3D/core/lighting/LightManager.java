@@ -32,8 +32,8 @@ public class LightManager {
     
     private FloatBuffer indexFloats;
     private FloatBuffer lightFloats;
-    private Vector4f[][] indexVectors;
-    private Vector4f[][] indexStrength;
+    private float[][][] indexVectors;
+    private float[][][] indexStrength;
     
     public static final int lightBindingPoint = 1;
     public static final int indexBindingPoint = 2;
@@ -48,6 +48,7 @@ public class LightManager {
     private static boolean inits = false;
     private ShadowManager shadowManger;
     private static Vector3f gridOffset;
+    private final int num_lights_per_frag = 4;
     public LightManager(ShadowManager shadowManager){
     	this.shadowManger = shadowManager;
     	gridOffset = new Vector3f(0,0,0);
@@ -55,16 +56,15 @@ public class LightManager {
         Light nullLight = new Light(new Vector3f(0,0,0), new Vector3f(0,0,0),new Vector3f(0,0,0),0,1,new Vector4f(0,0,0,0));
         lights.add(nullLight);// "empty" light, invisible padding light
         lights.add(new Light(new Vector3f(0,0.3f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),2f,.8f,new Vector4f(1,0,1,0)));
-        /*
-        lights.add(new Light(new Vector3f(1,0.3f,1), new Vector3f(1,1,1),new Vector3f(1,0,0),1f,.9f,new Vector4f(0,-1,0,0)));
         
-        lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
-        lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
         
-        lights.add(new Light(new Vector3f(0,0.3f,4), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
-        lights.add(new Light(new Vector3f(4,0.3f,4), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
-        lights.add(new Light(new Vector3f(4,0.3f,0), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,.5f,new Vector4f(0,0,0,0)));
-        */
+        lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(0,1,1),2f,-1f,new Vector4f(0,0,0,0)));
+        lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+        
+    //    lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+    //    lights.add(new Light(new Vector3f(2,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+    //    lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+        
         if (shadowManager != null){
 	        for (int i = 1; i < lights.size(); i++){
 	        	lights.get(i).setShadow(shadowManager.getShadow(lights.get(i)));
@@ -84,18 +84,20 @@ public class LightManager {
         indexBuffer[0] = ARBVertexBufferObject.glGenBuffersARB();
         indexBuffer[1] = ARBVertexBufferObject.glGenBuffersARB();
         ARBVertexBufferObject.glBindBufferARB(GL_UNIFORM_BUFFER, indexBuffer[0]);
-        ARBVertexBufferObject.glBufferDataARB(GL_UNIFORM_BUFFER, GRID_SIZE*GRID_SIZE*4*4, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
+        ARBVertexBufferObject.glBufferDataARB(GL_UNIFORM_BUFFER, GRID_SIZE*GRID_SIZE*num_lights_per_frag*4, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
         ARBVertexBufferObject.glBindBufferARB(GL_UNIFORM_BUFFER, indexBuffer[1]);
-        ARBVertexBufferObject.glBufferDataARB(GL_UNIFORM_BUFFER, GRID_SIZE*GRID_SIZE*4*4, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
+        ARBVertexBufferObject.glBufferDataARB(GL_UNIFORM_BUFFER, GRID_SIZE*GRID_SIZE*num_lights_per_frag*4, ARBVertexBufferObject.GL_DYNAMIC_DRAW_ARB);
         
-        indexFloats = BufferUtils.createFloatBuffer(GRID_SIZE*GRID_SIZE*4);
+        indexFloats = BufferUtils.createFloatBuffer(GRID_SIZE*GRID_SIZE*num_lights_per_frag);
         lightFloats = BufferUtils.createFloatBuffer(MAX_LIGHTS*STRUCT_SIZE_F);
-        indexVectors = new Vector4f[GRID_SIZE][GRID_SIZE];
-        indexStrength = new Vector4f[GRID_SIZE][GRID_SIZE];
+        indexVectors = new float[GRID_SIZE][GRID_SIZE][num_lights_per_frag];
+        indexStrength = new float[GRID_SIZE][GRID_SIZE][num_lights_per_frag];
         for (int i = 0; i < indexVectors.length; i++){
             for (int j = 0; j < indexVectors[0].length; j++){
-                indexVectors[i][j] = new Vector4f();
-                indexStrength[i][j] = new Vector4f(1000000,1000000,1000000,1000000);
+            	for (int c = 0; c < num_lights_per_frag; c++){
+	                indexVectors[i][j][c] = 0;
+	                indexStrength[i][j][c] = 1000000;
+            	}
             }
         }
     }
@@ -122,7 +124,7 @@ public class LightManager {
     }
     
     public void setGridOffset(float x, float y, float z){
-    	this.gridOffset.set(x, y, z);
+    	this.gridOffset.set(x-x%GRID_CELL_SIZE, y, z-z%GRID_CELL_SIZE);
     }
     
     public int getLightBuffer(){
@@ -176,8 +178,10 @@ public class LightManager {
         //reset all lights
         for (int i = 0; i < indexVectors.length; i++){
             for (int j = 0; j < indexVectors[0].length; j++){
-                indexVectors[i][j].set(0,0,0,0);
-                indexStrength[i][j].set(1000000,1000000,1000000,1000000);
+            	for (int c = 0; c < num_lights_per_frag; c++){
+	                indexVectors[i][j][c] = 0;
+	                indexStrength[i][j][c] = 1000000;
+            	}
             }
         }
         for (int i = 1; i < lights.size(); i++){
@@ -208,42 +212,26 @@ public class LightManager {
     
     //this is a horrible piece of code, change from vectors to arrays please
     private void influenceCell(int lightIndex, int x, int y, float distance){
+    	//light outside of grid
         if (x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE){
             return;
         }
-        if (indexStrength[x][y].w > distance){
-            if (indexStrength[x][y].z > distance){
-                if (indexStrength[x][y].y > distance){
-                    if (indexStrength[x][y].x > distance){
-                        indexVectors[x][y].w = indexVectors[x][y].z;
-                        indexStrength[x][y].w = indexStrength[x][y].z;
-                        indexVectors[x][y].z = indexVectors[x][y].y;
-                        indexStrength[x][y].z = indexStrength[x][y].y;
-                        indexVectors[x][y].y = indexVectors[x][y].x;
-                        indexStrength[x][y].y = indexStrength[x][y].x;
-                        indexVectors[x][y].x = lightIndex;
-                        indexStrength[x][y].x = distance;
-                    }else{
-                        indexVectors[x][y].w = indexVectors[x][y].z;
-                        indexStrength[x][y].w = indexStrength[x][y].z;
-                        indexVectors[x][y].z = indexVectors[x][y].y;
-                        indexStrength[x][y].z = indexStrength[x][y].y;
-                        indexVectors[x][y].y = lightIndex;
-                        indexStrength[x][y].y = distance;
-                    }
-                }else{
-                    indexVectors[x][y].w = indexVectors[x][y].z;
-                    indexStrength[x][y].w = indexStrength[x][y].z;
-                    indexVectors[x][y].z = lightIndex;
-                    indexStrength[x][y].z = distance;
-                }
-            }else{
-                indexVectors[x][y].w = lightIndex;
-                indexStrength[x][y].w = distance;
-            }
-        }else{
-            //light too weak, ignore it
+        //light influence lower than lowest
+        if (indexStrength[x][y][num_lights_per_frag-1] < distance){
+        	return;
         }
+        //calculate light influence
+    	for (int c = num_lights_per_frag-1; c >= 0; c--){
+    		if (c == 0 || indexStrength[x][y][c-1] < distance){
+    			for (int d = num_lights_per_frag-1; d > c; d--){
+        			indexVectors[x][y][d] = indexVectors[x][y][d-1];
+        			indexStrength[x][y][d] = indexStrength[x][y][d-1];
+    			}
+    			indexVectors[x][y][c] = lightIndex;
+    			indexStrength[x][y][c] = distance;
+    			return;
+    		}
+    	}
     }
     
     private void writeIndex(){
@@ -251,7 +239,9 @@ public class LightManager {
         indexFloats.clear();
         for (int j = 0; j < indexVectors[0].length; j++){
             for (int i = 0; i < indexVectors.length; i++){
-                indexFloats.put(indexVectors[i][j].x).put(indexVectors[i][j].y).put(indexVectors[i][j].z).put(indexVectors[i][j].w);
+            	for (int c = 0; c < num_lights_per_frag; c++){
+            		indexFloats.put(indexVectors[i][j][c]);
+            	}
             }
         }
         indexFloats.flip();
