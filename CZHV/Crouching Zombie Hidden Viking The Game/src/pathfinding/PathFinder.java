@@ -10,7 +10,7 @@ public abstract class PathFinder
 	
 	private int radius;
 	protected Map map;
-	private GameCharacter character;
+	protected GameCharacter character;
 	
 	public PathFinder(Map map, int radius, GameCharacter character)
 	{

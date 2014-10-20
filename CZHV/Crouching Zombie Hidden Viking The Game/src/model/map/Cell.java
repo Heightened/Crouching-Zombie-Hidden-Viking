@@ -22,6 +22,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	private Map map;
 	private int x,y;
 	private float spaceRadius;
+	private float lightIntensity = 0;
 	
 	public Cell(Map map, int x, int y, float defaultRadius)
 	{
@@ -120,4 +121,19 @@ public class Cell implements ChangeListener<Container<? extends Object>>
     public static float distance(Cell c1, Cell c2){
         return (float)Math.sqrt((Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2)));
     }
+
+	public float getLightIntensity()
+	{
+		return this.lightIntensity;
+	}
+
+	public void setLightIntensity(float intensity)
+	{
+		this.lightIntensity = intensity;
+	}
+
+	public float getSpeedModifier()
+	{
+		return 1/(1+this.lightIntensity);
+	}
 }

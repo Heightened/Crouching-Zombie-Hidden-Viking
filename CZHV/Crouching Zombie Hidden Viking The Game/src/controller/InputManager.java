@@ -124,38 +124,43 @@ public class InputManager extends ConcreteController{
 					if(startClick!=null){
 						Object obj = renderer.click(startClick.x, startClick.y);
 						startClick = null;
-						if (obj != null){
-							if(Keyboard.getEventKey() == Keyboard.KEY_A){
-								//if mouse clicked and A pressed
-								if(Keyboard.getEventKeyState()){
-									if (obj instanceof Vector2f){
+						if (obj != null) {
+							if (Keyboard.getEventKey() == Keyboard.KEY_A) {
+								// if mouse clicked and A pressed
+								if (Keyboard.getEventKeyState()) {
+									if (obj instanceof Vector2f) {
 										doAttack(null);
-									}	
-									if (obj instanceof Cell){
+									}
+									if (obj instanceof Cell) {
 										doAttack((Cell) obj);
 									}
-								} 
-							}
-							if (obj instanceof Vector2f){
-								//stopThreads(attack);
-								stopAttack();
-								boolean Switch = false;;
-								Collection<Cell> cells = getGame().getMap().getActiveCells();
-								for(Cell c: cells){
-									if(c.getX() == (int)(((Vector2f)obj).x+0.5f) && c.getY() == (int)(((Vector2f)obj).y+0.5f)){
-										if(!c.getItemHolder().isEmpty()){
-											doPickupItem((Vector2f)obj);
-											Switch = true;
-										} 
-									} 
 								}
-								if(!Switch){
-									doGroupMoveAction((Vector2f)obj, getControllableCharacters());
+							} else {
+								if (obj instanceof Vector2f) {
+									// stopThreads(attack);
+									stopAttack();
+									boolean Switch = false;
+									;
+									Collection<Cell> cells = getGame().getMap()
+											.getActiveCells();
+									for (Cell c : cells) {
+										if (c.getX() == (int) (((Vector2f) obj).x + 0.5f)
+												&& c.getY() == (int) (((Vector2f) obj).y + 0.5f)) {
+											if (!c.getItemHolder().isEmpty()) {
+												doPickupItem((Vector2f) obj);
+												Switch = true;
+											}
+										}
+									}
+									if (!Switch) {
+										doGroupMoveAction((Vector2f) obj,
+												getControllableCharacters());
+									}
 								}
-							} 
-							if (obj instanceof Cell){
-								if(!((Cell)obj).getItemHolder().isEmpty()){
-									doPickupItem(cellToVector2f((Cell)obj));
+								if (obj instanceof Cell) {
+									if (!((Cell) obj).getItemHolder().isEmpty()) {
+										doPickupItem(cellToVector2f((Cell) obj));
+									}
 								}
 							}
 						}
@@ -173,6 +178,21 @@ public class InputManager extends ConcreteController{
 						for(GameCharacter g: selectedCharacters){
 							if(getGame().getControlledCharacters().contains(g)){
 								getGame().getActionBuffer().add(new StopMovingAction(g));
+							}
+						}
+					}
+				}
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_L){
+				boolean startPress = false;
+				if(Keyboard.getEventKeyState()){
+					startPress = true;
+				} else {
+					if(startPress){
+						startPress = false;
+						for(GameCharacter g: selectedCharacters){
+							if(getGame().getControlledCharacters().contains(g)){
+								g.toggleSparkle();
 							}
 						}
 					}
@@ -331,11 +351,9 @@ public class InputManager extends ConcreteController{
 							if(focusedTarget!=null){
 								if(focusedTarget.isDead()){
 									focusedTarget = null;
-								} else {
-									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()), characters);
 								}
 								if(attacker.contains(characters.get(i))){
-									if(lockedTargets[i] == null){
+									if(lockedTargets.length != 0 && lockedTargets[i] == null){
 										lockedTargets[i] = focusedTarget;
 									}
 								}
@@ -343,11 +361,11 @@ public class InputManager extends ConcreteController{
 							Iterator<GameCharacter> iter = targets.iterator();
 							GameCharacter gc = characters.get(i);
 							Weapon w = gc.getBestWeapon(gc.getBestRange());
-							float range = 1;
+							float range = GameCharacter.DEFAULT_MELEE_RANGE;
 							if(w != null){
 								range = w.getRange();
 							}
-							while(lockedTargets[i] == null && iter.hasNext()){
+							while(lockedTargets.length != 0 && lockedTargets[i] == null && iter.hasNext()){
 								GameCharacter enemy = iter.next();
 								if(!enemy.isDead()){									
 									if(nearby(gc, enemy, range)){
@@ -359,12 +377,14 @@ public class InputManager extends ConcreteController{
 								
 							} 
 // end target determination -----------------------------------------------------------------------------
-							if(lockedTargets[i]!=null){
+							if(lockedTargets.length != 0 && lockedTargets[i]!=null){
 								if(lockedTargets[i].isDead()){
 									lockedTargets[i] = null;
 								} else if(nearby(gc, lockedTargets[i], range)){
 									getGame().getActionBuffer().add(new StopMovingAction(gc));
 									getGame().getActionBuffer().add(new ShootAction(w,gc,lockedTargets[i]));
+								} else if(!nearby(gc,lockedTargets[i], range)){
+									doGroupMoveAction(cellToVector2f(focusedTarget.getCell()), characters);
 								} else {
 									lockedTargets[i] = null;
 								}

@@ -7,14 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import controller.AIController;
 import model.item.Item;
 import model.item.Weapon;
 import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
-import pathfinding.distanceHeuristics.ApproxEuclid;
 import simulator.tempFlocking.Vehicle;
+import controller.AIController;
 
 public class GameCharacter extends Vehicle{
 	public static final float DEFAULT_MELEE_RANGE = 2;
@@ -39,7 +38,8 @@ public class GameCharacter extends Vehicle{
 	private boolean selected;
 	private boolean isMoving = false;
 	private long lastHit;
-	private long delay = 1000;
+	private long delay = 1000; //attack delay ms
+	private boolean sparkle = false;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -166,6 +166,7 @@ public class GameCharacter extends Vehicle{
 		this.y = y-yi;
 		
 		this.cell = newCell;
+		if(this.infected) this.setSpeedMod(this.cell.getSpeedModifier());
 		oldCell.getCharacterHolder().getItem().remove(this);
 		
 		newCell.characterMoved(this, null);
@@ -189,11 +190,6 @@ public class GameCharacter extends Vehicle{
 		newCell.characterMoved(this, null);
 		if(oldCell != null)
 			oldCell.characterMoved(this, null);
-	}
-	
-	public boolean sparkles()
-	{
-		return true;
 	}
 	
 	public float getX()
@@ -243,13 +239,21 @@ public class GameCharacter extends Vehicle{
 		pathPointer = 0;
 	}
 	
+	public boolean sparkles()
+	{
+		return sparkle;
+	}
+	
+	public void toggleSparkle() {
+		this.sparkle = !this.sparkle;
+	}
 
 	public boolean isMoving() {
 		return isMoving;
 	}
 
 	public boolean hit() {
-		boolean hit = this.lastHit+this.delay < System.currentTimeMillis();
+		boolean hit = !sparkles() && this.lastHit+this.delay < System.currentTimeMillis();
 		if(hit)
 			this.lastHit = System.currentTimeMillis();
 		
@@ -268,12 +272,13 @@ public class GameCharacter extends Vehicle{
 		float range = DEFAULT_MELEE_RANGE;
 		Collection<Weapon> weapons = getWeapons();
 		for(Weapon w: weapons){
-			if(w.getRange()> range){
+			if(w.getRange() > range){
 				range = w.getRange();
 			}
 		}
 		return range;
 	}
+	
 	
 	public Weapon getBestWeapon(float range){
 		Weapon best = null;
@@ -282,10 +287,10 @@ public class GameCharacter extends Vehicle{
 		}
 		Collection<Weapon> weapons = getWeapons();
 		for(Weapon w: weapons){
-			if(w.getRange()<range){
+			if(w.getRange()<range+1){ //the +1 is necessary in some cases
 				if(best == null){
 					best = w;
-				} else if (w.getPower()> best.getPower()){
+				} else if (w.getPower() >= best.getPower()){
 					best = w;
 				}
 			}
@@ -329,8 +334,12 @@ public class GameCharacter extends Vehicle{
 		this.strength = strength;
 	}
 	
-	public float getMaxSpeed() {
-		return this.maxSpeed;
+	public float getMaxSpeed()
+	{
+		if(this.isInfected())
+			return this.getCell().getSpeedModifier()*this.maxSpeed;
+		else
+			return this.maxSpeed;
 	}
 	
 	public void setMaxSpeed(float maxSpeed) {
