@@ -336,7 +336,7 @@ public class GameCharacter extends Vehicle{
 	public float getMaxSpeed()
 	{
 		if(this.isInfected())
-			return this.getCell().getSpeedMultiplyer()*this.maxSpeed;
+			return this.getCell().getSpeedModifier()*this.maxSpeed;
 		else
 			return this.maxSpeed;
 	}

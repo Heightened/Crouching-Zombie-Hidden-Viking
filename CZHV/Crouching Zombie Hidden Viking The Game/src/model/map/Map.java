@@ -114,7 +114,7 @@ public class Map implements ChangeListener<Cell>
 			
 		}
 		
-		
+		/*
 		int nItems = 10; //Rand.randInt(size/600, size/300);
 		
 		for(int i=0; i<nItems; i++)
