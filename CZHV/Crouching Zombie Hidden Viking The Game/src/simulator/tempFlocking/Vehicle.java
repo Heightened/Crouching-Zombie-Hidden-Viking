@@ -30,6 +30,9 @@ public class Vehicle extends Dummy3DObj{
 	int gridx = 0;
 	int gridy = 0;
 
+	Vector2f prevVelocity;
+	Vector2f[] interpolatedVelocity;
+	int interpolatedPointer = 0;
 	public Vehicle(){
 		prevPosition = new Vector4f(position);
 		steering = new Vector2f(0,0);
@@ -37,6 +40,8 @@ public class Vehicle extends Dummy3DObj{
 		velocity = new Vector2f(0,0);
 		this.target = position;
 		targetRadius = Renderer3D.cellSize*1f;
+		interpolatedVelocity = new Vector2f[5];
+		prevVelocity = new Vector2f();
 	}
 	
 	public void setFlockingTargetCell(Cell c){
@@ -112,11 +117,17 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 
 		truncate(velocity, max_speed);
 		
-		float angle = (float)Math.atan2(velocity.x, velocity.y)/(float)Math.PI;
-		//System.out.println(angle);
-		if (steering.length() > 0.005f){
-		//	rotation.y = angle*180;
+		//INTERPOLATION START
+		Vector2f avgVelocity = new Vector2f();
+		avgVelocity.x = velocity.x + prevVelocity.x;
+		avgVelocity.y = velocity.y + prevVelocity.y;
+		if (avgVelocity.length() > 0.1f){
+			float angle = (float)Math.atan2(avgVelocity.x, avgVelocity.y)/(float)Math.PI;
+			//System.out.println(angle);
+			rotation.y = 360-angle*180;
 		}
+		prevVelocity = new Vector2f(velocity);
+		//INTERPOLATION END
 		
 	//	position.x += velocity.x;
 	//	position.z += velocity.y;

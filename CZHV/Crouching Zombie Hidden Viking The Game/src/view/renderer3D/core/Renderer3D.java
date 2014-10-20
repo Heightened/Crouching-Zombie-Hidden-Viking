@@ -10,6 +10,7 @@ import java.util.List;
 import model.Game;
 import model.character.GameCharacter;
 import model.map.Cell;
+import model.map.ChunkedMap;
 import model.map.Map;
 
 import org.lwjgl.BufferUtils;
@@ -21,7 +22,6 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
@@ -80,14 +80,21 @@ public class Renderer3D implements RendererInfoInterface{
 	
 	private ShaderObject combineShader;
 
+	private ChunkedMap chunkedView;
 
 	public Renderer3D(Game game){
 		setupDisplay();
 		this.game = game;
 		map = game.getMap();
+		chunkedView = game.getViewMap();
 		for (int i = 0; i < 50; i++){
 			for (int j = 0; j < 50; j++){
 				game.getFlockingMap().getActiveCells(2*i, 2*j);
+			}
+		} 
+		for (int i = 0; i < 10; i++){
+			for (int j = 0; j < 10; j++){
+				chunkedView.getActiveCells(10*i, 10*j);
 			}
 		} 
 		impassibleCells = map.getImpassibleCells();
@@ -320,6 +327,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 		long fixtime = System.currentTimeMillis();
 		activeCells = map.getActiveCells();
+		//activeCells = chunkedView.getActiveCells(0, 0);
 
 		for (Cell cell : activeCells){
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
@@ -513,11 +521,6 @@ public class Renderer3D implements RendererInfoInterface{
 				//}
 			}
 		}
-
-		if (ray != null){
-			drawLine(new Vector3f(ray.start.x, ray.start.y, ray.start.z), new Vector3f(ray.start.x+ray.dir.x, ray.start.y+ray.dir.y, ray.start.z+ray.dir.z), lineColor);
-			//drawLine(new Vector3f(0,1,0), new Vector3f(ray.dir.x, ray.dir.y+1, ray.dir.z), lineColor);
-		}
 		drawLine(new Vector3f(0,1,0), new Vector3f(0,0,0), lineColor);
 		lineShader.unbind();
 	}
@@ -594,7 +597,7 @@ public class Renderer3D implements RendererInfoInterface{
 			if (index > impassibleCells.size()/4){
 				break;
 			}
-			d.setPosition(cell.getX()*cellSize, 0.02f, cell.getY()*cellSize);
+			d.setPosition(cell.getX()*cellSize, 0f, cell.getY()*cellSize);
 			d.draw(shader);
 		}
 

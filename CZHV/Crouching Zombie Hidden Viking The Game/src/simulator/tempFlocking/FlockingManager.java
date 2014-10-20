@@ -25,7 +25,7 @@ public class FlockingManager {
 		}
 	}
 
-	public void loop(ChunkedMap flockingMap){
+	public void loop(ChunkedMap flockingMap){		
 		for (GameCharacter v : vlist){
 			if(v == null)
 				System.out.println("------------------ v == null");
