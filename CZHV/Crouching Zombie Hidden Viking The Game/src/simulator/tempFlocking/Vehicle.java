@@ -23,7 +23,7 @@ public class Vehicle extends Dummy3DObj{
 	final float max_speed = 2f;//final for performance
 	protected float currentSpeed;
 	final float max_force = 0.20f;
-	final float mass = 1;
+	final float mass = .1f;
 	Vector4f prevPosition;
 	protected Vector4f target;
 	protected float targetRadius;

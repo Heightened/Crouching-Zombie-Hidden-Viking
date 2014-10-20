@@ -133,7 +133,7 @@ public class Map implements ChangeListener<Cell>
 		for(int i=0; i<nZombies; i++)
 		{
 			int x,y;
-			GameCharacter c = new GameCharacter(64,16,.5f,2,true);
+			GameCharacter c = new GameCharacter(64,16,2f,2,true);
 			c.setPathFinder(new Astar(this,100,c));
 			
 			do
