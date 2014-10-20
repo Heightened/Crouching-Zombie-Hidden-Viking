@@ -178,6 +178,21 @@ public class InputManager extends ConcreteController{
 					}
 				}
 			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_L){
+				boolean startPress = false;
+				if(Keyboard.getEventKeyState()){
+					startPress = true;
+				} else {
+					if(startPress){
+						startPress = false;
+						for(GameCharacter g: selectedCharacters){
+							if(getGame().getControlledCharacters().contains(g)){
+								g.toggleSparkle();
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	

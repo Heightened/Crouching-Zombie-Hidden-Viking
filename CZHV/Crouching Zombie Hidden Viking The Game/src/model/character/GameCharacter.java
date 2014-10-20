@@ -39,6 +39,7 @@ public class GameCharacter extends Vehicle{
 	private boolean isMoving = false;
 	private long lastHit;
 	private long delay = 1000; //attack delay ms
+	private boolean sparkle;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -242,13 +243,16 @@ public class GameCharacter extends Vehicle{
 		pathPointer = 0;
 	}
 	
+	public void toggleSparkle() {
+		this.sparkle = !this.sparkle;
+	}
 
 	public boolean isMoving() {
 		return isMoving;
 	}
 
 	public boolean hit() {
-		boolean hit = this.lastHit+this.delay < System.currentTimeMillis();
+		boolean hit = !sparkles() && this.lastHit+this.delay < System.currentTimeMillis();
 		if(hit)
 			this.lastHit = System.currentTimeMillis();
 		
