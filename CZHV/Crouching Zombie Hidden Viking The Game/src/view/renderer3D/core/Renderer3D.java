@@ -358,8 +358,7 @@ public class Renderer3D implements RendererInfoInterface{
 		framecounter++;
 		if (framecounter == 100){
 			framecounter = 0;
-			System.out.println("100 frames in " + (totalframetime/100f) + " ms");
-			System.out.println("or " + (1000/(totalframetime/100f)) + " fps");
+			System.out.println("100 frames in " + (totalframetime/100f) + " ms | " + (1000/(totalframetime/100f)) + " fps");
 			totalframetime = 0;
 		}
 

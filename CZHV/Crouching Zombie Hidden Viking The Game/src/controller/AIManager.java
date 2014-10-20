@@ -65,16 +65,33 @@ public class AIManager implements MapChangeListener {
 	public void setInactive(GameCharacter character) {
 		if(game.isAIControlled(character))
 		{
-			addControlBinding(character);
-			setInactive(controlBinding.get(character));
+			if(character.isDead())
+			{
+				if(controlBinding.containsKey(character))
+					activeControllers.remove(controlBinding.get(character));
+				
+				removeControlBinding(character);
+			}
+			else
+			{
+				addControlBinding(character);
+				setInactive(controlBinding.get(character));
+			}
 		}
 	}
 
 	private void addControlBinding(GameCharacter character) {
 		if(!controlBinding.containsKey(character)){
 			//TODO: factory for AIController
+			System.out.println("Added AIController");
 			controlBinding.put(character,  new SimpleAIController(game, character, this.controlBinding));
 		}
+	}
+	
+	private void removeControlBinding(GameCharacter character)
+	{
+		if(controlBinding.containsKey(character))
+			controlBinding.remove(character);
 	}
 	
 	public void stopManager(){

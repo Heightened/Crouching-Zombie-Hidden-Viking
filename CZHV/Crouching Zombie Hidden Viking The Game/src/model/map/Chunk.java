@@ -93,13 +93,15 @@ public class Chunk implements ChangeListener<Cell>
 		if(character == null)
 			(new Exception("Character cannot be null")).printStackTrace();
 		
-		if(this.contains(character.getCell()) && !this.chars.contains(character))
+		if(this.contains(character.getCell()) && !this.chars.contains(character) && !character.isDead())
 		{
 			this.chars.add(character);
 			for(MapChangeListener l : this.listeners)
 				l.setActive(character);
 		}
-		else if(!this.contains(character.getCell()) && this.chars.contains(character))
+		else if((!this.contains(character.getCell()) && this.chars.contains(character))
+				||
+				(this.contains(character.getCell()) && character.isDead()))
 		{
 			this.chars.remove(character);
 			for(MapChangeListener l : this.listeners)

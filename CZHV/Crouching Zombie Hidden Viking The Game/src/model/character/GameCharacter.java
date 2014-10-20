@@ -60,6 +60,11 @@ public class GameCharacter extends Vehicle{
 	public void move(float dtime)
 	{
 		//System.out.println("speed= ("+speedX+","+speedY+")");
+		if(this.isDead())
+		{
+			System.out.println("Cannot move because I'm dead!");
+			return;
+		}
 		
 		float newX = this.x+dtime*this.speedX;
 		float newY = this.y+dtime*this.speedY;
@@ -184,6 +189,11 @@ public class GameCharacter extends Vehicle{
 		newCell.characterMoved(this, null);
 		if(oldCell != null)
 			oldCell.characterMoved(this, null);
+	}
+	
+	public boolean sparkles()
+	{
+		return true;
 	}
 	
 	public float getX()
@@ -355,8 +365,7 @@ public class GameCharacter extends Vehicle{
 		currentHp = currentHp-Damage;		
 		if(isDead()){
 			if(cell!=null){
-				cell.getCharacterHolder().getItem().remove(this);
-				cell.getMap().getControlledCharacters().remove(this);
+				cell.getMap().remove(this);
 			}
 		}
 	}
