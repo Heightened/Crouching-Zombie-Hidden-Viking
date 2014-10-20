@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Resources;
+
 import model.Game;
 import model.character.GameCharacter;
 import model.map.Cell;
@@ -87,6 +89,7 @@ public class Renderer3D implements RendererInfoInterface{
 		this.game = game;
 		map = game.getMap();
 		chunkedView = game.getViewMap();
+		Resource.load();
 		for (int i = 0; i < 50; i++){
 			for (int j = 0; j < 50; j++){
 				game.getFlockingMap().getActiveCells(2*i, 2*j);
@@ -613,7 +616,7 @@ public class Renderer3D implements RendererInfoInterface{
 	
 		Dummy3DObj d = new Dummy3DObj();
 		shader.putUnifFloat4("color", decorColor);
-		shader.bindTexture("texture", Resource.vikingTexture);
+		shader.bindTexture("texture", Resource.viking.texture);
 		for (Cell cell : impassibleCells){
 			d.setPosition(cell.getX()*cellSize, 0f, cell.getY()*cellSize);
 			d.draw(shader);
