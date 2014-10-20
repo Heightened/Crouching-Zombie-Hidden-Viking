@@ -74,8 +74,13 @@ public class Astar extends PathFinder
 				
 				//System.out.println("Neighbour:" + n.x + " " + n.y);
 				float weight = 1;
-				if(n.type == PathFindingMap.CellType.UNKNOWN) weight *= unknownCellWeight;
-				if(!this.map.getCell(n.getX(), n.getY()).isFree(null)) weight *= impassibleWeight;
+				if(n.type == PathFindingMap.CellType.UNKNOWN) { 
+					weight *= unknownCellWeight;
+				}
+				else {
+					if(!this.map.getCell(n.getX(), n.getY()).isFree(null)) weight *= impassibleWeight;
+					if(this.character.isInfected()) weight /= this.map.getCell(n.getX(), n.getY()).getSpeedModifier();
+				}
 				
 				float tentative_g_score = current.path_length + weight * Node.distance(n, current);
 				float tentative_f_score = tentative_g_score + Node.distance(n, goal);

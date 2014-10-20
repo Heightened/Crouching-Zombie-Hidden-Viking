@@ -21,6 +21,7 @@ public class Vehicle extends Dummy3DObj{
 	Vector2f velocity;
 	Vector2f targetVelocity;
 	final float max_speed = 2f;//final for performance
+	protected float currentSpeed;
 	final float max_force = 0.20f;
 	final float mass = 1;
 	Vector4f prevPosition;
@@ -42,6 +43,7 @@ public class Vehicle extends Dummy3DObj{
 		targetRadius = Renderer3D.cellSize*1f;
 		interpolatedVelocity = new Vector2f[5];
 		prevVelocity = new Vector2f();
+		this.currentSpeed = this.max_speed;
 	}
 	
 	public void setFlockingTargetCell(Cell c){
@@ -73,6 +75,10 @@ public class Vehicle extends Dummy3DObj{
 			for (int y = gridy - 1; y < gridy+2; y++ ){
 				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
 				while(iter.hasNext()){
+/*
+ * TODO: concurrent modification exception
+ * deze iterator geeft dus een concurrent modification exception
+ */
 					Vehicle v = iter.next();
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
@@ -115,7 +121,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		velocity.x += steering.x;
 		velocity.y += steering.y;
 
-		truncate(velocity, max_speed);
+		truncate(velocity, currentSpeed);
 		
 		//INTERPOLATION START
 		Vector2f avgVelocity = new Vector2f();
@@ -173,7 +179,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		temp.x = target.position.x - position.x;
 		temp.y = target.position.z - position.z;
 		float distance = temp.length();
-		float temp2 = distance/max_speed;
+		float temp2 = distance/currentSpeed;
 		return seekTarget(target.getFuturePosition(temp2), 0);
 	}
 	
@@ -181,7 +187,7 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		temp.x = target.position.x - position.x;
 		temp.y = target.position.z - position.z;
 		float distance = temp.length();
-		float temp2 = distance/max_speed/8;
+		float temp2 = distance/currentSpeed/8;
 		return fleeTarget(target.getFuturePosition(temp2), radius, true);
 	}
 
@@ -195,11 +201,11 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		if(distance != 0) {
 			if (distance < slowRadius){
 				targetVelocity.normalise();
-				targetVelocity.scale(max_speed);
+				targetVelocity.scale(currentSpeed);
 				targetVelocity.scale(distance/slowRadius);
 			}else{
 				targetVelocity.normalise();
-				targetVelocity.scale(max_speed);
+				targetVelocity.scale(currentSpeed);
 			}
 		}
 
@@ -238,12 +244,12 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 		if (distance < fleeRadius){
 			targetvx/=factor;
 			targetvy/=factor;
-			targetvx*= max_speed;
-			targetvy*= max_speed;
+			targetvx*= currentSpeed;
+			targetvy*= currentSpeed;
 			targetvx*=factor/fleeRadius;
 			targetvy*=factor/fleeRadius;
-			targetvx*= max_speed;
-			targetvy*= max_speed;
+			targetvx*= currentSpeed;
+			targetvy*= currentSpeed;
 			targetvx*=-1;
 			targetvy*=-1;
 		}else{
@@ -263,6 +269,10 @@ Exception in thread "Thread-11" java.lang.NullPointerException
 	
 	public Vector4f getTarget(){
 		return this.target;
+	}
+	
+	public void setSpeedMod(float newMod){
+		this.currentSpeed = this.max_speed*newMod;
 	}
 }
 
