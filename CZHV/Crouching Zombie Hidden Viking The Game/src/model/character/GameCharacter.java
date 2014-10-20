@@ -191,6 +191,11 @@ public class GameCharacter extends Vehicle{
 			oldCell.characterMoved(this, null);
 	}
 	
+	public boolean sparkles()
+	{
+		return true;
+	}
+	
 	public float getX()
 	{
 		return this.x;
