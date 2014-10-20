@@ -39,7 +39,7 @@ public class GameCharacter extends Vehicle{
 	private boolean isMoving = false;
 	private long lastHit;
 	private long delay = 1000; //attack delay ms
-	private boolean sparkle;
+	private boolean sparkle = false;
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
@@ -191,11 +191,6 @@ public class GameCharacter extends Vehicle{
 			oldCell.characterMoved(this, null);
 	}
 	
-	public boolean sparkles()
-	{
-		return true;
-	}
-	
 	public float getX()
 	{
 		return this.x;
@@ -241,6 +236,11 @@ public class GameCharacter extends Vehicle{
 		isMoving = false;
 		path = null;
 		pathPointer = 0;
+	}
+	
+	public boolean sparkles()
+	{
+		return sparkle;
 	}
 	
 	public void toggleSparkle() {
