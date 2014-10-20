@@ -119,7 +119,7 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		Collection<Cell> cells = this.getMap().getNearbyCells(this.getX(), this.getY(), 18);
 		
 		for(Cell ic : cells)
-			ic.addLightIntensity((float) (m*1f/Math.pow(1f+Cell.distance(ic, this), 2)));
+			ic.addLightIntensity((float) (m*2f/Math.pow(1f+Cell.distance(ic, this), 2)));
 	}
 
 	public float getSpaceRadius()

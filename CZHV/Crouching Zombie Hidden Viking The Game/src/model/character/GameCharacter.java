@@ -62,7 +62,7 @@ public class GameCharacter extends Vehicle{
 		//System.out.println("speed= ("+speedX+","+speedY+")");
 		if(this.isDead())
 		{
-			System.out.println("Cannot move because I'm dead!");
+			System.out.println("Cannot move because I'm dead! (I'm a "+(isInfected()? "Zombie" : "Viking")+")");
 			return;
 		}
 		
@@ -248,6 +248,7 @@ public class GameCharacter extends Vehicle{
 	}
 	
 	public void toggleSparkle() {
+		System.out.println("Sprakle toggled");
 		this.getCell().updateIntensities(this.sparkle? -1: 1);
 		this.sparkle = !this.sparkle;
 	}
@@ -364,10 +365,13 @@ public class GameCharacter extends Vehicle{
 	}
 
 	public int getCurrentHp() {
+		//return (int)(100*this.cell.getLightIntensity()+1);
+		
 		if(currentHp<0){
 			return 0;
 		}
 		return currentHp;
+		//*/
 	}
 
 	public List<Node> getPath(){
