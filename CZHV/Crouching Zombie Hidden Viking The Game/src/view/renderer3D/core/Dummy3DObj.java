@@ -98,12 +98,8 @@ public class Dummy3DObj {
 	float animationTime = 0;
 	
 	public void update() {
-		if (mesh == null){
-			//mesh = new Animation(120, "Animation/Cube/cube");
-		}
-		animationTime += 0.005f ;
+		animationTime += 0.020f ;
 		animationTime %= 1.0f;
-		//mesh.setTime(animationTime);
 	}
 	
 	private float scalex = scale;
@@ -176,7 +172,8 @@ public class Dummy3DObj {
 		
 		//System.out.println(Resource.henk);
 		shader.bindTexture("texture", Resource.viking.texture);
-		Resource.viking.model.draw(shader);
+		//Resource.viking.model.draw(shader);
+		Resource.viking.animation.get("run").draw(shader, animationTime);
 		//mesh.draw(shader);
 		/*
         mesh.bind();
