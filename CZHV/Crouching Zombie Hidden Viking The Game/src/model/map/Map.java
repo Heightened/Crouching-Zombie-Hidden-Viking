@@ -69,7 +69,7 @@ public class Map implements ChangeListener<Cell>
 		for(int i=0; i<nZombies; i++)
 		{
 			int x,y;
-			GameCharacter c = new GameCharacter(64,16,4,2,true);
+			GameCharacter c = new GameCharacter(64,16,0.5f,2,true);
 			c.setPathFinder(new Astar(this,100,c));
 			
 			do
@@ -93,7 +93,7 @@ public class Map implements ChangeListener<Cell>
 		for(int i=0; i<nVikings; i++)
 		{
 			int x,y;
-			GameCharacter c = new GameCharacter(128,20,64,2,false);
+			GameCharacter c = new GameCharacter(128,20,2f,2,false);
 			c.setPathFinder(new Astar(this,100,c));
 			c.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 10.0f, 0.7f));
 			
