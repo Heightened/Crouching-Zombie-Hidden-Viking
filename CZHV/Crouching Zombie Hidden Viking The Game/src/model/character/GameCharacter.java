@@ -271,12 +271,13 @@ public class GameCharacter extends Vehicle{
 		float range = DEFAULT_MELEE_RANGE;
 		Collection<Weapon> weapons = getWeapons();
 		for(Weapon w: weapons){
-			if(w.getRange()> range){
+			if(w.getRange() > range){
 				range = w.getRange();
 			}
 		}
 		return range;
 	}
+	
 	
 	public Weapon getBestWeapon(float range){
 		Weapon best = null;
@@ -285,10 +286,10 @@ public class GameCharacter extends Vehicle{
 		}
 		Collection<Weapon> weapons = getWeapons();
 		for(Weapon w: weapons){
-			if(w.getRange()<range){
+			if(w.getRange()<range+1){ //the +1 is necessary in some cases
 				if(best == null){
 					best = w;
-				} else if (w.getPower()> best.getPower()){
+				} else if (w.getPower() >= best.getPower()){
 					best = w;
 				}
 			}

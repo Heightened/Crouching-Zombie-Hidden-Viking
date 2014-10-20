@@ -14,7 +14,7 @@ public class StopMovingAction implements Action{
 	@Override
 	public boolean perform(Game g) {
 		c.stopMovement();
-		return false;
+		return true;
 	}
 	
 }

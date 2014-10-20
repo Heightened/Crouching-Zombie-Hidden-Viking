@@ -73,6 +73,10 @@ public class Vehicle extends Dummy3DObj{
 			for (int y = gridy - 1; y < gridy+2; y++ ){
 				Iterator<GameCharacter> iter = map.getCharacters(x, y).iterator();
 				while(iter.hasNext()){
+/*
+ * TODO: concurrent modification exception
+ * deze iterator geeft dus een concurrent modification exception
+ */
 					Vehicle v = iter.next();
 					if (v != this){
 						//System.out.println("NEIGHBOUR " + v.position + " " + position);
