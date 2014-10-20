@@ -105,9 +105,23 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 	@Override
 	public void characterMoved(GameCharacter c, Cell cell)
 	{
+		if(c.sparkles())
+		{
+			int m = this.getCharacterHolder().getItem().contains(c)? 1 : -1;
+			this.updateIntensities(m);
+		}
+		
 		this.map.characterMoved(c, this);
 	}
 	
+	public void updateIntensities(int m)
+	{
+		Collection<Cell> cells = this.getMap().getNearbyCells(this.getX(), this.getY(), 18);
+		
+		for(Cell ic : cells)
+			ic.addLightIntensity((float) (m*1f/Math.pow(1f+Cell.distance(ic, this), 2)));
+	}
+
 	public float getSpaceRadius()
 	{
 		return this.spaceRadius;
@@ -132,8 +146,13 @@ public class Cell implements ChangeListener<Container<? extends Object>>
 		this.lightIntensity = intensity;
 	}
 
+	public void addLightIntensity(float intensity)
+	{
+		this.lightIntensity += intensity;
+	}
+
 	public float getSpeedModifier()
 	{
-		return 1/(1+this.lightIntensity);
+		return 1f/(1f+this.lightIntensity);
 	}
 }

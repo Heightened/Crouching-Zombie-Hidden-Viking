@@ -52,8 +52,8 @@ public class Game {
 		if(dtime == 0.0)
 			return;
 		
-		if(tickCount%100 == 0)
-			System.out.println("100 ticks");
+		if(tickCount%500 == 0)
+			System.out.println("500 ticks (total: "+tickCount+")");
 		
 		// update characters
 		ArrayList<GameCharacter> chars = (ArrayList<GameCharacter>)flockingMap.getCharacters();
@@ -62,7 +62,7 @@ public class Game {
 			c.move(dtime);
 		}
 		
-		//update moar!
+		
 	}
 	
 	public ChunkedMap getFlockingMap(){

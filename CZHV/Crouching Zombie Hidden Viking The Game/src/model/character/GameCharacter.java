@@ -244,6 +244,7 @@ public class GameCharacter extends Vehicle{
 	}
 	
 	public void toggleSparkle() {
+		this.getCell().updateIntensities(this.sparkle? -1: 1);
 		this.sparkle = !this.sparkle;
 	}
 
