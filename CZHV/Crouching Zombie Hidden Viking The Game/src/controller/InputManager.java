@@ -271,13 +271,18 @@ public class InputManager extends ConcreteController{
 	}
 	
 	private void doGroupMoveAction(Vector2f vec, ArrayList<GameCharacter> characters) {
-		ArrayList<GameCharacter> controllable = characters;
+		//ArrayList<GameCharacter> controllable = characters;
+		for(GameCharacter c : characters)
+			getGame().getActionBuffer().add(new MoveAction(c, vec.getX(), vec.getY()));
+		
+		/*
 		try {
 			GroupMoveAction m = new GroupMoveAction(controllable,  vec.getX(), vec.getY());
 			getGame().getActionBuffer().add(m);
 		} catch (Exception e) {
 			//Nothing has to be done
 		}
+		//*/
 	}
 
 	protected ArrayList<GameCharacter> getControllableCharacters() {

@@ -130,7 +130,7 @@ public class AIManager implements MapChangeListener {
 					}
 					try{
 						//sleep for one millisecond
-						Thread.sleep(1);
+						Thread.sleep(10);
 					}catch(Exception e){
 						e.printStackTrace();
 					}
