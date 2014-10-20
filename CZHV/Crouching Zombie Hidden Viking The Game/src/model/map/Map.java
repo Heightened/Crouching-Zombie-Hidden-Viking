@@ -72,6 +72,7 @@ public class Map implements ChangeListener<Cell>
 		for(int i=0; i<nVikings; i++)
 		{
 			GameCharacter v = new GameCharacter(128,20,2f,2,false);
+			v.setPathFinder(new Astar(this,100,v));
 			v.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 10.0f, 0.7f));
 			
 			int l = Rand.randInt(30, 100);
