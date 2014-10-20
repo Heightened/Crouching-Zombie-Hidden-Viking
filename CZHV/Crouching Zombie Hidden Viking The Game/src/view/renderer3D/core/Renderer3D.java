@@ -326,9 +326,23 @@ public class Renderer3D implements RendererInfoInterface{
 		}
 
 		long fixtime = System.currentTimeMillis();
-		activeCells = map.getActiveCells();
-		//activeCells = chunkedView.getActiveCells(0, 0);
 
+		
+		Vector3f position = camera.getWorldPosition();
+		int cellx = (int)(position.x/cellSize);
+		int celly = (int)(position.z/cellSize);
+		long temptime = System.currentTimeMillis();
+		activeCells = map.getActiveCells();
+		impassibleCells  = chunkedView.getImpassibleCells(cellx-20, celly-22, cellx+20, celly+2);
+//		for (int x = cellx-20; x < cellx + 20; x+=9){
+//			for (int y = celly-30; y < celly+10; y+=9){
+//				if (x != cellx && y != celly){
+//					activeCells.addAll(chunkedView.getActiveCells(x, y));
+//				}
+//			}
+//		}
+		temptime = System.currentTimeMillis() - temptime;
+		
 		for (Cell cell : activeCells){
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter gameChar : gameChars){
@@ -337,7 +351,6 @@ public class Renderer3D implements RendererInfoInterface{
 				}
 			}
 		}
-
 
 
 		//selecter.update(MVP);
@@ -365,6 +378,8 @@ public class Renderer3D implements RendererInfoInterface{
 		mainPass.bind();
 
 		camera.lookThrough();
+	
+		
 		MVP.setIdentity();
 		Matrix4f.mul(projMat, viewMat, MVP);
 
@@ -532,10 +547,17 @@ public class Renderer3D implements RendererInfoInterface{
 			List<GameCharacter> gameChars = cell.getCharacterHolder().getItem();
 			for (GameCharacter gameChar : gameChars){
 				Vector4f screenspace = gameChar.calcScreenSpace(0.3f, MVP);
-				drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,0.08f,0.02f,new Vector3f(1,0.1f,0));
-				//life
-				float health = 0.08f*gameChar.getCurrentHp() / (float)gameChar.getMaxHp();
-				drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,health,0.02f,new Vector3f(0.2f,1,0f));
+				if (gameChar.isInfected()){
+					drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,0.08f,0.02f,new Vector3f(0.5f,0.5f,0));
+					//life
+					float health = 0.08f*gameChar.getCurrentHp() / (float)gameChar.getMaxHp();
+					drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,health,0.02f,new Vector3f(0.2f,0.5f,0.5f));
+				}else{
+					drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,0.08f,0.02f,new Vector3f(1,0.1f,0));
+					//life
+					float health = 0.08f*gameChar.getCurrentHp() / (float)gameChar.getMaxHp();
+					drawSquare(screenspace.x - 0.04f,screenspace.y-0.01f,health,0.02f,new Vector3f(0.2f,1,0f));
+				}
 			}
 		}
 		
@@ -588,18 +610,15 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 
 		}
+	
 		Dummy3DObj d = new Dummy3DObj();
 		shader.putUnifFloat4("color", decorColor);
 		shader.bindTexture("texture", Resource.vikingTexture);
-		int index = 0;
 		for (Cell cell : impassibleCells){
-			index++;
-			if (index > impassibleCells.size()/4){
-				break;
-			}
 			d.setPosition(cell.getX()*cellSize, 0f, cell.getY()*cellSize);
 			d.draw(shader);
-		}
+		}	
+		fixtime = System.currentTimeMillis() - fixtime;
 
 	}
 

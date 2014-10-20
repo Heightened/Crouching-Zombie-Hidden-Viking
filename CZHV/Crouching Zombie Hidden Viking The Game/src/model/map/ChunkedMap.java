@@ -68,6 +68,34 @@ public class ChunkedMap implements ChangeListener<Cell>, MapChangeListener
 		return iCells;
 	}
 	
+	public Collection<model.map.Cell> getImpassibleCells(int x, int y, int width, int height)
+	{
+		x = clamp(x, 0,map.getWidth());
+		y = clamp(y, 0,map.getHeight());
+		
+		width = clamp(width, 0,map.getWidth());
+		height = clamp(height, 0,map.getHeight());
+		Collection<model.map.Cell> iCells = new ArrayList<model.map.Cell>();
+		for (int i = x; i < width; i++) {
+			for (int j = y; j < height; j++) {
+				if (!map.getCell(i, j).isPassible()) {
+					iCells.add(map.getCell(i, j));
+				}
+			}
+		}
+		return iCells;
+	}
+	
+	private int clamp(int in, int bottom, int top){
+		if (in < bottom){
+			return bottom;
+		}
+		if (in > top){
+			return top;
+		}
+		return in;
+	}
+	
 	public ArrayList<model.map.Cell> getActiveCells()
 	{
 		ArrayList<model.map.Cell> allCells = new ArrayList<>();
