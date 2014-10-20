@@ -102,13 +102,13 @@ public class InputManager extends ConcreteController{
 											}
 										}
 									}
-								} else {
-									for (GameCharacter character : characters) {
-										if (!character.isSelected()) {
-											if(getGame().getControlledCharacters().contains(character)){
-												character.setSelected(true);
-												selectedCharacters.add(character);
-											}
+								} 
+								for (GameCharacter character : characters) {
+									if (!character.isSelected()) {
+										if (getGame().getControlledCharacters()
+												.contains(character)) {
+											character.setSelected(true);
+											selectedCharacters.add(character);
 										}
 									}
 								}
@@ -134,45 +134,48 @@ public class InputManager extends ConcreteController{
 						Object obj = renderer.click(startClick.x, startClick.y);
 						startClick = null;
 						if (obj != null) {
+							boolean actionPerformed = false;
 							if (Keyboard.getEventKey() == Keyboard.KEY_A) {
 								// if mouse clicked and A pressed
 								if (Keyboard.getEventKeyState()) {
 									if (obj instanceof Vector2f) {
+										doGroupMoveAction((Vector2f) obj,
+												getControllableCharacters());
 										doAttack(null);
+										actionPerformed = true;
 									}
 									if (obj instanceof Cell) {
 										doAttack((Cell) obj);
-									}
-								}
-							} else {
-								if (obj instanceof Vector2f) {
-									// stopThreads(attack);
-									stopAttack();
-									boolean Switch = false;
-									;
-									Collection<Cell> cells = getGame().getMap()
-											.getActiveCells();
-									for (Cell c : cells) {
-										if (c.getX() == (int) (((Vector2f) obj).x + 0.5f)
-												&& c.getY() == (int) (((Vector2f) obj).y + 0.5f)) {
-											if (!c.getItemHolder().isEmpty()) {
-												doPickupItem((Vector2f) obj);
-												Switch = true;
-											}
-										}
-									}
-									if (!Switch) {
-										doGroupMoveAction((Vector2f) obj,
-												getControllableCharacters());
-									}
-								}
-								if (obj instanceof Cell) {
-									if (!((Cell) obj).getItemHolder().isEmpty()) {
-										doPickupItem(cellToVector2f((Cell) obj));
+										actionPerformed = true;
 									}
 								}
 							}
-						}
+							if (!actionPerformed && obj instanceof Vector2f) {
+								stopAttack();
+								boolean Switch = false;
+								
+								Collection<Cell> cells = getGame().getMap()
+										.getActiveCells();
+								for (Cell c : cells) {
+									if (c.getX() == (int) (((Vector2f) obj).x + 0.5f)
+											&& c.getY() == (int) (((Vector2f) obj).y + 0.5f)) {
+										if (!c.getItemHolder().isEmpty()) {
+											doPickupItem((Vector2f) obj);
+											Switch = true;
+										}
+									}
+								}
+								if (!Switch) {
+									doGroupMoveAction((Vector2f) obj,
+											getControllableCharacters());
+								}
+							}
+							if (obj instanceof Cell) {
+								if (!((Cell) obj).getItemHolder().isEmpty()) {
+									doPickupItem(cellToVector2f((Cell) obj));
+								}
+							}
+						}						
 					}
 				}
 			}			
