@@ -84,16 +84,21 @@ public class InputManager extends ConcreteController{
 								// selection
 								if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT
 										|| Keyboard.getEventKey() == Keyboard.KEY_RSHIFT) {
+									boolean keyPressed = false;
 									if (Keyboard.getEventKeyState()) {
-										for (GameCharacter character : characters) {
-											if(getGame().getControlledCharacters().contains(character)){
-												temp.add(character);
-												selectedCharacters = temp;
+										keyPressed = true;
+									} else {
+										if(keyPressed){
+											for (GameCharacter character : characters) {
+												if(getGame().getControlledCharacters().contains(character)){
+													temp.add(character);
+													selectedCharacters = temp;
+												}
 											}
-										}
-										for (GameCharacter character : selectedCharacters) {
-											if(getGame().getControlledCharacters().contains(character)){
-												character.setSelected(true);
+											for (GameCharacter character : selectedCharacters) {
+												if(getGame().getControlledCharacters().contains(character)){
+													character.setSelected(true);
+												}
 											}
 										}
 									}
@@ -430,6 +435,7 @@ public class InputManager extends ConcreteController{
 							try {
 								Thread.sleep(100);
 							} catch (InterruptedException e) {
+								
 							}
 						}						
 					}
