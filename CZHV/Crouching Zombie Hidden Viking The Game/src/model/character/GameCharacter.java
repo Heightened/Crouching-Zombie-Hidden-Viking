@@ -7,14 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import controller.AIController;
 import model.item.Item;
 import model.item.Weapon;
 import model.map.Cell;
 import pathfinding.Node;
 import pathfinding.PathFinder;
-import pathfinding.distanceHeuristics.ApproxEuclid;
 import simulator.tempFlocking.Vehicle;
+import controller.AIController;
 
 public class GameCharacter extends Vehicle{
 	public static final float DEFAULT_MELEE_RANGE = 2;
@@ -39,7 +38,7 @@ public class GameCharacter extends Vehicle{
 	private boolean selected;
 	private boolean isMoving = false;
 	private long lastHit;
-	private long delay = 1000;
+	private long delay = 1000; //attack delay ms
 	
 	public GameCharacter(){
 		this(100,16,16,2,false);
