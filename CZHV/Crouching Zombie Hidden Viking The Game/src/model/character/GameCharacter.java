@@ -166,6 +166,7 @@ public class GameCharacter extends Vehicle{
 		this.y = y-yi;
 		
 		this.cell = newCell;
+		if(this.infected) this.setSpeedMod(this.cell.getSpeedModifier());
 		oldCell.getCharacterHolder().getItem().remove(this);
 		
 		newCell.characterMoved(this, null);
