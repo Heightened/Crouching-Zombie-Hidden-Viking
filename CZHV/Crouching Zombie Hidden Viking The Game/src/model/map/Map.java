@@ -64,53 +64,45 @@ public class Map implements ChangeListener<Cell>
 			}
 		}
 		
-		int nZombies = 60; //this.randInt(size/600, size/300);
-		
-		for(int i=0; i<nZombies; i++)
-		{
-			int x,y;
-			GameCharacter c = new GameCharacter(64,16,25,2,true);
-			c.setPathFinder(new Astar(this,100,c));
-			
-			do
-			{
-				x = Rand.randInt(0, this.getWidth() - 1);
-				y = Rand.randInt(0, this.getHeight() - 1);
-			}
-			while(!this.getCell(x, y).isFree(c));
-			
-			c.teleportTo(this.getCell(x,y));
-			
-			//if(this.randInt(0,5)==2)
-			{
-				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
-			}
-		}
+		this.addZombies(60);
 		
 		//*
 		int nVikings = 10; //Rand.randInt(size/600, size/300);
 		
 		for(int i=0; i<nVikings; i++)
 		{
-			int x,y;
-			GameCharacter c = new GameCharacter(128,20,64,2,false);
-			c.setPathFinder(new Astar(this,100,c));
-			c.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 10.0f, 0.7f));
+			GameCharacter v = new GameCharacter(128,20,64,2,false);
+			v.setPathFinder(new Astar(this,100,v));
+			v.getBag().addItem(new Weapon("Automatic dagger bow", 32, true, 10.0f, 0.7f));
 			
-			do
+			int l = Rand.randInt(30, 100);
+			
+			int x = this.grid.length/2; //Rand.randInt(0, this.grid.length);
+			int y = this.grid[0].length/2; //Rand.randInt(0, this.grid[0].length);
+			
+			for(int j=0; j<l; j++)
 			{
-				x = Rand.randInt(0, this.getWidth() - 1);
-				y = Rand.randInt(0, this.getHeight() - 1);
+				if(this.isInGrid(x,y) && this.getCell(x, y).isFree(v))
+					v.teleportTo(this.getCell(x,y));
+				
+				switch(Rand.randInt(0, 3))
+				{
+					case 0:
+						x--;
+						break;
+					case 1:
+						x++;
+						break;
+					case 2:
+						y--;
+						break;
+					case 3:
+						y++;
+						break;
+				}
 			}
-			while(!this.getCell(x, y).isFree(c));
 			
-			c.teleportTo(this.getCell(x,y));
-			
-			//if(this.randInt(0,5)==2)
-			{
-				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
-			}
-			controlled.add(c);
+			controlled.add(v);
 			
 		}
 		
@@ -134,6 +126,30 @@ public class Map implements ChangeListener<Cell>
 		}
 		//*/
 		setRadii();
+	}
+	
+	public void addZombies(int nZombies)
+	{
+		for(int i=0; i<nZombies; i++)
+		{
+			int x,y;
+			GameCharacter c = new GameCharacter(64,16,25,2,true);
+			c.setPathFinder(new Astar(this,100,c));
+			
+			do
+			{
+				x = Rand.randInt(0, this.getWidth() - 1);
+				y = Rand.randInt(0, this.getHeight() - 1);
+			}
+			while(!this.getCell(x, y).isFree(c));
+			
+			c.teleportTo(this.getCell(x,y));
+			
+			//if(this.randInt(0,5)==2)
+			{
+				//c.moveTo(this.randInt(0,this.getWidth()-1)+0.5f, this.randInt(0, this.getHeight()-1)+0.5f);
+			}
+		}
 	}
 	
 	public boolean isInGrid(int x, int y)

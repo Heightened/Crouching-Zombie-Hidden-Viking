@@ -62,7 +62,8 @@ public class Game {
 			c.move(dtime);
 		}
 		
-		
+		if(flockingMap.getCharacters().size() < 65)
+			this.map.addZombies(5);
 	}
 	
 	public ChunkedMap getFlockingMap(){
