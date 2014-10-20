@@ -14,6 +14,7 @@ public class Game {
 	public static final boolean AI_DRAW_HIERARCHY = true;
 	private Map map;
 	private ChunkedMap flockingMap;
+	private ChunkedMap viewMap;
 	private LinkedBlockingQueue<Action> controlBuffer;
 	private LinkedBlockingQueue<Action> actionBuffer;
 	private ArrayList<GameCharacter> controlledCharacters;
@@ -31,6 +32,7 @@ public class Game {
 		map = new Map(100,100);
 		map.populate();
 		flockingMap = new ChunkedMap(map, 2, 2500);
+		viewMap = new ChunkedMap(map, 10, 100);
 		//TODO add characters to map
 	}	
 	
@@ -65,6 +67,10 @@ public class Game {
 	
 	public ChunkedMap getFlockingMap(){
 		return flockingMap;
+	}
+	
+	public ChunkedMap getViewMap(){
+		return viewMap;
 	}
 	
 	public ArrayList<GameCharacter> getControlledCharacters() {

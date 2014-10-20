@@ -95,7 +95,6 @@ public class Selection {
 	
 	public static Line3D getMouseRay(Camera camera, Matrix4f viewMat, Matrix4f projMat){
 		Vector2f mouse = getNormalizedMouse();//selecter.getNormalizedMouse();
-		mouse.y *= -1;
 		return  MatrixCZHV.getPickingRayStartDir(mouse.x, mouse.y, camera.getWorldPosition(), viewMat, projMat);
 	}
 	

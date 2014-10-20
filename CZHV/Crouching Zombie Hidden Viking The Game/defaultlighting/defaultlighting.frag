@@ -121,7 +121,7 @@ void main(void)
 
 	texelColor = texture2D(texture,texture_coordinate);
     texelColor = vec4(normalize((Bitangent+1)/2).rgb,1);
-    texelColor = vec4(final_color.rgb*color.rgb,1);
+    texelColor = vec4(final_color.rgb,1);
     //texelColor = vec4(shadow, shadow, shadow,1);
     texelColor = vec4(color.rgb,1);
     //texelColor = vec4(texture2D(normsamp,worldspacePos.xz*4).rgb,1);
