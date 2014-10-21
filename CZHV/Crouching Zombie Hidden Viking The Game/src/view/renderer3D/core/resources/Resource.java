@@ -38,6 +38,11 @@ public class Resource {
 	
 	public static class viking extends ResourceContainer{}
 	public static class zombie extends ResourceContainer{}
+	public static class wall extends ResourceContainer{}
+	public static class wallend extends ResourceContainer{}
+	public static class gate extends ResourceContainer{}
+	public static class tower extends ResourceContainer{}
+	
 	
 	static {
 		viking.setModel("viking.obj");
@@ -46,6 +51,18 @@ public class Resource {
 
 		zombie.setAnimation("walk", "Animation/Zombie/Walk/walk");
 		zombie.setTexture("Texture/Viking2048.png");
+		
+		wall.setModel("Model/wallsquare.obj");
+		wall.setTexture("Texture/OldSandstone1024.png");
+		
+		wallend.setModel("Model/wallsquare.obj");
+		wallend.setTexture("Texture/RustyPaint1024.png");
+		
+		gate.setModel("Model/wallsquareGate.obj");
+		gate.setTexture("Texture/RustyPaint1024.png");
+		
+		tower.setModel("Model/wallsquareTower.obj");
+		tower.setTexture("Texture/RustyPaint1024.png");
 		
 		System.out.println("Loading complete.");
 	}
