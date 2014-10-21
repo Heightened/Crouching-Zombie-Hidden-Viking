@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import view.renderer3D.core.resources.Animation;
+import view.renderer3D.core.resources.Model;
 import view.renderer3D.core.resources.Resource;
 
 public class Dummy3DObj {
@@ -183,21 +184,14 @@ public class Dummy3DObj {
 	}
 	
 	//for solids
-	public void draw(ShaderObject shader, boolean b){
+	public void draw(ShaderObject shader, Model m){
 		if (modelMatrix == null){
 			modelMatrix = BufferUtils.createFloatBuffer(16);
-			calcModelMatrix();
 		}
+		calcModelMatrix();
 		shader.putMat4("modelMatrix", modelMatrix);
 		
-		shader.bindTexture("texture", Resource.viking.texture);
-		Resource.viking.model.draw(shader);
-		//mesh.draw(shader);
-		/*
-        mesh.bind();
-        mesh.prepareForDraw(shader);
-        mesh.draw();
-        mesh.unbind();*/
+		m.draw(shader);
 	}
 	
 	public void putVertex(FloatBuffer buffer, float x, float y, float z){

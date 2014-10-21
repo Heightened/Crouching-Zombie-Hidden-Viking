@@ -43,5 +43,17 @@ public class LevelLoader {
 			ZombieSpawnPoint converted = (ZombieSpawnPoint)obj;
 			
 		}
+		if (obj instanceof Wall){
+			Wall converted = (Wall)obj;
+			
+		}
+		if (obj instanceof Gate){
+			Gate converted = (Gate)obj;
+			
+		}
+		if (obj instanceof Tower){
+			Tower converted = (Tower)obj;
+			
+		}
 	}
 }

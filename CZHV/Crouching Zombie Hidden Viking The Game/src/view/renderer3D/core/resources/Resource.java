@@ -36,12 +36,138 @@ public class Resource {
 	}
 	
 	
-	public static class viking extends ResourceContainer{}
-	public static class zombie extends ResourceContainer{}
-	public static class wall extends ResourceContainer{}
-	public static class wallend extends ResourceContainer{}
-	public static class gate extends ResourceContainer{}
-	public static class tower extends ResourceContainer{}
+	public static class viking {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
+	public static class zombie {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
+	public static class wall {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
+	public static class wallend {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
+	public static class gate {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
+	public static class tower {
+		public static Model model;
+		public static TextureObject texture;
+		public static HashMap<String, Animation> animation = new HashMap<String, Animation>();
+		
+		public static void setModel(String modelPath) {
+			model = new Model(modelPath);
+		}
+		
+		public static void setTexture(String texturePath) {
+			texture = new TextureObject(texturePath);
+			texture.setup();
+			texture.setMINMAG(GL11.GL_LINEAR);
+			texture.setWRAPST(GL11.GL_REPEAT);
+			texture.mipMap();
+			texture.unbind();
+		}
+		
+		public static void setAnimation(String name, String animationPath) {
+			animation.put(name, new Animation(120, animationPath));
+		}
+	}
 	
 	
 	static {
