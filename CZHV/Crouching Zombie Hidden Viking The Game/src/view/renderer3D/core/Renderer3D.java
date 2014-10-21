@@ -5,9 +5,8 @@ import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Resources;
 
 import model.Game;
 import model.character.GameCharacter;
@@ -33,6 +32,7 @@ import org.lwjgl.util.vector.Vector4f;
 import simulator.tempFlocking.FlockingManager;
 import simulator.tempFlocking.Vehicle;
 import view.renderer3D.core.grid.ViewGrid;
+import view.renderer3D.core.lighting.Light;
 import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.resources.Model;
 import view.renderer3D.core.resources.Resource;
@@ -47,6 +47,7 @@ public class Renderer3D implements RendererInfoInterface{
 	private VBO lineVBO;
 	private TextureObject tex;
 	private TextureObject normtex;
+	private ShaderObject particleShader;
 	private ShaderObject lightShader;
 	private ShaderObject quadShader;
 	private ShaderObject quadColorShader;
@@ -83,6 +84,7 @@ public class Renderer3D implements RendererInfoInterface{
 	private ShaderObject combineShader;
 
 	private ChunkedMap chunkedView;
+	private HashMap<GameCharacter, Light> vikingLights;
 
 	public Renderer3D(Game game){
 		setupDisplay();
@@ -100,6 +102,8 @@ public class Renderer3D implements RendererInfoInterface{
 				chunkedView.getActiveCells(10*i, 10*j);
 			}
 		} 
+		
+		vikingLights = new HashMap<>();
 		impassibleCells = map.getImpassibleCells();
 		shadowManager = new ShadowManager(this);
 		lightManager = new LightManager(shadowManager);
@@ -159,6 +163,17 @@ public class Renderer3D implements RendererInfoInterface{
 		lightShader.findUniforms();
 		lightShader.findAttributes();
 		lightShader.unbind();
+
+		particleShader = new ShaderObject("lighting shader");
+		particleShader.addVertexSource(FileToString.read("particlelighting/particlelighting.vert"));
+		particleShader.addFragmentSource(FileToString.read("particlelighting/particlelighting.frag"));
+		particleShader.compileVertex();
+		particleShader.compileFragment();
+		particleShader.link();
+		particleShader.bind();
+		particleShader.findUniforms();
+		particleShader.findAttributes();
+		particleShader.unbind();
 
 		lineShader = new ShaderObject("line shader");
 		lineShader.addVertexSource(FileToString.read("lineshader.vert"));
@@ -351,7 +366,24 @@ public class Renderer3D implements RendererInfoInterface{
 			for (GameCharacter gameChar : gameChars){
 				if (gameChar != null){
 					gameChar.update();
+					if (gameChar.sparkles()){
+						Light l = vikingLights.get(gameChar);
+						if (l == null){
+							l = new Light(new Vector3f(), new Vector3f(1,0.5f,0), new Vector3f(1,1,1), 1f, -1f, new Vector4f());
+							vikingLights.put(gameChar, l);
+							lightManager.addLight(l);
+						}
+						l.position.x = gameChar.getPosition().x;
+						l.position.y = gameChar.getPosition().y+0.2f;
+						l.position.z = gameChar.getPosition().z;
+					}
 				}
+			}
+		}
+		
+		for (GameCharacter gameChar : vikingLights.keySet()){
+			if (gameChar.isDead()){
+				lightManager.removeLight(vikingLights.get(gameChar));
 			}
 		}
 
@@ -419,8 +451,8 @@ public class Renderer3D implements RendererInfoInterface{
 
 		bufferGeo(lightShader);
 		
-		drawLines();
-		drawSquares();
+		//drawLines();
+		//drawSquares();
 
 
 		lightManager.unbind();
@@ -428,7 +460,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 		mainPass.unBind();
 
-		bloomPass();
+		//bloomPass();
 
 		//drawFullscreenQuad(screenSize.width, screenSize.height, bloomColorTextureVer);
 		//drawFullscreenQuad(screenSize.width, screenSize.height, preBloomTexture);
@@ -453,17 +485,23 @@ public class Renderer3D implements RendererInfoInterface{
 	}
 
 	public void bloomPass(){
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+
 		GL11.glViewport(0, 0, screenSize.width/2, screenSize.height/2);
 
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		
 		//PRE PASS
 		preBloomPass.bind();
 		GL11.glClearColor(0, 0, 0, 1);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-		lightShader.bind();
-		fireTest.update(lightShader);
-		lightShader.unbind();
+		particleShader.bind();
+		particleShader.putMat4("viewMatrix", viewMatrix);
+		particleShader.putMat4("projectionMatrix", projectionMatrix);
+		particleShader.bindTexture("depthtex", mainDepthTexture);
+		fireTest.update(particleShader);
+		particleShader.unbind();
 		preBloomPass.unBind();
+
 		
 		//HORIZONTAL PASS
 		bloomPassHor.bind();

@@ -58,12 +58,12 @@ public class LightManager {
         lights.add(new Light(new Vector3f(0,0.3f,0), new Vector3f(1,1,0),new Vector3f(1,0,0),2f,.8f,new Vector4f(1,0,1,0)));
         
         
-        lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(0,1,1),2f,-1f,new Vector4f(0,0,0,0)));
-        lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+       // lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,1),new Vector3f(0,1,1),2f,-1f,new Vector4f(0,0,0,0)));
+        //lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
         
-    //    lights.add(new Light(new Vector3f(0,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
-    //    lights.add(new Light(new Vector3f(2,0.3f,2), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
-    //    lights.add(new Light(new Vector3f(2,0.3f,0), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+      //  lights.add(new Light(new Vector3f(0,0.3f,4), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+       // lights.add(new Light(new Vector3f(4,0.3f,4), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
+        //lights.add(new Light(new Vector3f(4,0.3f,0), new Vector3f(0,1,0),new Vector3f(1,0,0),2f,-1f,new Vector4f(0,0,0,0)));
         
         if (shadowManager != null){
 	        for (int i = 1; i < lights.size(); i++){
@@ -104,6 +104,10 @@ public class LightManager {
     
     public void addLight(Light l){
     	lights.add(l);
+    }
+    
+    public void removeLight(Light l){
+    	lights.remove(l);
     }
     
     private boolean bound = false;

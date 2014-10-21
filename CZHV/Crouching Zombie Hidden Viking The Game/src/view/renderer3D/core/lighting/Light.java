@@ -20,9 +20,9 @@ import view.renderer3D.core.shadows.Shadow;
  * @author Vouwfietsman
  */
 public class Light {
-    Vector3f position;
-    Vector3f color;
-    Vector3f specColor;
+    public Vector3f position;
+    public Vector3f color;
+    public Vector3f specColor;
     float radius;
     float cutoffangle;
 
