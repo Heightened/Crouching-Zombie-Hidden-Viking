@@ -104,7 +104,8 @@ public class Map implements ChangeListener<Cell>
 			}
 			
 			controlled.add(v);
-			v.toggleSparkle();
+			if(i < 4)
+				v.toggleSparkle();
 		}
 		
 		/*

@@ -369,7 +369,7 @@ public class Renderer3D implements RendererInfoInterface{
 					if (gameChar.sparkles()){
 						Light l = vikingLights.get(gameChar);
 						if (l == null){
-							l = new Light(new Vector3f(), new Vector3f(1,0.5f,0), new Vector3f(1,1,1), 1f, -1f, new Vector4f());
+							l = new Light(new Vector3f(), new Vector3f(1,0.5f,0), new Vector3f(1,1,1), 1f, -1f, new Vector4f(0,1,0,0));
 							vikingLights.put(gameChar, l);
 							lightManager.addLight(l);
 						}
@@ -381,12 +381,16 @@ public class Renderer3D implements RendererInfoInterface{
 			}
 		}
 		
+		ArrayList<GameCharacter> toBeRemoved = new ArrayList<>();
 		for (GameCharacter gameChar : vikingLights.keySet()){
-			if (gameChar.isDead()){
+			if (gameChar.isDead() || !gameChar.sparkles()){
 				lightManager.removeLight(vikingLights.get(gameChar));
+				toBeRemoved.add(gameChar);
 			}
 		}
-
+		
+		for(GameCharacter g : toBeRemoved)
+			vikingLights.remove(g);
 
 		//selecter.update(MVP);
 		lightManager.setGridOffset(camera.getWorldPosition().x-2f,0, camera.getWorldPosition().z-3f);
