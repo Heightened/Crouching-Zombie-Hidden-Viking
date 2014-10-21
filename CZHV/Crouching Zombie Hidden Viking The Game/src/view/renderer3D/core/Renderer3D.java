@@ -451,8 +451,8 @@ public class Renderer3D implements RendererInfoInterface{
 
 		bufferGeo(lightShader);
 		
-		//drawLines();
-		//drawSquares();
+		drawLines();
+		drawSquares();
 
 
 		lightManager.unbind();
@@ -460,7 +460,7 @@ public class Renderer3D implements RendererInfoInterface{
 
 		mainPass.unBind();
 
-		//bloomPass();
+		bloomPass();
 
 		//drawFullscreenQuad(screenSize.width, screenSize.height, bloomColorTextureVer);
 		//drawFullscreenQuad(screenSize.width, screenSize.height, preBloomTexture);
