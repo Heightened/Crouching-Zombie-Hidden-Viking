@@ -658,10 +658,10 @@ public class Renderer3D implements RendererInfoInterface{
 	
 		Dummy3DObj d = new Dummy3DObj();
 		shader.putUnifFloat4("color", decorColor);
-		shader.bindTexture("texture", Resource.viking.texture);
+		shader.bindTexture("texture", Resource.wall.texture);
 		for (Cell cell : impassibleCells){
 			d.setPosition(cell.getX()*cellSize, 0f, cell.getY()*cellSize);
-			d.draw(shader);
+			d.draw(shader, Resource.wall.model);
 		}	
 		fixtime = System.currentTimeMillis() - fixtime;
 

@@ -24,9 +24,12 @@ import view.renderer3D.core.lighting.LightManager;
 import view.renderer3D.core.resources.Model;
 import view.renderer3D.inputoutput.FileToString;
 import view.renderer3D.leveleditor.objtypes.Fire;
+import view.renderer3D.leveleditor.objtypes.Gate;
 import view.renderer3D.leveleditor.objtypes.LVLEditorLight;
 import view.renderer3D.leveleditor.objtypes.LVLEditorObject;
+import view.renderer3D.leveleditor.objtypes.Tower;
 import view.renderer3D.leveleditor.objtypes.VikingSpawnPoint;
+import view.renderer3D.leveleditor.objtypes.Wall;
 import view.renderer3D.leveleditor.objtypes.ZombieSpawnPoint;
 
 public class LevelEditor{
@@ -58,6 +61,9 @@ public class LevelEditor{
 		optionsPanel.addObjType(new Fire());
 		optionsPanel.addObjType(new VikingSpawnPoint());
 		optionsPanel.addObjType(new ZombieSpawnPoint());
+		optionsPanel.addObjType(new Wall());
+		optionsPanel.addObjType(new Gate());
+		optionsPanel.addObjType(new Tower());
 		setupDisplay();
 		lightManager = new LightManager(null);
 		MVP = new Matrix4f();
