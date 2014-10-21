@@ -191,6 +191,8 @@ public class Dummy3DObj {
 		calcModelMatrix();
 		shader.putMat4("modelMatrix", modelMatrix);
 		
+		
+		
 		m.draw(shader);
 	}
 	
