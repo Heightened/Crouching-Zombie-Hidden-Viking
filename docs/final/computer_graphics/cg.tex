@@ -28,13 +28,25 @@ In the second phase, the normal render phase, the same ModelViewProjection matri
 This setup can easily be extended to support multiple lights by partitioning the shadow map into equal parts for each light, and translating the vertices with each of the lights ModelViewProjection matrices. Fillrate or resolution will suffer heavily when too many lights are casting shadows, limiting the amount of shadowcasters, therefore the lights which do cast shadows should be carefully selected.
 
 \section{Geometry}
-All geometry used within the program is loaded from external model files and converted into a usable format for OpenGL.
+Almost all geometry used within the program is loaded from external model files and converted into a usable format for OpenGL.
 
 \subsection{Models}
 Models are imported into the engine through the .obj specification. This file specification describes a generic way to form any mesh from a set of vertices, normals, texture coordinates and faces, and has the additional advantage of being a plaintext specification (as opposed to bytecode), which makes it easy to read and debug. When loaded into memory, the data contained within the original .obj file is expanded upon by calculating a corresponding tangent vector with each normal. This resulting dataset is then uploaded to the graphics card in a tightly packed buffer, and is now ready for use via a simple glDrawArrays call.
-\subsection{Animations}
 
+\subsection{Animations}
 After considering skeletal animations, a technique where each vertex of the model is displaced depending on the displacement of a corresponding virtual ``bone'', and after consecutively dismissing this method as overly complicated for our limited quality models, the decision was made to implement the most straightforward animation technique: keyframe animations. In keyframe animations, a new set of vertices is created for every instance of a discrete timestep of the animation. The entire animation is simply a collection of models, and can be treated as such. By using this method, the code for displaying animations is nearly identical to the code needed to display a static model, the only difference being that the drawn model instance changes every (couple of) frames.
+
+\subsection{Particles}
+To accommodate the post-apocalyptic setting we wanted to use fire as both a light source and interesting element of the scenery. Particles were used to produce a fairly realistic geometrical representation of fire. To enable this we defined emitters which produce partially randomized particles within the specified parameters. Each particle receives an initial speed vector, a force vector affecting it's trajectory and a transformation to be applied each frame. The transformation can be used to have the individual particles rotate while moving. 
+
+\subsubsection{Shape}
+Any type of previously defined geometry could be used as representation of a single particle. However we chose to use the simplest of renderable geometries, a single triangle, for our fire particles. This way we could support more particles and create a more dynamic looking flame. By continuously rotating the triangles they would still look good from all angles and look more volatile and unpredictable as is the case with real fire.
+
+\subsubsection{Look}
+When the resulting set of particles is rendered using a solid colour it does not give the desired impression however. Using a single colour makes particles difficult to distinguish which is not necessarily a bad thing but the hard edges do not look very fire-like. One solution would have been to use semi-translucent textures to soften the edges. But allowing for these types of textures would have been costly. Instead we decided to use a post-processing to blur the particles final image, this effect is further described under Bloom. Another improvement over the solid coloured particles was to introduce a gradient from which a colour is picked based on how long a particle has existed. This is consistent with how the colour of actual fire changes based on temperature and in turn distance from the source.
+
+\subsubsection{Performance}
+All in all there is quite a bit of data to be generated with each emitted particle. Processing power can be a bit of a bottleneck. By using lookup tables for certain particle attributes we could maximize the efficiency. This was done in generating a random direction and rotation. The gradient class we implemented also defines an limited array of colours. Instead of recalculating the exact colour for each value $t ; 0 <= t < 1$ we take the closest from the predefined array.
 
 \section{Post Processing}
 After rendering the scene and all of its geometry, extra graphic effects can be applied to the final result. This is called post processing.
