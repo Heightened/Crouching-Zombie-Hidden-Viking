@@ -2,7 +2,16 @@
 
 The vikings will be controlled by human players. For the zombies to be a worthy opponent, they should show some intelligence. Just making the zombies stronger, or increasing the amount of zombies will result in a boring game.
 
-Each zombie is controlled by a controller. This controller consists of a number of linked components. A layer of pathfinders and targetfinders adds support for higher level actions (commands) such as ``go to $X$'' or ``attack him''. On top of that there is a layer for the execution of specific strategies. These can range from a simple ``hide'' to a more complex ``ambush''. Zombies will set up a hierarchy so that the big boss give the order ``ambush'' and these eventually translate to a bunch of ``hide there'' strategies on a lower level.
+Additionally we wanted each zombie to be autonomous. That is, they can choose to follow orders, but that's their own choice. We don't want to pre-program any leadership or coordinating AI.
+
+\subsection{Autonomic zombies}
+Each zombie is controlled by its own controller. This controller consists of two main parts: the LeaderChooser and the StrategyChooser.
+
+\subsubsection{Choosing a leader}
+The LeaderChooser takes care of forming groups. It first does a loyalty check, to see if there are any reasons to search for another leader.
+
+\subsubsection{Choosing a strategy}
+Choosing a strategy is done in two places. The leader uses an actual StrategyChooser, which gives a strategy for the leader to execute. A strategy in itself chooses for a strategy every follower. This way strategies got down the ranks and each zombie has control over how they execute their orders.
 
 \begin{figure}[!htb]
 	\centering
