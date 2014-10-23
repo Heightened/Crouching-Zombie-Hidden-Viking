@@ -178,7 +178,7 @@ public class Resource {
 		zombie.setAnimation("walk", "Animation/Zombie/Walk/walk");
 		zombie.setTexture("Texture/Viking2048.png");
 		
-		wall.setModel("Model/wallsquare.obj");
+		wall.setModel("Model/wallsquareInverted.obj");
 		wall.setTexture("Texture/OldSandstone1024.png");
 		
 		wallend.setModel("Model/wallsquare.obj");

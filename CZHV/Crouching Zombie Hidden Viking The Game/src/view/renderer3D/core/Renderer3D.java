@@ -332,7 +332,7 @@ public class Renderer3D implements RendererInfoInterface{
 	Vector4f zombieColor = new Vector4f(0,1,0,1);
 	Vector4f vikingColor = new Vector4f(0,0,1,1);
 	Vector4f itemColor = new Vector4f(1,0,0,1);
-	Vector4f decorColor = new Vector4f(0,0,0,1);
+	Vector4f decorColor = new Vector4f(1,1,1,1);
 	Vector4f selectedColor = new Vector4f(0,1,1,1);
 	Vector4f selectboxColor = new Vector4f(0,0,0.5f,0.5f);
 	Vector4f floorColor = new Vector4f(1,1,1,1);
