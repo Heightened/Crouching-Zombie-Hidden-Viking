@@ -25,12 +25,12 @@ Group arrival will be done slightly differently from the arrival of singular uni
 
 \subsubsection{The Scooping Problem}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/clear_path1.pdf}
+\includegraphics[width=0.30\textwidth]{images/clear_path1.pdf}
 \caption{A clear and open path}
 \label{fig:clear_path}
 \end{wrapfigure} 
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/scoop_path1.pdf}
+\includegraphics[width=0.30\textwidth]{images/scoop_path1.pdf}
 \caption{The scooping problem}
 \label{fig:scoop_path}
 \end{wrapfigure} 
@@ -41,12 +41,12 @@ In order to fix this problem, determine the radii of the cells upon creation or 
 \subsubsection{Wall Hugging Slowdown}
 \label{sec:extra_weight}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/obst_path1.pdf}
+\includegraphics[width=0.30\textwidth]{images/obst_path1.pdf}
 \caption{A bad path for groups}
 \end{wrapfigure} 
 Another problem is what we like to call ``wall hugging slowdown'', which is explained here. The solution for this has not been implemented into the game yet, as current group travel behaviour quickly converges to a line alongside time constraints.
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/obst_path2.pdf}
+\includegraphics[width=0.30\textwidth]{images/obst_path2.pdf}
 \caption{A better path for groups}
 \end{wrapfigure} 
 
@@ -58,7 +58,7 @@ $$f(r_g, r_t) = \left\{\begin{array}{l l}
                 $$
 Here $r_g$ is the radius of the group, $r_t$ is the travel radius of the cell, and $p$ and $s$ are to be determined by simulation. The radius of the group is actually a function $$r_g(n) = \sqrt{\frac{n * h_u}{\pi}}$$ where $n$ is the number of units and $h_u$ is the surface of the bounding hexagon around a unit.
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/bounding_hexagon.pdf}
+\includegraphics[width=0.30\textwidth]{images/bounding_hexagon.pdf}
 \caption{The bounding hexagon}
 \end{wrapfigure} 
 

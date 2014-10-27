@@ -2,39 +2,99 @@
 
 The vikings will be controlled by human players. For the zombies to be a worthy opponent, they should show some intelligence. Just making the zombies stronger, or increasing the amount of zombies will result in a boring game.
 
-Additionally we wanted each zombie to be autonomous. That is, they can choose to follow orders, but that's their own choice. We don't want to pre-program any leadership or coordinating AI.
+Additionally we wanted each zombie to be autonomous. We don't want to pre-program any leaderships or coordinating AI, each zombie can choose to take orders from a leader, but is always free to do something else. That is, our framework should not restrict them to be disobedient. An AI that punishes zombies who do not follow his commands would still fit in this framework.
 
-\subsection{Autonomic zombies}
-Each zombie is controlled by its own controller. This controller consists of two main parts: the LeaderChooser and the StrategyChooser.
 
-\subsubsection{Choosing a leader}
-The LeaderChooser takes care of forming groups. It first does a loyalty check, to see if there are any reasons to search for another leader.
-
-\subsubsection{Choosing a strategy}
-Choosing a strategy is done in two places. The leader uses an actual StrategyChooser, which gives a strategy for the leader to execute. A strategy in itself chooses for a strategy every follower. This way strategies got down the ranks and each zombie has control over how they execute their orders.
-
+\begin{comment}
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=\textwidth]{zombie-controller.png}
 	\caption{Overview of the components that make up the zombie controller.}
 \end{figure}
+\end{comment}
 
-\subsection{Leader choosing and Loyalty}
-In order for the zombies to achieve some kind of strategies each zombie can choose a leader to follow. A leader can control his followers until the follower decides to desert. Orders are in the form of ``execute strategy $X$''. A zombie cannot choose a leader from the zombies that are directly or indirectly following him. Zombies will create tree like hierarchies.
+\subsection{Autonomic zombies}
+Each zombie is controlled by its own controller, in accordance to our MVC framework. We implement in this controller a way to choose a leader, receive commands from the leader and give commands to followers. This should enable the zombies to form groups and work together to achieve goals that are too difficult for a lone zombie. This controller consists of two main parts: the LeaderChooser and the StrategyChooser.
 
-Zombies with a small amount of followers (direct and indirect) will have a higher likelihood of following a leader, because on it's own, the group can't achieve much. Zombies with a large amount of followers have a better chance of surviving on their own, they are more likely to desert.
+\subsection{Choosing a leader}
+About every second the LeaderChooser decides whether the zombie is loyal and sticks with the same leader. If the zombie decides to ``desert'', he chooses another leader, this includes the option to choose himself as a leader. To choose another leader, all surrounding zombies are rated as potential leader, and the leader with the highest rating will be chosen, unless he considers himself a satisfactory leader.
 
-\subsection{Leading}
-A leader is a zombie that is not following anyone, he is at the root of a tree. A leader decides when to switch to what strategy. For this decision he can take into account his amount of followers and the position of his followers, vikings, and other items on the map. Larger groups can try more complex strategies, like ``ambush'', while smaller groups (including lone zombies) should stick to simple strategies like ``wander''.
+For these three decisions the following statistics are available:
+\begin{description}
+ \item [My followerCount] The number of direct and indirect followers of the zombie
+ \item [His followerCount] The number of direct and indirect followers of the potential leader
+ \item [My groupSize] The total number of zombies in the hierarchy (size of the tree)
+ \item [Satisfaction] Personal satisfaction with the current situation (see section~\ref{sec:satisfaction})
+ \item [Satisfaction level] Average satisfaction of all direct and indirect followers of the potential leader (see section~\ref{sec:satisfaction})
+\end{description}
+This can be extended with for example:
+\begin{description}
+ \item [My health] Health of the zombie
+ \item [His health] Health of the potential leader
+ \item [Danger] Approximation of the danger level, based on the surrounding light, vikings and zombies
+\end{description}
+
+\subsubsection{Decision tree and KNN}
+For the loyalty check and the decision whether to become a leader without even searching a decision tree can be implemented based on these parameters. Since all parameters can be considered continuous for this purpose, this will cause some overhead in building the tree, in order to find the position where a split results in maximum gain of information.
+
+However, for the rating of potential leader a decision tree is less appropriate. We would like to receive a continuous variable as rating. A decision tree that takes a list (of variable length) of potential leaders and returns the best choice does not seem possible, it would no longer be a single tree, since the number of attributes is variable.
+
+A nearest neighbour approach will cope better with continuous attributes, but gives the same problems for rating potential leaders as the decision tree has.
+
+Building a decision tree is very slow compared to adding learned data to a KNN classifier. Classification in a KNN classifier is very slow compared to classification in a decision tree. Since we plan to do the majority of the learning before the actual gameplay, and mainly classify during the gameplay, the decision tree seems to be the better option of the two considering running time.
+
+\subsubsection{Neural network}
+Neural networks know many variations. Some of them seems well suited for our leader ranking problem.
+%TODO
+
+\subsubsection{Proposed solution}
+We propose to implement two decision trees, one for the loyalty check, and one for deciding whether or not to become a leader oneself. These are simple ``yes/no'' questions.
+
+Ranking should be done only on the leaders that pass a projected loyalty check, i.e., the loyalty decision tree is used on a set of attributes with values as if the potential leader was already chosen as leader. This prevents the ranking and loyalty check from disagreeing. All leaders that remain can be ranked, ideally by a neural network, but we don't expect a large difference from randomly choosing one. Certainly in our initial efforts we will use a very simple approach for this final ranking.
+
+\subsubsection{Implemented solution}
+Since we were unable to generate any meaningful learning data (see section~\ref{sec:learning_data}) we stuck to our temporal ``rule of thumb'' formulas that we used while testing. This worked better than we expected, for the simple strategies. When more complicated strategies would be implemented the groups formed by our implementation of the LeaderChooser may not be good enough any more.
+
+\subsection{Choosing a strategy}
+Since we expected to have very little time and resources to implement a proper AI for tactical decisions, we wanted to create a framework that allowed for both manually programmed tactics as well as AI controlled tactics. We achieved this by using strategies. Each strategy gives a specific action for the zombie in question, and a new strategy for each of his followers to apply. Initially the decision of that action and set of strategies can be pre-programmed in a couple of different ways resulting in a couple of different strategies. Later, we can implement strategies that use different AI techniques to determine the best actions and set of strategies for the given circumstances.
+
+Every zombie with a leader will now receive orders, but the zombies without orders (mainly the leaders, but also zombies that just joined a group) should find a strategy to apply on their own. For this purpose we have a StrategyChooser. A strategy chooser can use a decision tree to choose the best strategy for the situation.
+
+However, in our situation after we had our game in a state that we could start testing and implementing different strategies, there was no time left to implement multiple main strategies. So the StrategyChooser was implemented such that it would always choose the single strategy that was appropriate in the situation: ``LeaderControlledAggro'' if the zombie is a leader, and ``Follow Leader'' if the zombie was a followers without orders.
 
 \subsection{Strategies}
-In order to execute a strategy, zombies can perform actions and commands them selves, but more complex strategies require teamwork. A zombies that has followers can give orders to his direct followers. This can be ``follow me'', be he can also give each of his followers a specific strategy to execute. A zombie with three followers can give the orders ``hide at $X$'', ``hide at $Y$'' and ``follow me'' in order to execute his own strategy ``ambush''.
+The strategies we implemented are
+\begin{description}
+ \item [LeaderControllerAggro] The one applying this strategy wanders and attacks vikings when they get within a given range. He gives his followers commands to stay relatively close to him, and attack the same target he is attacking.
+ \item [Follow] The zombie applying this strategy follows the given character.
+ \item [Wander] The zombie applying this strategy almost randomly walks around. It keeps walking in generally the same direction as the previous action.
+ \item [Attack] If the given target is in range, the zombie applying this strategy attacks him, otherwise he moves towards the position of the target.
+\end{description}
 
-\subsection{Scoring}
+\subsubsection{Satisfaction}
+\label{sec:satisfaction}
+A zombie following orders judges his orders and gives each order a number expressing his satisfaction/dissatisfaction with the orders. Apart from deserting, this is the only option for the followers to react to the orders. Since the overall satisfaction of a group is taken into account while rating a potential leader, it should be advantageous for a leader to keep his followers satisfied.
+
+The way this satisfaction number should be calculated is still unclear. This is a similar problem to rating potential leaders: it requires a continuous number a output. As with that problem, the actual implementation does not really make a difference at the stage our game is currently in. We used a satisfaction of $0$ for every order, signifying no change in satisfaction with the leaders choices. So long we have only one or possible two strategies available, this is will not have a negative result on our zombie behaviour.
+
+\subsection{Learning data}
+\label{sec:learning_data}
+\subsubsection{Overall scoring}
 Since we have only one type of zombie each game, we can score the AI based on the results of a game. This scoring function depends on the number of zombies killed, the time it took for the vikings to reach their goal, the damage done to the vikings, and possibly more.
 
 We can make some simple training games where no user action is required. For example a game where the goal of the vikings is to walk to a location. This way we can disable user input and output and speed up the game massively so that we can simulate a large amount of games to give the zombies a basic training.
 
-With different of these zombie training levels, we train zombies for the different types of missions, and with different levels of intelligence. If time allows we can use different types of zombies with a similar score in a single game. During the game we can alter the likelihood of spawning a particular type of zombie based on a ``kill/death''-like ratio for that type. If we would be able to collect enough data from real games, we could even try to use that information to predict what zombie types will be effective against a given player.
+With different of these zombie training levels, we train zombies for the different types of missions, and with different levels of intelligence. If time allows we can use different types of zombies with a similar score in a single mission. During the mission we can alter the likelihood of spawning a particular type of zombie based on a ``kill/death''-like ratio for that type. If we would be able to collect enough data from real games, we could even try to use that information to predict what zombie types will be effective against a given player.
+
+\subsubsection{Training data for specific decisions}
+For the loyalty checks, deciding to become a leader and deciding upon a strategy to apply, we need training data that maps a set of attributes (like groupsize, followerCount, satisfaction level, etc) to the best option. It is very hard to find out what is the best option for each specific situation. The results of the decision only become apparent later, and those results are not solely the result of that single decision. We are forced to use an approximation. A given time after the decision is made, or if before that, the decision is undone (e.g. the zombie deserted again), the situation of the zombie is assessed. If it's better than at the time the decision was made, it was the right decision, if not, then it was the wrong decision. This assessment should be based on the variables that were most affected by the decision.
+
+\subsubsection{Implementation}
+%TODO
+We did not implement any mechanic to collect training data or to rate our zombies.
+
+Since we were unable to implement missions in our game within the time restrictions, we could not implement or even use an overall scoring.
+
+Most of all, after the relevant game mechanics were completely implemented, there was no time left for implementing the collection of training data.
 
 \FloatBarrier

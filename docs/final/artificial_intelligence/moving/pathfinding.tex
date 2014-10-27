@@ -6,7 +6,7 @@ Simply having a map with float co-ordinates makes path finding very difficult du
 
 \subsubsection{Eight-Directional Path Finding on a Grid}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/diagonal_moves.pdf}
+\includegraphics[width=0.30\textwidth]{images/diagonal_moves.pdf}
 \caption{Diagonal movement}
 \label{fig:diag_move}
 \end{wrapfigure}
@@ -45,7 +45,7 @@ In each heuristic formula, we will refer to the coordinates as $x_i$ and $y_i$ f
 \paragraph{Euclidean}
 \label{sec:euclidean}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/euclidean_unit.pdf}
+\includegraphics[width=0.30\textwidth]{images/euclidean_unit.pdf}
 \caption{Euclidean distance shape}
 \end{wrapfigure}
 Our first heuristic, and the one we have used in our system, is the Euclidean distance. Euclidean distance is given by $\sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}$. We went for this heuristic, as it conforms with our ideals of movement, using any direction.
@@ -66,7 +66,7 @@ float sqrtApprox(float value) {
 
 \paragraph{Manhattan}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/manhattan_unit.pdf}
+%\includegraphics[width=0.30\textwidth]{../images/manhattan_unit.pdf}
 \caption{Manhattan distance shape}
 \end{wrapfigure}
 The second heuristic we considered is the Manhattan distance. Manhattan distance is given by $\lvert x_1 - x_2 \rvert + \lvert y_1 - y_2 \rvert$. In the simulations we looked at, this heuristic typically had the fastest results. 
@@ -76,7 +76,7 @@ The problem that arose with this was that our path-finding also considers diagon
 \paragraph{Chebyshev}
 \label{sec:chebyshev}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/chebyshev_unit.pdf}
+\includegraphics[width=0.30\textwidth]{images/chebyshev_unit.pdf}
 \caption{Chebyshev distance shape}
 \end{wrapfigure}
 To complete the triad of distance heuristics, we also considered Chebyshev distance as our third option. Chebyshev distance is given by $max(\lvert x_1 - x_2 \rvert, \lvert y_1 - y_2 \rvert)$. Like Manhattan distance, this heuristic worked fast and well in the simulations we looked at, though it was slightly below Manhattan in performance.
@@ -87,7 +87,7 @@ There is a benefit to this heuristic in the shape it forms. The square shape con
 
 \paragraph{Diagonal Manhattan}
 \begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{../images/diagonal_manhattan_unit.pdf}
+\includegraphics[width=0.30\textwidth]{images/diagonal_manhattan_unit.pdf}
 \caption{Diagonal Manhattan distance shape}
 \end{wrapfigure}
 Diagonal Manhattan distance is our own hybrid between between Manhattan and Chebyshev distance. The distance is given by $max(\lvert x_1 - x_2 \rvert, \lvert y_1 - y_2 \rvert) + min(\lvert x_1 - x_2 \rvert, \lvert y_1 - y_2 \rvert) * (\sqrt{2} - 1)$. What this formula does is add the diagonal distance, as per Euclidean calculation, to the remaining Manhattan distance in one straight line. In essence, we take Chebyshev distance, and multiply it by the Euclidean distance for a single diagonal move, excluding the remaining purely horizontal or vertical distance. The calculation comes from taking the whole Chebyshev distance, considered as a straight line, and add the distance that actually needs to be diagonal to the total, scaled by the difference in distance between two horizontally or vertically adjacent cells, and the distance between two diagonally adjacent cells.
