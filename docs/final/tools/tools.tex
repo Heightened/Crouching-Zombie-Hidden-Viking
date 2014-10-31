@@ -1,0 +1,11 @@
+\chapter{Tools}
+Several tools are used to help develop the game, either to help development or to increase the quality of the final game. Most of these tools are developed by external parties but one was developed for this particular game. This chapter will describe the tool which was developed alongside the game: the level editor.
+
+\section{Level Editor}
+The game features an open space for the players to navigate; part of the challenge of building this space was figuring out how to fill it with objects in a realistic and challenging way. Early in development certain random elements were combined to form a plausible scene without requiring user input, this worked well but resulted in very haphazard maps. To solve this problem user intervention was needed when the maps were built. A tool which allows users to do this is generally called a level editor. Although the level editor supports all functionality described here, it was not used to its fullest extent in the final game code.
+
+\subsection{Function}
+The level editor is a program very similar to the normal game at first glance, but lacks the fundamentals of the game: the gameplay. Instead the level editor sports a small external window which allows direct modification of the game world, something which is impossible in the normal game. For instance, a user of the level editor may select or add any world object at any time and change its position, rotation, scale or any other object-specific variables.
+
+\subsection{Level files}
+The Level Editor and the game are still different programs, and a method is needed to transfer data about the world from the editor to the game. Of course using files is the best option, but which file format? Developing a custom format is not very difficult, but is inflexible and time consuming. The choice went to XML for it's object-oriented structure and readability, so it matches the object oriented structure of the program and is easy to debug. To convert a series of world objects to an XML file a parser is used which can convert any java class to XML via java reflection, a method to explore the structure and contents of a java class at runtime. In essence this setup transfers java object instances from one program to another, which is as flexible as it sounds.
