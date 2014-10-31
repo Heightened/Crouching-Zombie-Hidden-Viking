@@ -24,31 +24,39 @@ Instead, we just applied fleeing behaviour towards the solid cells. The weight o
 Group arrival will be done slightly differently from the arrival of singular units. First of all, when a group of units get to their goal, they do not adjust to the exact position. Instead of adjusting or trying to get into once cell together, they all flock to the center of the cell until they are within a radius from it, based on the group size. 
 
 \subsubsection{The Scooping Problem}
-\begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{images/clear_path1.pdf}
+\begin{figure}
+\centering
+\begin{subfigure}{0.4\textwidth}
+\includegraphics[width=0.9\textwidth]{images/clear_path1.pdf}
 \caption{A clear and open path}
 \label{fig:clear_path}
-\end{wrapfigure} 
-\begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{images/scoop_path1.pdf}
+\end{subfigure}%
+%
+\begin{subfigure}{0.4\textwidth}
+\includegraphics[width=0.9\textwidth]{images/scoop_path1.pdf}
 \caption{The scooping problem}
 \label{fig:scoop_path}
-\end{wrapfigure} 
+\end{subfigure}
+\end{figure}
 Since flocking allows groups to move together, we do not want to force all members of a group to first get into a cell before moving to the next one. Instead, we just let them flock to within a radius of the target cell, its travel radius, then they move on to the next. This creates a problem when a group encounters the start of a wall. The units have to walk on one side of the wall to reach their final destination. The wall may scoop some of the group to the other side, because it is still within travel radius of their target cell.
 
 In order to fix this problem, determine the radii of the cells upon creation or loading of the map. These radii will be the distance from the center of the cell to the edge of the closest static obstacle. This allows groups to move very freely towards their goal in open fields, while making sure they correctly funnel into finer areas. Figure \ref{fig:clear_path} shows the freedom characters would have when steering along a path in an open area. Figure \ref{fig:scoop_path} shows how the movements of characters becomes more regulated when a case of the scooping problem occurs. Characters have to move along the end of the wall before they may consider the cells on the other side of the wall their targets.
 
+\FloatBarrier
 \subsubsection{Wall Hugging Slowdown}
 \label{sec:extra_weight}
-\begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{images/obst_path1.pdf}
+\begin{figure}
+\centering
+\begin{subfigure}{0.40\textwidth}
+\includegraphics[width=0.90\textwidth]{images/obst_path1.pdf}
 \caption{A bad path for groups}
-\end{wrapfigure} 
-Another problem is what we like to call ``wall hugging slowdown'', which is explained here. The solution for this has not been implemented into the game yet, as current group travel behaviour quickly converges to a line alongside time constraints.
-\begin{wrapfigure}{r}{0.30\textwidth}
-\includegraphics[width=0.30\textwidth]{images/obst_path2.pdf}
+\end{subfigure}%
+\begin{subfigure}{0.40\textwidth}
+\includegraphics[width=0.90\textwidth]{images/obst_path2.pdf}
 \caption{A better path for groups}
-\end{wrapfigure} 
+\end{subfigure}
+\end{figure}
+Another problem is what we like to call ``wall hugging slowdown'', which is explained here. The solution for this has not been implemented into the game yet, as current group travel behaviour quickly converges to a line alongside time constraints.
 
 A problem that arises with steered movement is that moving along a wall gets slower. The initial slowdown comes from the unit pushing a bit into the wall as it moves along, if the wall is not smooth. A group also cannot take enough space to move in at the wall side. The solution for the scooping problem worsens this, as the radii for cells next to a wall are very small. We solve these problems at once by increasing the weight of cells, depending on their travel radii and the group size. The weight of cells at least the radius of the group away should be uninfluenced. From the group radius up to the cells adjacent to obstacles, the weight should increase at a faster-than-linear rate. We will determine the weight influence based on the following formula:
 $$f(r_g, r_t) = \left\{\begin{array}{l l}

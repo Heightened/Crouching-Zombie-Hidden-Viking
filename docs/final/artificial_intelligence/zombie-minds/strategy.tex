@@ -14,7 +14,9 @@ Additionally we wanted each zombie to be autonomous. We don't want to pre-progra
 \end{comment}
 
 \subsection{Autonomic zombies}
-Each zombie is controlled by its own controller, in accordance to our MVC framework. We implement in this controller a way to choose a leader, receive commands from the leader and give commands to followers. This should enable the zombies to form groups and work together to achieve goals that are too difficult for a lone zombie. This controller consists of two main parts: the LeaderChooser and the StrategyChooser.
+Each zombie is controlled by its own controller, in accordance to our MVC framework. All controllers are placed in a queue. A number of threads (currently $10$) takes a controller form the queue and gives it the chance to push actions to the game. After that, the controller is put back at the queue. This way, we run all of our AI controllers concurrently, without a massive amount of thread the would only slow it down.
+
+We implement in this controller a way to choose a leader, receive commands from the leader and give commands to followers. This should enable the zombies to form groups and work together to achieve goals that are too difficult for a lone zombie. This controller consists of two main parts: the LeaderChooser and the StrategyChooser.
 
 \subsection{Choosing a leader}
 About every second the LeaderChooser decides whether the zombie is loyal and sticks with the same leader. If the zombie decides to ``desert'', he chooses another leader, this includes the option to choose himself as a leader. To choose another leader, all surrounding zombies are rated as potential leader, and the leader with the highest rating will be chosen, unless he considers himself a satisfactory leader.
@@ -44,13 +46,12 @@ A nearest neighbour approach will cope better with continuous attributes, but gi
 Building a decision tree is very slow compared to adding learned data to a KNN classifier. Classification in a KNN classifier is very slow compared to classification in a decision tree. Since we plan to do the majority of the learning before the actual gameplay, and mainly classify during the gameplay, the decision tree seems to be the better option of the two considering running time.
 
 \subsubsection{Neural network}
-Neural networks know many variations. Some of them seems well suited for our leader ranking problem.
-%TODO
+Neural networks know many variations. Some of them seems well suited for our leader ranking problem, given that we can generate proper feedback so that the network can learn. We expect this to be very difficult and because of that we did not invest much time in researching the possibilities of neural networks.
 
 \subsubsection{Proposed solution}
 We propose to implement two decision trees, one for the loyalty check, and one for deciding whether or not to become a leader oneself. These are simple ``yes/no'' questions.
 
-Ranking should be done only on the leaders that pass a projected loyalty check, i.e., the loyalty decision tree is used on a set of attributes with values as if the potential leader was already chosen as leader. This prevents the ranking and loyalty check from disagreeing. All leaders that remain can be ranked, ideally by a neural network, but we don't expect a large difference from randomly choosing one. Certainly in our initial efforts we will use a very simple approach for this final ranking.
+Ranking should be done only on the leaders that pass a projected loyalty check, i.e., the loyalty decision tree is used on a set of attributes with values as if the potential leader was already chosen as leader. This prevents the ranking and loyalty check from disagreeing. All potential leaders that remain can be ranked, possibly by a something like a neural network, but we don't expect a large difference from randomly choosing one. Since it would require a lot of time to implement one of the possible AI approaches to this problem, with only a marginal improvement in zombie behaviour, we will initially use a very simple approach for this final ranking.
 
 \subsubsection{Implemented solution}
 Since we were unable to generate any meaningful learning data (see section~\ref{sec:learning_data}) we stuck to our temporal ``rule of thumb'' formulas that we used while testing. This worked better than we expected, for the simple strategies. When more complicated strategies would be implemented the groups formed by our implementation of the LeaderChooser may not be good enough any more.
@@ -75,7 +76,7 @@ The strategies we implemented are
 \label{sec:satisfaction}
 A zombie following orders judges his orders and gives each order a number expressing his satisfaction/dissatisfaction with the orders. Apart from deserting, this is the only option for the followers to react to the orders. Since the overall satisfaction of a group is taken into account while rating a potential leader, it should be advantageous for a leader to keep his followers satisfied.
 
-The way this satisfaction number should be calculated is still unclear. This is a similar problem to rating potential leaders: it requires a continuous number a output. As with that problem, the actual implementation does not really make a difference at the stage our game is currently in. We used a satisfaction of $0$ for every order, signifying no change in satisfaction with the leaders choices. So long we have only one or possible two strategies available, this is will not have a negative result on our zombie behaviour.
+The way this satisfaction number should be calculated is still unclear. This is a similar problem to rating potential leaders: it requires a continuous number a output. As with that problem, the actual implementation does not really make a difference at the stage our game is currently in. We used a satisfaction of $0$ for every order, signifying no change in satisfaction with the leader's choices. So long we have only one or possible two strategies available, this is will not have a negative result on our zombie behaviour.
 
 \subsection{Learning data}
 \label{sec:learning_data}

@@ -5,13 +5,14 @@ In the area of path finding we encounter a few problems due to the desired game 
 Simply having a map with float co-ordinates makes path finding very difficult due to the endless possibility space. To work with this we put a grid over the map, such that the integer part of a float co-ordinate indexes a cell. This allows us to use graph-based algorithms. Once a unit is in the desired cell, the accuracy of the float number can then fine tune its position.
 
 \subsubsection{Eight-Directional Path Finding on a Grid}
+
+Solid, static obstacles on the map will have their cells marked, such that path finding is disallowed using these cells to pass through. We will allow diagonal steps in our paths, for more smooth movement, this does however bring a restriction. A diagonally adjacent cell is only considered a neighbour of the current cell if both cells directly adjacent to the target cell and the current cell are not obstacles.
+
 \begin{wrapfigure}{r}{0.30\textwidth}
 \includegraphics[width=0.30\textwidth]{images/diagonal_moves.pdf}
 \caption{Diagonal movement}
 \label{fig:diag_move}
 \end{wrapfigure}
-
-Solid, static obstacles on the map will have their cells marked, such that path finding is disallowed using these cells to pass through. We will allow diagonal steps in our paths, for more smooth movement, this does however bring a restriction. A diagonally adjacent cell is only considered a neighbour of the current cell if both cells directly adjacent to the target cell and the current cell are not obstacles. 
 
 In figure \ref{fig:diag_move}, we see a current cell $C$ and a target cell $T$ in various situations. The upper left shows the neutral situation, all cells other than $C$ are white, meaning that $C$ can reach all of these cells in one step. In the upper right, we see an obstruction in the upper right corner, marked as black. The obstruction cannot be moved to, but since it is not directly adjacent to $C$, it does not hinder $C$ from going to $T$ (or the other way around). In the lower left image we see a situation of a square that is directly adjacent to both $C$ and $T$, this one prevents $C$ from directly stepping to $T$, as marked grey. Lastly, we get the situation that both adjacent cells are an obstruction, for completeness.
 
@@ -64,9 +65,10 @@ float sqrtApprox(float value) {
 }
 \end{lstlisting}
 
+\clearpage
 \paragraph{Manhattan}
 \begin{wrapfigure}{r}{0.30\textwidth}
-%\includegraphics[width=0.30\textwidth]{../images/manhattan_unit.pdf}
+\includegraphics[width=0.30\textwidth]{images/manhattan_unit.pdf}
 \caption{Manhattan distance shape}
 \end{wrapfigure}
 The second heuristic we considered is the Manhattan distance. Manhattan distance is given by $\lvert x_1 - x_2 \rvert + \lvert y_1 - y_2 \rvert$. In the simulations we looked at, this heuristic typically had the fastest results. 
@@ -85,6 +87,7 @@ The main problem with this heuristic is that the diagonal movement, once again, 
 
 There is a benefit to this heuristic in the shape it forms. The square shape conforms to the shape of the grid, which means we can possibly apply it to other areas. We have applied this heuristic for a different purpose in section \ref{sec:solid_cells}.
 
+\clearpage
 \paragraph{Diagonal Manhattan}
 \begin{wrapfigure}{r}{0.30\textwidth}
 \includegraphics[width=0.30\textwidth]{images/diagonal_manhattan_unit.pdf}
